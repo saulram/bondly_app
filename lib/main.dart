@@ -34,7 +34,6 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> initAppModel() async {
     appModel = getIt<AppModel>();
-    appModel.onAppStart();
   }
 
   @override
