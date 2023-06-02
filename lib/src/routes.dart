@@ -5,9 +5,6 @@ import 'package:go_router/go_router.dart';
 
 class AppRouter {
   GoRouter get router => _router;
-
-
-
   // GoRouter configuration
   final _router = GoRouter(
     initialLocation: '/',

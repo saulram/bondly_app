@@ -5,13 +5,21 @@ import 'package:bondly_app/src/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 Future<void> main() async {
+  //we make sure that the WidgetsBinding is initialized before we initialize the DependencyManager
   WidgetsFlutterBinding.ensureInitialized();
+  // Here we initialize the DependencyManager
   await DependencyManager().initialize();
+  // Here we make sure that the AppModel is ready before we continue
   await getIt.isReady<AppModel>();
+  // Here we make sure that all the models are ready before we continue
   await getIt.allReady();
-
+  // Here we set the URL strategy for our web app.
+  // It is safe to call this function when running on mobile or desktop as well.
+  setPathUrlStrategy();
+  // Here we run the app
   runApp(const MyApp());
 }
 
