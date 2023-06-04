@@ -1,5 +1,5 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
-import 'package:bondly_app/domain/viewmodels/app_viewmodel.dart';
+import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

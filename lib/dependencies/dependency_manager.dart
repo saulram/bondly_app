@@ -1,5 +1,5 @@
-import 'package:bondly_app/domain/viewmodels/app_viewmodel.dart';
-import 'package:bondly_app/domain/viewmodels/base_model.dart';
+import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/src/routes.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +13,6 @@ class DependencyManager {
   }
 
   void provideModels() {
-
     getIt.registerSingleton<AppRouter>(AppRouter());
     getIt.registerSingleton<NavigationModel>(NavigationModel());
     getIt.registerSingletonAsync<SharedPreferences>(
@@ -21,8 +20,6 @@ class DependencyManager {
     getIt.registerSingletonWithDependencies<AppModel>(
         () => AppModel(getIt<SharedPreferences>()),
         dependsOn: [SharedPreferences]);
-
-
   }
 
   Future<void> dispose() async {

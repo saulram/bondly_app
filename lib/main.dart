@@ -1,10 +1,8 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
-import 'package:bondly_app/domain/viewmodels/app_viewmodel.dart';
-import 'package:bondly_app/domain/viewmodels/base_model.dart';
+import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/src/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 Future<void> main() async {
