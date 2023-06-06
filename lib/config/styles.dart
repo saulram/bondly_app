@@ -25,7 +25,7 @@ class AppStyles {
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(0.dp),
     ),
-    minimumSize: Size.fromHeight(40.dp)
+    minimumSize: Size.fromHeight(48.dp)
   );
 
   static ButtonStyle transparentButtonStyle = ElevatedButton.styleFrom(

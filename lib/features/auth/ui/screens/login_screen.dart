@@ -1,14 +1,18 @@
+import 'package:bondly_app/features/auth/ui/viewmodels/login_ui_state.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_view_model.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/extensions/device_scale.dart';
 import 'package:bondly_app/config/constants.dart';
 import 'package:bondly_app/config/strings_login.dart';
 import 'package:bondly_app/config/styles.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final LoginViewModel model;
+
+  const LoginScreen(this.model, {Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -16,7 +20,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final String _logoImagePath = "assets/img_logo.png";
-  final LoginViewModel _model = LoginViewModel();
 
   @override
   void didChangeDependencies() {
@@ -29,36 +32,48 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: ModelProvider<LoginViewModel>(
-        model: _model,
+        model: widget.model,
         child: ModelBuilder<LoginViewModel>(
           builder: (context, model, child) {
             var screenWidth = MediaQuery.of(context).size.width > Constants.mobileBreakpoint ?
                 Constants.boxedCenteredContentWidth : MediaQuery.of(context).size.width;
-            return Container(
-              margin: EdgeInsets.only(top: 64.dp),
-              height: MediaQuery.of(context).size.height,
-              alignment: Alignment.center,
-              child: SizedBox(
-                width: screenWidth,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _buildLogo(),
-                      _buildWelcomeMessage(),
-                      _buildForm(),
-                      _buildActions()
-                    ],
-                  ),
-                ),
-              ),
-            );
+            switch (model.state) {
+              case LoadingLogin _:
+                return const Center(child: CupertinoActivityIndicator());
+              case SuccessLogin _:
+                return Container();
+              case FailureLogin error:
+              default:
+                return _buildLoginView(screenWidth);
+            }
           }
         ),
       )
     );
   }
+
+  Widget _buildLoginView(double screenWidth) {
+    return Container(
+      margin: EdgeInsets.only(top: 64.dp),
+      height: MediaQuery.of(context).size.height,
+      alignment: Alignment.center,
+      child: SizedBox(
+        width: screenWidth,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildLogo(),
+              _buildWelcomeMessage(),
+              _buildForm(),
+              _buildActions()
+            ],
+          ),
+        ),
+      ),
+    );
+}
 
   Widget _buildLogo() {
     return Container(
@@ -138,8 +153,8 @@ class _LoginScreenState extends State<LoginScreen> {
             right: 48.dp
           ),
           child: FilledButton(
-            onPressed: () { print("Enter pressed");
-              _model.login();
+            onPressed: () {
+              widget.model.onLoginAction();
             },
             style: AppStyles.primaryButtonStyle,
             child: Text(
