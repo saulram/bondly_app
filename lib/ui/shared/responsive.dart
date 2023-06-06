@@ -1,4 +1,4 @@
-import 'package:bondly_app/resources/constants.dart';
+import 'package:bondly_app/config/constants.dart';
 import 'package:flutter/material.dart';
 
 ///  Responsive widget

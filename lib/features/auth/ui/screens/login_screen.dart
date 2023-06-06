@@ -1,9 +1,9 @@
 import 'package:bondly_app/features/auth/ui/viewmodels/login_view_model.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/extensions/device_scale.dart';
-import 'package:bondly_app/resources/constants.dart';
-import 'package:bondly_app/resources/strings_login.dart';
-import 'package:bondly_app/resources/styles.dart';
+import 'package:bondly_app/config/constants.dart';
+import 'package:bondly_app/config/strings_login.dart';
+import 'package:bondly_app/config/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -32,12 +32,14 @@ class _LoginScreenState extends State<LoginScreen> {
         model: _model,
         child: ModelBuilder<LoginViewModel>(
           builder: (context, model, child) {
+            var screenWidth = MediaQuery.of(context).size.width > Constants.mobileBreakpoint ?
+                Constants.boxedCenteredContentWidth : MediaQuery.of(context).size.width;
             return Container(
               margin: EdgeInsets.only(top: 64.dp),
               height: MediaQuery.of(context).size.height,
               alignment: Alignment.center,
               child: SizedBox(
-                width: MediaQuery.of(context).size.width > Constants.mobileBreakpoint ?  Constants.boxedCenteredContentWidth : MediaQuery.of(context).size.width,
+                width: screenWidth,
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -76,7 +78,9 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       child: Text(
         LoginStrings.welcomeMessage,
-        style: AppStyles.baseTextStyle,
+        style: AppStyles.baseTextStyle.copyWith(
+          fontSize: 18
+        ),
       ),
     );
   }
@@ -90,10 +94,13 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         children: [
           TextFormField(
-            decoration: const InputDecoration(
-              label: Text(LoginStrings.username),
-              prefixIcon: Icon(Icons.person),
-              border: OutlineInputBorder()
+            decoration: InputDecoration(
+              label: Text(
+                LoginStrings.username,
+                style: AppStyles.baseTextStyle,
+              ),
+              prefixIcon: const Icon(Icons.person),
+              border: const OutlineInputBorder()
             ),
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
@@ -103,10 +110,13 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           SizedBox(height: 12.dp,),
           TextFormField(
-            decoration: const InputDecoration(
-              label: Text(LoginStrings.password),
-              prefixIcon: Icon(Icons.password),
-              border: OutlineInputBorder()
+            decoration: InputDecoration(
+              label: Text(
+                LoginStrings.password,
+                style: AppStyles.baseTextStyle,
+              ),
+              prefixIcon: const Icon(Icons.password),
+              border: const OutlineInputBorder()
             ),
             obscureText: true,
             enableSuggestions: false,
@@ -122,19 +132,20 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.only(top: 24.dp),
+          margin: EdgeInsets.only(
+            top: 24.dp,
+            left: 48.dp,
+            right: 48.dp
+          ),
           child: FilledButton(
             onPressed: () { print("Enter pressed");
               _model.login();
-              },
+            },
             style: AppStyles.primaryButtonStyle,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 48.dp),
-              child: Text(
-                LoginStrings.enter,
-                style: AppStyles.primaryButtonTextStyle,
-              ),
-            )
+            child: Text(
+              LoginStrings.enter,
+              style: AppStyles.primaryButtonTextStyle,
+            ),
           ),
         ),
         Container(
