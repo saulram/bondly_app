@@ -43,6 +43,8 @@ class AppTheme extends ChangeNotifier {
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
+
+      counterStyle: GoogleFonts.poppins(color: AppColors.bodyColorDark,fontWeight: FontWeight.w300),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: AppColors.bodyColorDark),
@@ -104,6 +106,7 @@ class AppTheme extends ChangeNotifier {
       labelSmall: GoogleFonts.montserrat(color: AppColors.bodyColor),
     ),
     inputDecorationTheme: InputDecorationTheme(
+    counterStyle: GoogleFonts.poppins(color: AppColors.bodyColor,fontWeight: FontWeight.w300),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: AppColors.primaryColorLight),
