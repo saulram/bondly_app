@@ -5,12 +5,11 @@ import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 
 class LoginViewModel extends NavigationModel {
-  final LoginUseCase _useCase;
+  final LoginUseCase _useCase = getIt<LoginUseCase>();
   final AppModel _appModel;
   LoginUIState? state;
 
   LoginViewModel(
-    this._useCase,
     this._appModel
   );
 

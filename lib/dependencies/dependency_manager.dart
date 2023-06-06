@@ -29,10 +29,9 @@ class DependencyManager {
 
     getIt.registerSingletonWithDependencies<LoginViewModel>(
         () => LoginViewModel(
-          getIt<LoginUseCase>(),
           getIt<AppModel>()
       ),
-      dependsOn: [LoginUseCase, AppModel]
+      dependsOn: [AppModel]
     );
   }
 
