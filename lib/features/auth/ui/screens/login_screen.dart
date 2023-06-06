@@ -35,16 +35,20 @@ class _LoginScreenState extends State<LoginScreen> {
             return Container(
               margin: EdgeInsets.only(top: 64.dp),
               height: MediaQuery.of(context).size.height,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _buildLogo(),
-                    _buildWelcomeMessage(),
-                    _buildForm(),
-                    _buildActions()
-                  ],
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width > Constants.mobileBreakpoint ?  Constants.boxedCenteredContentWidth : MediaQuery.of(context).size.width,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildLogo(),
+                      _buildWelcomeMessage(),
+                      _buildForm(),
+                      _buildActions()
+                    ],
+                  ),
                 ),
               ),
             );
@@ -120,7 +124,9 @@ class _LoginScreenState extends State<LoginScreen> {
         Container(
           margin: EdgeInsets.only(top: 24.dp),
           child: FilledButton(
-            onPressed: () { print("Enter pressed"); },
+            onPressed: () { print("Enter pressed");
+              _model.login();
+              },
             style: AppStyles.primaryButtonStyle,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 48.dp),
