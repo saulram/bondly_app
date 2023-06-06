@@ -19,7 +19,7 @@ class AppModel extends NavigationModel {
   bool get loginState => _loginState;
 
   set loginState(bool value) {
-    loginState = value;
+    _loginState = value;
     notifyListeners();
   }
 
