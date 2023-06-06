@@ -5,10 +5,10 @@ import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/extensions/device_scale.dart';
 import 'package:bondly_app/config/constants.dart';
 import 'package:bondly_app/config/strings_login.dart';
-import 'package:bondly_app/config/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
 class LoginScreen extends StatefulWidget {
   final LoginViewModel model;
@@ -21,6 +21,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final String _logoImagePath = "assets/img_logo.png";
+  final String _logoDarkImagePath = "assets/img_logo_dark.png";
 
   @override
   void didChangeDependencies() {
@@ -35,8 +36,10 @@ class _LoginScreenState extends State<LoginScreen> {
         model: widget.model,
         child: ModelBuilder<LoginViewModel>(
           builder: (context, model, child) {
-            var screenWidth = MediaQuery.of(context).size.width > Constants.mobileBreakpoint ?
-            Constants.boxedCenteredContentWidth : MediaQuery.of(context).size.width;
+            var screenWidth =
+            MediaQuery.of(context).size.width > Constants.mobileBreakpoint
+                ? Constants.boxedCenteredContentWidth
+                : MediaQuery.of(context).size.width;
             switch (model.state) {
               case LoadingLogin _:
                 return const Center(child: CupertinoActivityIndicator());
@@ -79,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLogo() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 36.dp),
-      child: Image.asset(_logoImagePath),
+      child: Image.asset(context.isDarkMode ? _logoDarkImagePath :_logoImagePath),
     );
   }
 
@@ -100,12 +103,12 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           TextFormField(
             decoration: InputDecoration(
-                label: Text(
-                  LoginStrings.username,
-                  style: context.themeData.textTheme.bodyMedium,
-                ),
-                prefixIcon: const Icon(Icons.person),
-                border: const OutlineInputBorder()),
+              label: Text(
+                LoginStrings.username,
+                style: context.themeData.textTheme.bodyMedium,
+              ),
+              prefixIcon: const Icon(Icons.person),
+            ),
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.digitsOnly
@@ -117,12 +120,12 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           TextFormField(
             decoration: InputDecoration(
-                label: Text(
-                  LoginStrings.password,
-                  style: context.themeData.textTheme.bodyMedium,
-                ),
-                prefixIcon: const Icon(Icons.password),
-                border: const OutlineInputBorder()),
+              label: Text(
+                LoginStrings.password,
+                style: context.themeData.textTheme.bodyMedium,
+              ),
+              prefixIcon: const Icon(Icons.password),
+            ),
             obscureText: true,
             enableSuggestions: false,
             autocorrect: false,
@@ -136,27 +139,21 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildActions() {
     return Column(
       children: [
-        Container(
-          margin: EdgeInsets.only(top: 24.dp, left: 48.dp, right: 48.dp),
-          child: FilledButton(
-            onPressed: () {
-              widget.model.onLoginAction();
-            },
-            style: AppStyles.primaryButtonStyle,
-            child: Text(
-              LoginStrings.enter,
-              style: AppStyles.primaryButtonTextStyle,
-            ),
+        FilledButton(
+          onPressed: () {
+            widget.model.onLoginAction();
+          },
+          child: const Text(
+            LoginStrings.enter,
           ),
         ),
         Container(
           margin: EdgeInsets.only(top: 8.dp),
           child: TextButton(
-            style: context.themeData.textButtonTheme.style,
             onPressed: () {
-              print("hola");
+              Logger().w("Forgot password pressed");
             },
-            child:const Text(
+            child: const Text(
               LoginStrings.forgotPassword,
             ),
           ),
