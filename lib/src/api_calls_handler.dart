@@ -113,7 +113,7 @@ class ApiCallsHandler extends CallsHandler {
 
   Future<http.Response> post(String path,
       {Map<String, dynamic>? data, Map<String, String>? extraHeaders}) async {
-    Uri gingerUri = _gingerUri(path);
+    Uri gingerUri = _bondlyUri(path);
 
     String payload = "";
     if (data != null) {
@@ -137,7 +137,7 @@ class ApiCallsHandler extends CallsHandler {
 
   Future<http.Response> get(String path,
       {Map<String, String>? params, Map<String, String>? extraHeaders}) async {
-    Uri gingerUri = _gingerUri(path, params: params);
+    Uri gingerUri = _bondlyUri(path, params: params);
 
     try {
       /// Log this request to LogEntries
@@ -155,7 +155,7 @@ class ApiCallsHandler extends CallsHandler {
 
   Future<http.Response> delete(String path,
       {Map<String, String>? params, Map<String, String>? extraHeaders}) async {
-    Uri gingerUri = _gingerUri(path, params: params);
+    Uri gingerUri = _bondlyUri(path, params: params);
 
     try {
       /// Log this request to LogEntries
@@ -171,8 +171,13 @@ class ApiCallsHandler extends CallsHandler {
     }
   }
 
-  Uri _gingerUri(String path, {Map<String, String>? params}) {
-    return Uri.parse(Environment.baseUrl)
-        .replace(path: _bookendSlash(path), queryParameters: params);
+  Uri _bondlyUri(String path, {Map<String, String>? params}) {
+    Uri _baseUri = Uri.parse(Environment.baseUrl);
+    String _basePath = _baseUri.path;
+    return Uri.parse(Environment.baseUrl).replace(
+      path: _bookendSlash(_basePath+path),
+      queryParameters: params,
+    );
+
   }
 }

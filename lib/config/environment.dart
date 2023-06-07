@@ -1,3 +1,3 @@
 class Environment {
-  static const String baseUrl = "http://api.bondly.mx/api/";
+  static const String baseUrl = "https://api.bondly.mx/api/";
 }
