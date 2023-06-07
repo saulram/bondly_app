@@ -1,3 +1,4 @@
+import 'package:bondly_app/ui/shared/app_scaffold.dart';
 import 'package:bondly_app/ui/shared/responsive.dart';
 import 'package:flutter/material.dart';
 
@@ -17,8 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //build Desktop Layout
   Widget _buildDesktopLayout() {
-    return Scaffold(
-      body: Center(
+    return AppScaffold(
+      isBusy: false,
+      child: Center(
         child: TextButton(
           child: const Text('Esto es home Desktop, user auth'),
           onPressed: () => print("go to root"),
@@ -29,8 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //build Tablet Layout
   Widget _buildTabletLayout() {
-    return Scaffold(
-      body: Center(
+    return AppScaffold.tabletLayout(
+      isBusy: false,
+      child: Center(
         child: TextButton(
           child: const Text('Esto es home Tablet, user auth'),
           onPressed: () => print("go to root"),
@@ -41,8 +44,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //build Mobile Layout
   Widget _buildMobileLayout() {
-    return Scaffold(
-      body: Center(
+    return AppScaffold.mobileLayout(
+      isBusy: false,
+      child: Center(
         child: TextButton(
           child: const Text('Esto es home Mobile, user auth'),
           onPressed: () => print("go to root"),
