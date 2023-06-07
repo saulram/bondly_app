@@ -20,6 +20,7 @@ class AppStyles {
   );
 
   // Buttons
+  @deprecated
   static ButtonStyle primaryButtonStyle = ElevatedButton.styleFrom(
     backgroundColor: AppColors.primaryButtonColor,
     shape: RoundedRectangleBorder(

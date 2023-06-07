@@ -1,13 +1,14 @@
 import 'package:bondly_app/features/auth/ui/viewmodels/login_ui_state.dart';
+import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_view_model.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/extensions/device_scale.dart';
 import 'package:bondly_app/config/constants.dart';
 import 'package:bondly_app/config/strings_login.dart';
-import 'package:bondly_app/config/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
 class LoginScreen extends StatefulWidget {
   final LoginViewModel model;
@@ -20,6 +21,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final String _logoImagePath = "assets/img_logo.png";
+  final String _logoDarkImagePath = "assets/img_logo_dark.png";
 
   @override
   void didChangeDependencies() {
@@ -30,13 +32,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: ModelProvider<LoginViewModel>(
         model: widget.model,
         child: ModelBuilder<LoginViewModel>(
           builder: (context, model, child) {
-            var screenWidth = MediaQuery.of(context).size.width > Constants.mobileBreakpoint ?
-                Constants.boxedCenteredContentWidth : MediaQuery.of(context).size.width;
+            var screenWidth =
+            MediaQuery.of(context).size.width > Constants.mobileBreakpoint
+                ? Constants.boxedCenteredContentWidth
+                : MediaQuery.of(context).size.width;
             switch (model.state) {
               case LoadingLogin _:
                 return const Center(child: CupertinoActivityIndicator());
@@ -51,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
       )
     );
   }
+
 
   Widget _buildLoginView(double screenWidth) {
     return Container(
@@ -78,44 +82,32 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLogo() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 36.dp),
-      child: Image.asset(
-          _logoImagePath
-      ),
+      child: Image.asset(context.isDarkMode ? _logoDarkImagePath :_logoImagePath),
     );
   }
 
   Widget _buildWelcomeMessage() {
     return Container(
-      margin: EdgeInsets.only(
-        top: 48.dp,
-        left: 24.dp,
-        right: 24.dp
-      ),
+      margin: EdgeInsets.only(top: 48.dp, left: 24.dp, right: 24.dp),
       child: Text(
         LoginStrings.welcomeMessage,
-        style: AppStyles.baseTextStyle.copyWith(
-          fontSize: 18
-        ),
+        style: context.themeData.textTheme.titleLarge,
       ),
     );
   }
 
   Widget _buildForm() {
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: 48.dp,
-        vertical: 36.dp
-      ),
+      margin: EdgeInsets.symmetric(horizontal: 48.dp, vertical: 36.dp),
       child: Column(
         children: [
           TextFormField(
             decoration: InputDecoration(
               label: Text(
                 LoginStrings.username,
-                style: AppStyles.baseTextStyle,
+                style: context.themeData.textTheme.bodyMedium,
               ),
               prefixIcon: const Icon(Icons.person),
-              border: const OutlineInputBorder()
             ),
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
@@ -123,15 +115,16 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
             maxLength: Constants.usernameMaxLength,
           ),
-          SizedBox(height: 12.dp,),
+          SizedBox(
+            height: 12.dp,
+          ),
           TextFormField(
             decoration: InputDecoration(
               label: Text(
                 LoginStrings.password,
-                style: AppStyles.baseTextStyle,
+                style: context.themeData.textTheme.bodyMedium,
               ),
               prefixIcon: const Icon(Icons.password),
-              border: const OutlineInputBorder()
             ),
             obscureText: true,
             enableSuggestions: false,
@@ -146,38 +139,26 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildActions() {
     return Column(
       children: [
-        Container(
-          margin: EdgeInsets.only(
-            top: 24.dp,
-            left: 48.dp,
-            right: 48.dp
-          ),
-          child: FilledButton(
-            onPressed: () {
-              widget.model.onLoginAction();
-            },
-            style: AppStyles.primaryButtonStyle,
-            child: Text(
-              LoginStrings.enter,
-              style: AppStyles.primaryButtonTextStyle,
-            ),
+        FilledButton(
+          onPressed: () {
+            widget.model.onLoginAction();
+          },
+          child: const Text(
+            LoginStrings.enter,
           ),
         ),
         Container(
-          margin: EdgeInsets.only(
-            top: 8.dp
-          ),
+          margin: EdgeInsets.only(top: 8.dp),
           child: TextButton(
-            onPressed: () { print("hola"); },
-            style: AppStyles.transparentButtonStyle,
-            child: Text(
+            onPressed: () {
+              Logger().w("Forgot password pressed");
+            },
+            child: const Text(
               LoginStrings.forgotPassword,
-              style: AppStyles.transparentButtonTextStyle,
             ),
           ),
         )
       ],
     );
   }
-
 }
