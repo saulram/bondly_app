@@ -6,5 +6,5 @@ class LoginStrings {
   static const String enter = "ENTRAR";
   static const String username = "USUARIO (No. de empleado)";
   static const String password = "CONTRASEÑA";
-  static const String required = "* Requerido";
+  static const String required = "* Este campo es requerido";
 }

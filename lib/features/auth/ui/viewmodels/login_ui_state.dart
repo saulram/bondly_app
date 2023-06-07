@@ -13,5 +13,6 @@ class FailureLogin extends LoginUIState {
 enum LoginErrorType {
   authError,
   connectionError,
+  invalidInputError,
   unknownError
 }

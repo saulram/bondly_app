@@ -23,6 +23,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final String _logoImagePath = "assets/img_logo.png";
   final String _logoDarkImagePath = "assets/img_logo_dark.png";
 
+  final userTextFieldController = TextEditingController();
+  final passwordTextFieldController = TextEditingController();
+
   @override
   void didChangeDependencies() {
     DeviceScale().currentDeviceHeight = MediaQuery.of(context).size.height;
@@ -46,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
               case SuccessLogin _:
                 return Container();
               case FailureLogin error:
+                return _buildLoginView(screenWidth, showErrors: true);
               default:
                 return _buildLoginView(screenWidth);
             }
@@ -56,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
 
-  Widget _buildLoginView(double screenWidth) {
+  Widget _buildLoginView(double screenWidth, {bool showErrors = false}) {
     return Container(
       margin: EdgeInsets.only(top: 64.dp),
       height: MediaQuery.of(context).size.height,
@@ -70,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               _buildLogo(),
               _buildWelcomeMessage(),
-              _buildForm(),
+              _buildForm(showErrors),
               _buildActions()
             ],
           ),
@@ -96,12 +100,13 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildForm() {
+  Widget _buildForm(bool showErrors) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 48.dp, vertical: 36.dp),
       child: Column(
         children: [
           TextFormField(
+            controller: userTextFieldController,
             decoration: InputDecoration(
               label: Text(
                 LoginStrings.username,
@@ -115,10 +120,16 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
             maxLength: Constants.usernameMaxLength,
           ),
-          SizedBox(
-            height: 12.dp,
-          ),
+          if (showErrors)
+            Container(
+              width: double.infinity,
+              margin: EdgeInsets.only(bottom: 12.dp),
+              child: const Text(LoginStrings.required),
+            )
+          else
+            SizedBox(height: 12.dp),
           TextFormField(
+            controller: passwordTextFieldController,
             decoration: InputDecoration(
               label: Text(
                 LoginStrings.password,
@@ -130,7 +141,12 @@ class _LoginScreenState extends State<LoginScreen> {
             enableSuggestions: false,
             autocorrect: false,
             maxLength: Constants.passwordMaxLength,
-          )
+          ),
+          if (showErrors)
+            const SizedBox(
+              width: double.infinity,
+              child: Text(LoginStrings.required),
+            ),
         ],
       ),
     );
@@ -141,7 +157,10 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         FilledButton(
           onPressed: () {
-            widget.model.onLoginAction();
+            widget.model.onLoginAction(
+              userTextFieldController.text,
+              passwordTextFieldController.text
+            );
           },
           child: const Text(
             LoginStrings.enter,
@@ -160,5 +179,12 @@ class _LoginScreenState extends State<LoginScreen> {
         )
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    userTextFieldController.dispose();
+    passwordTextFieldController.dispose();
+    super.dispose();
   }
 }

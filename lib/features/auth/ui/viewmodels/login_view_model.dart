@@ -1,8 +1,10 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/auth/domain/repositories/login_repository.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_use_case.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_ui_state.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
+import 'package:multiple_result/multiple_result.dart';
 
 class LoginViewModel extends NavigationModel {
   final LoginUseCase _useCase = getIt<LoginUseCase>();
@@ -13,16 +15,30 @@ class LoginViewModel extends NavigationModel {
     this._appModel
   );
 
-  Future<void> onLoginAction() async {
+  Future<void> onLoginAction(String user, String password) async {
     state = LoadingLogin();
     notifyListeners();
 
-    // Simulate a login
-    await Future.delayed(const Duration(seconds: 2));
-    _appModel.loginState = true;
+    final Result result = await _useCase.processLogin(user, password);
+    result.when(
+      (success) {
+        state = SuccessLogin();
+        _appModel.loginState = true;
+        notifyListeners();
 
-    state = SuccessLogin();
-    notifyListeners();
-    navigation.pushReplacement("/home");
+        navigation.pushReplacement("/home");
+      },
+      (error) {
+        var errorType = LoginErrorType.authError;
+        switch (error) {
+          case EmptyLoginFieldsException _: errorType = LoginErrorType.invalidInputError;
+          case InvalidLoginException _: errorType = LoginErrorType.authError;
+          case TooManyLoginAttemptsException _: errorType = LoginErrorType.authError;
+        }
+        state = FailureLogin(errorType);
+
+        notifyListeners();
+      }
+    );
   }
 }

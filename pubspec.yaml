@@ -43,6 +43,8 @@ dependencies:
   url_strategy: ^0.2.0
   multiple_result: ^5.0.0
   google_fonts: ^5.0.0
+  http: ^1.0.0
+  crypto: ^3.0.3
 
 dev_dependencies:
   flutter_test:
