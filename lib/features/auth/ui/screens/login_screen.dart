@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
               case SuccessLogin _:
                 return Container();
               case FailureLogin error:
-                return _buildLoginView(screenWidth, showErrors: true);
+                return _buildLoginView(screenWidth, errorType: error.errorType);
               default:
                 return _buildLoginView(screenWidth);
             }
@@ -59,8 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-
-  Widget _buildLoginView(double screenWidth, {bool showErrors = false}) {
+  Widget _buildLoginView(double screenWidth, {LoginErrorType? errorType}) {
     return Container(
       margin: EdgeInsets.only(top: 64.dp),
       height: MediaQuery.of(context).size.height,
@@ -74,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               _buildLogo(),
               _buildWelcomeMessage(),
-              _buildForm(showErrors),
+              _buildForm(errorType),
               _buildActions()
             ],
           ),
@@ -100,7 +99,20 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildForm(bool showErrors) {
+  Widget _buildForm(LoginErrorType? errorType) {
+    bool showInputError = errorType == LoginErrorType.invalidInputError;
+    String errorDescription;
+    switch (errorType) {
+      case LoginErrorType.authError:
+        errorDescription = LoginStrings.invalidCredentials;
+      case LoginErrorType.connectionError:
+        errorDescription = LoginStrings.connectionError;
+      case LoginErrorType.unknownError:
+        errorDescription = LoginStrings.unknownError;
+      default:
+        errorDescription = "";
+    }
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 48.dp, vertical: 36.dp),
       child: Column(
@@ -120,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
             maxLength: Constants.usernameMaxLength,
           ),
-          if (showErrors)
+          if (showInputError)
             Container(
               width: double.infinity,
               margin: EdgeInsets.only(bottom: 12.dp),
@@ -142,11 +154,19 @@ class _LoginScreenState extends State<LoginScreen> {
             autocorrect: false,
             maxLength: Constants.passwordMaxLength,
           ),
-          if (showErrors)
-            const SizedBox(
-              width: double.infinity,
-              child: Text(LoginStrings.required),
-            ),
+          if (showInputError)
+              const SizedBox(
+                width: double.infinity,
+                child: Text(LoginStrings.required),
+              )
+          else if (errorDescription != "")
+            Container(
+              margin: EdgeInsets.only(top: 16.dp),
+              child: Text(
+                errorDescription,
+                style: const TextStyle(color: Colors.red),
+              ),
+            )
         ],
       ),
     );
@@ -155,15 +175,19 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildActions() {
     return Column(
       children: [
-        FilledButton(
-          onPressed: () {
-            widget.model.onLoginAction(
-              userTextFieldController.text,
-              passwordTextFieldController.text
-            );
-          },
-          child: const Text(
-            LoginStrings.enter,
+        Container(
+          width: double.infinity,
+          margin: EdgeInsets.symmetric(horizontal: 48.dp),
+          child: FilledButton(
+            onPressed: () {
+              widget.model.onLoginAction(
+                  userTextFieldController.text,
+                  passwordTextFieldController.text
+              );
+            },
+            child: const Text(
+              LoginStrings.enter,
+            ),
           ),
         ),
         Container(

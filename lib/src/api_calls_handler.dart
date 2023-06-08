@@ -113,7 +113,7 @@ class ApiCallsHandler extends CallsHandler {
 
   Future<http.Response> post(String path,
       {Map<String, dynamic>? data, Map<String, String>? extraHeaders}) async {
-    Uri gingerUri = _bondlyUri(path);
+    Uri uri = _bondlyUri(path);
 
     String payload = "";
     if (data != null) {
@@ -122,9 +122,9 @@ class ApiCallsHandler extends CallsHandler {
 
     try {
       /// Log this request to LogEntries
-      logRequest(gingerUri.toString(), 'POST', payload);
+      logRequest(uri.toString(), 'POST', payload);
 
-      var response = await _client.post(gingerUri,
+      var response = await _client.post(uri,
           body: payload, headers: null);
       throwOnFailureCode(response);
       return response;
@@ -137,12 +137,12 @@ class ApiCallsHandler extends CallsHandler {
 
   Future<http.Response> get(String path,
       {Map<String, String>? params, Map<String, String>? extraHeaders}) async {
-    Uri gingerUri = _bondlyUri(path, params: params);
+    Uri uri = _bondlyUri(path, params: params);
 
     try {
       /// Log this request to LogEntries
-      logRequest(gingerUri.toString(), 'GET', params?.toString());
-      var response = await _client.get(gingerUri, headers: null);
+      logRequest(uri.toString(), 'GET', params?.toString());
+      var response = await _client.get(uri, headers: null);
       throwOnFailureCode(response);
 
       return response;
@@ -155,27 +155,27 @@ class ApiCallsHandler extends CallsHandler {
 
   Future<http.Response> delete(String path,
       {Map<String, String>? params, Map<String, String>? extraHeaders}) async {
-    Uri gingerUri = _bondlyUri(path, params: params);
+    Uri uri = _bondlyUri(path, params: params);
 
     try {
       /// Log this request to LogEntries
-      logRequest(gingerUri.toString(), 'DELETE', params?.toString());
+      logRequest(uri.toString(), 'DELETE', params?.toString());
 
-      var response = await _client.delete(gingerUri, headers: null);
+      var response = await _client.delete(uri, headers: null);
       throwOnFailureCode(response);
       return response;
     } on http.ClientException catch (e) {
       throw SocketException("ClientException has occurred: $e");
     } on IOException catch (e) {
-      throw SocketException("IOxception has occurred: $e");
+      throw SocketException("IOException has occurred: $e");
     }
   }
 
   Uri _bondlyUri(String path, {Map<String, String>? params}) {
-    Uri _baseUri = Uri.parse(Environment.baseUrl);
-    String _basePath = _baseUri.path;
+    Uri baseUri = Uri.parse(Environment.baseUrl);
+    String basePath = baseUri.path;
     return Uri.parse(Environment.baseUrl).replace(
-      path: _bookendSlash(_basePath+path),
+      path: _bookendSlash(basePath + path),
       queryParameters: params,
     );
 
