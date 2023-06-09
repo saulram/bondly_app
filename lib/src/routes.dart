@@ -1,4 +1,7 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
+import 'package:bondly_app/features/auth/ui/viewmodels/login_view_model.dart';
+import 'package:bondly_app/features/home/ui/home_screen.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -17,25 +20,13 @@ class AppRouter {
           routes: [
             GoRoute(
               path: 'login',
-              builder: (context, state) => Scaffold(
-                body: Center(
-                  child: TextButton(
-                    child: const Text('Esta es la pantalla de login'),
-                    onPressed: () => print("go to login"),
-                  ),
-                ),
-              ),
+              builder: (context, state) => LoginScreen(
+                getIt<LoginViewModel>()
+              )
             ),
             GoRoute(
               path: 'home',
-              builder: (context, state) => Scaffold(
-                body: Center(
-                  child: TextButton(
-                    child: const Text('Esto es home, user auth'),
-                    onPressed: () => print("go to root"),
-                  ),
-                ),
-              ),
+              builder: (context, state) => const HomeScreen()
             ),
           ]),
     ],
