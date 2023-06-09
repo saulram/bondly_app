@@ -13,7 +13,6 @@ class DefaultLoginRepository extends LoginRepository {
       await _authAPI.attemptLogin(user, password);
       return Result.success(true);
     } catch (exception) {
-      print(exception);
       return Result.error(InvalidLoginException());
     }
   }

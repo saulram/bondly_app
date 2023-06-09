@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import "dart:async";
 import "dart:convert";
 import 'dart:io' show SocketException, IOException;
@@ -7,13 +9,19 @@ import 'package:flutter/foundation.dart';
 import "package:http/http.dart" as http;
 import 'package:logger/logger.dart';
 
-
 const String jsonContentType = "application/json";
 const String formContentType = "application/x-www-form-urlencoded";
 
 class ServerErrorException implements Exception {}
 class ServiceNotFoundException implements Exception {}
 class UnauthorizedException implements Exception {}
+
+enum Methods {
+  POST,
+  GET,
+  DELETE,
+  PUT;
+}
 
 // Base Service API.
 abstract class CallsHandler {
@@ -61,7 +69,7 @@ abstract class CallsHandler {
   void logResponse(http.Response response) {
     try {
       var data = jsonDecode(response.body);
-      dynamic detail = data["detail"] ?? data["error"];
+      dynamic detail = data ?? data["error"];
       Logger().i("API end [${response.request?.method.toUpperCase()}] "
           "${response.statusCode} ${response.request?.url} "
           "success: ${data['success']} detail: $detail");
@@ -106,78 +114,83 @@ class ApiCallsHandler extends CallsHandler {
     return _baseClient;
   }
 
-
   /// -----------------------------------------------------------------------
   /// Http methods.
   /// -----------------------------------------------------------------------
 
-  Future<http.Response> post(String path,
-      {Map<String, dynamic>? data, Map<String, String>? extraHeaders}) async {
-    Uri uri = _bondlyUri(path);
-
-    String payload = "";
-    if (data != null) {
-      payload = jsonEncode(data);
-    }
-
-    try {
-      /// Log this request to LogEntries
-      logRequest(uri.toString(), 'POST', payload);
-
-      var response = await _client.post(uri,
-          body: payload, headers: null);
-      throwOnFailureCode(response);
-      return response;
-    } on http.ClientException catch (e) {
-      throw SocketException("ClientException has occurred: $e");
-    } on IOException catch (e) {
-      throw SocketException("IOException has occurred: $e");
-    }
+  Future<http.Response> post(
+      String path,
+      {Map<String, dynamic>? data,
+      Map<String, String>? extraHeaders}
+  ) async {
+    return _enqueueCall(path, Methods.POST, params: data, extraHeaders: extraHeaders);
   }
 
-  Future<http.Response> get(String path,
-      {Map<String, String>? params, Map<String, String>? extraHeaders}) async {
-    Uri uri = _bondlyUri(path, params: params);
-
-    try {
-      /// Log this request to LogEntries
-      logRequest(uri.toString(), 'GET', params?.toString());
-      var response = await _client.get(uri, headers: null);
-      throwOnFailureCode(response);
-
-      return response;
-    } on http.ClientException catch (e) {
-      throw SocketException("ClientException has occurred: $e");
-    } on IOException catch (e) {
-      throw SocketException("IOException has occurred: $e");
-    }
+  Future<http.Response> get(
+      String path,
+      {Map<String, dynamic>? params,
+      Map<String, String>? extraHeaders}
+  ) async {
+   return _enqueueCall(path, Methods.GET, params: params, extraHeaders: extraHeaders);
   }
 
-  Future<http.Response> delete(String path,
-      {Map<String, String>? params, Map<String, String>? extraHeaders}) async {
-    Uri uri = _bondlyUri(path, params: params);
-
-    try {
-      /// Log this request to LogEntries
-      logRequest(uri.toString(), 'DELETE', params?.toString());
-
-      var response = await _client.delete(uri, headers: null);
-      throwOnFailureCode(response);
-      return response;
-    } on http.ClientException catch (e) {
-      throw SocketException("ClientException has occurred: $e");
-    } on IOException catch (e) {
-      throw SocketException("IOException has occurred: $e");
-    }
+  Future<http.Response> delete(
+      String path,
+      {Map<String, dynamic>? params,
+      Map<String, String>? extraHeaders}
+  ) async {
+    return _enqueueCall(path, Methods.DELETE, params: params, extraHeaders: extraHeaders,);
   }
 
-  Uri _bondlyUri(String path, {Map<String, String>? params}) {
+  Uri _bondlyUri(String path, {Map<String, dynamic>? params}) {
     Uri baseUri = Uri.parse(Environment.baseUrl);
     String basePath = baseUri.path;
     return Uri.parse(Environment.baseUrl).replace(
       path: _bookendSlash(basePath + path),
       queryParameters: params,
     );
+  }
 
+  Future<http.Response> _enqueueCall(
+      String path,
+      Methods method,
+      {Map<String, dynamic>? params,
+      Map<String, String>? extraHeaders}
+  ) async {
+    Uri uri = _bondlyUri(path);
+
+    String payload = "";
+    if (params != null) {
+      payload = jsonEncode(params);
+    }
+
+    if (extraHeaders != null) {
+      extraHeaders.addAll(baseHeaders);
+    } else {
+      extraHeaders = baseHeaders;
+    }
+
+    try {
+      /// Log this request to LogEntries
+      logRequest(uri.toString(), method.toString(), params?.toString());
+
+      http.Response response;
+      switch (method) {
+        case Methods.POST:
+          response = await _client.post(uri, body: payload, headers: extraHeaders);
+        case Methods.GET:
+          response = await _client.get(uri, headers: extraHeaders);
+        case Methods.DELETE:
+          response = await _client.delete(uri, body: payload, headers: extraHeaders);
+        case Methods.PUT:
+          response = await _client.put(uri, body: payload, headers: extraHeaders);
+      }
+      throwOnFailureCode(response);
+      return response;
+    } on http.ClientException catch (e) {
+      throw SocketException("ClientException has occurred: $e");
+    } on IOException catch (e) {
+      throw SocketException("IOException has occurred: $e");
+    }
   }
 }
