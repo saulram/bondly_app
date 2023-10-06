@@ -19,7 +19,6 @@ Future<void> main() async {
   await getIt.allReady();
   // Here we set the URL strategy for our web app.
   setPathUrlStrategy();
-
   // Here we run the app
   runApp(
     MultiProvider(
