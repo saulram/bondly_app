@@ -1,8 +1,8 @@
+import 'package:bondly_app/config/strings_main.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
-import 'package:bondly_app/src/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -39,7 +39,6 @@ class BondlyApp extends StatefulWidget {
 
 class _BondlyAppState extends State<BondlyApp> {
   late AppModel appModel;
-  late AppRouter appRouter;
 
   @override
   void initState() {
@@ -57,7 +56,7 @@ class _BondlyAppState extends State<BondlyApp> {
       model: appModel,
       child: ModelBuilder<AppModel>(builder: (context, modelApp, child) {
         return MaterialApp.router(
-          title: 'BondlyApp',
+          title: StringsMain.appName,
           theme: context.watch<AppTheme>().lightTheme,
           darkTheme: context.watch<AppTheme>().darkTheme,
           routerConfig: modelApp.navigation,

@@ -7,7 +7,7 @@ class GetLoginStateUseCase {
 
   GetLoginStateUseCase(this._sharedPreferences);
 
-  Future<Result<bool, dynamic>> invoke() async {
+  Result<bool, dynamic> invoke() {
     try {
       var loginState = _sharedPreferences.getBool(_loginStateKey);
       return Result.success(loginState ?? false);

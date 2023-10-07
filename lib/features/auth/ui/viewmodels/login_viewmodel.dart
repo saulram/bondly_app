@@ -37,7 +37,7 @@ class LoginViewModel extends NavigationModel {
         notifyListeners();
         _loginStateUseCase.update(true);
 
-        navigation.pushReplacement(homeScreenRoute);
+        navigation.pushReplacement(AppRouter.homeScreenRoute);
       },
       (error) {
         var errorType = LoginErrorType.authError;

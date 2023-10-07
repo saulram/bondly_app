@@ -6,11 +6,11 @@ import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-const String startScreenRoute = "/";
-const String loginScreenRoute = "${startScreenRoute}login";
-const String homeScreenRoute = "${startScreenRoute}home";
-
 class AppRouter {
+  static const String startScreenRoute = "/";
+  static const String loginScreenRoute = "${startScreenRoute}login";
+  static const String homeScreenRoute = "${startScreenRoute}home";
+
   GoRouter get router => _router;
   // GoRouter configuration
   final _router = GoRouter(
@@ -36,6 +36,7 @@ class AppRouter {
     ],
     redirect: (BuildContext context, GoRouterState state) {
       var model = getIt<AppModel>();
+      model.load();
       if (!model.loginState) {
         return loginScreenRoute;
       } else {

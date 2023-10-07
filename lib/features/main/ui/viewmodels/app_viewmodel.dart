@@ -14,11 +14,12 @@ class AppModel extends NavigationModel {
   bool _loginState = false;
   bool get loginState => _loginState;
 
-  Future<void> load() async {
-    Result<bool, dynamic> result = await _useCase.invoke();
+  void load() {
+    Result<bool, dynamic> result = _useCase.invoke();
     result.when(
       (success) => _loginState = success,
       (error) => _loginState = false
     );
+    notifyListeners();
   }
 }
