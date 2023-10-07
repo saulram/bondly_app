@@ -1,6 +1,7 @@
-import 'package:bondly_app/features/auth/ui/viewmodels/login_ui_state.dart';
+import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
 import 'package:bondly_app/config/theme.dart';
-import 'package:bondly_app/features/auth/ui/viewmodels/login_view_model.dart';
+import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/extensions/device_scale.dart';
 import 'package:bondly_app/config/constants.dart';
@@ -11,6 +12,8 @@ import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 
 class LoginScreen extends StatefulWidget {
+  static const String companiesParamFlag = "companiesParamFlag";
+
   final LoginViewModel model;
 
   const LoginScreen(this.model, {Key? key}) : super(key: key);
@@ -25,6 +28,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final userTextFieldController = TextEditingController();
   final passwordTextFieldController = TextEditingController();
+
+  String _selectedCompany = "";
+
+  @override
+  void initState() {
+    super.initState();
+    widget.model.load();
+  }
 
   @override
   void didChangeDependencies() {
@@ -48,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 return const Center(child: CupertinoActivityIndicator());
               case SuccessLogin _:
                 return Container();
-              case FailureLogin error:
+              case FailedLogin error:
                 return _buildLoginView(screenWidth, errorType: error.errorType);
               default:
                 return _buildLoginView(screenWidth);
@@ -61,7 +72,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildLoginView(double screenWidth, {LoginErrorType? errorType}) {
     return Container(
-      margin: EdgeInsets.only(top: 64.dp),
       height: MediaQuery.of(context).size.height,
       alignment: Alignment.center,
       child: SizedBox(
@@ -109,6 +119,8 @@ class _LoginScreenState extends State<LoginScreen> {
         errorDescription = LoginStrings.connectionError;
       case LoginErrorType.unknownError:
         errorDescription = LoginStrings.unknownError;
+      case LoginErrorType.defaultCompanyError:
+        errorDescription = LoginStrings.noCompanySelected;
       default:
         errorDescription = "";
     }
@@ -135,11 +147,11 @@ class _LoginScreenState extends State<LoginScreen> {
           if (showInputError)
             Container(
               width: double.infinity,
-              margin: EdgeInsets.only(bottom: 12.dp),
+              margin: EdgeInsets.only(bottom: 8.dp),
               child: const Text(LoginStrings.required),
             )
           else
-            SizedBox(height: 12.dp),
+            SizedBox(height: 8.dp),
           TextFormField(
             controller: passwordTextFieldController,
             decoration: InputDecoration(
@@ -159,14 +171,28 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 child: Text(LoginStrings.required),
               )
-          else if (errorDescription != "")
+          else if (errorDescription.isNotEmpty)
             Container(
-              margin: EdgeInsets.only(top: 16.dp),
+              margin: EdgeInsets.only(top: 8.dp),
               child: Text(
                 errorDescription,
                 style: const TextStyle(color: Colors.red),
               ),
-            )
+            ),
+          SizedBox(height: 8.dp),
+          DropdownButtonFormField(
+            value: LoginStrings.selectYourCompany,
+            dropdownColor: AppColors.tertiaryColor,
+            items: widget.model.companies.map((e) {
+              return DropdownMenuItem(
+                  value: e,
+                  child: Text(e)
+              );
+            }).toList(),
+            onChanged: (item) {
+              _selectedCompany = item as String;
+            }
+          ),
         ],
       ),
     );
@@ -181,8 +207,9 @@ class _LoginScreenState extends State<LoginScreen> {
           child: FilledButton(
             onPressed: () {
               widget.model.onLoginAction(
-                  userTextFieldController.text,
-                  passwordTextFieldController.text
+                userTextFieldController.text,
+                passwordTextFieldController.text,
+                _selectedCompany
               );
             },
             child: const Text(

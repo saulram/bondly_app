@@ -1,18 +1,23 @@
 sealed class LoginUIState {}
 
+class SuccessCompaniesLoad extends LoginUIState {}
+
 class LoadingLogin extends LoginUIState {}
 
 class SuccessLogin extends LoginUIState {}
 
-class FailureLogin extends LoginUIState {
+class FailedCompaniesLoad extends LoginUIState {}
+
+class FailedLogin extends LoginUIState {
   LoginErrorType errorType;
 
-  FailureLogin(this.errorType);
+  FailedLogin(this.errorType);
 }
 
 enum LoginErrorType {
   authError,
   connectionError,
   invalidInputError,
-  unknownError
+  unknownError,
+  defaultCompanyError
 }

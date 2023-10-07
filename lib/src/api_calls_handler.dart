@@ -118,25 +118,25 @@ class ApiCallsHandler extends CallsHandler {
   /// Http methods.
   /// -----------------------------------------------------------------------
 
-  Future<http.Response> post(
-      String path,
-      {Map<String, dynamic>? data,
-      Map<String, String>? extraHeaders}
-  ) async {
+  Future<http.Response> post({
+      required String path,
+      Map<String, dynamic>? data,
+      Map<String, String>? extraHeaders
+  }) async {
     return _enqueueCall(path, Methods.POST, params: data, extraHeaders: extraHeaders);
   }
 
-  Future<http.Response> get(
-      String path,
-      {Map<String, dynamic>? params,
-      Map<String, String>? extraHeaders}
-  ) async {
+  Future<http.Response> get({
+      required String path,
+      Map<String, dynamic>? params,
+      Map<String, String>? extraHeaders
+  }) async {
    return _enqueueCall(path, Methods.GET, params: params, extraHeaders: extraHeaders);
   }
 
-  Future<http.Response> delete(
-      String path,
-      {Map<String, dynamic>? params,
+  Future<http.Response> delete({
+      required String path,
+      Map<String, dynamic>? params,
       Map<String, String>? extraHeaders}
   ) async {
     return _enqueueCall(path, Methods.DELETE, params: params, extraHeaders: extraHeaders,);

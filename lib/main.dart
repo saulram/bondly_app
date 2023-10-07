@@ -13,8 +13,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Here we initialize the DependencyManager
   await DependencyManager().initialize();
-  // Here we make sure that the AppModel is ready before we continue
-  await getIt.isReady<AppModel>();
   // Here we make sure that all the models are ready before we continue
   await getIt.allReady();
   // Here we set the URL strategy for our web app.

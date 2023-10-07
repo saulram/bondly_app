@@ -1,5 +1,4 @@
 import 'package:bondly_app/config/colors.dart';
-import 'package:bondly_app/features/main/ui/extensions/device_scale.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -60,6 +59,11 @@ class AppTheme extends ChangeNotifier {
       style: TextButton.styleFrom(
         foregroundColor: AppColors.primaryColorLight,
       ),
+    ),
+    dropdownMenuTheme: DropdownMenuThemeData(
+      menuStyle: MenuStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(AppColors.darkBackgroundColor),
+      )
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(

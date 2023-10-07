@@ -10,4 +10,6 @@ class LoginStrings {
   static const String invalidCredentials = "Los datos introducidos no son válidos";
   static const String connectionError = "Error de conexión, por favor reintente más tarde";
   static const String unknownError = "Sucedió un error, por favor reintente";
+  static const String selectYourCompany = "Selecciona tu empresa";
+  static const String noCompanySelected = "Selecciona una empresa diferente";
 }
