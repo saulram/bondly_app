@@ -1,50 +1,53 @@
-import 'package:bondly_app/features/auth/domain/models/points_model.dart';
-import 'package:bondly_app/features/auth/domain/models/upgrade_model.dart';
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/storage/data/local/entities/user_entity.dart';
 
 class UserEntityMapper {
   User map({
-    required UserEntity from,
-    Points? points,
-    Upgrade? upgrade
+    required UserEntity from
   }) {
     return User(
-      points: points,
-      upgrade: upgrade,
-      roles: from.roles,
-      groups: from.groups,
-      paths: from.paths,
-      passChanged: from.passChanged,
-      position: from.position,
-      profileImage: from.profileImage,
-      success: from.success,
-      email: from.email,
-      employeeNumber: from.employeeNumber,
-      area: from.area,
-      department: from.department,
-      token: from.token,
-      location: from.location,
-      completeName: from.completeName
+        rewards: null,
+        id: from.id,
+        completeName: from.completeName,
+        employeeNumber: from.employeeNumber,
+        role: from.role,
+        accountNumber: from.accountNumber,
+        accountHolder: from.accountHolder,
+        email: from.email,
+        isActive: from.isActive,
+        seats: from.seats,
+        planType: from.planType,
+        monthlyPoints: from.monthlyPoints,
+        accountType: from.accountType,
+        companyName: from.companyName,
+        avatar: from.avatar,
+        giftedPoints: from.giftedPoints,
+        pointsReceived: from.pointsReceived,
+        isVisible: from.isVisible,
+        token: from.token
     );
   }
 
   UserEntity mapReverse(User from) {
     return UserEntity(
-        roles: from.roles ?? [],
-        groups: from.groups ?? [],
-        paths: from.paths ?? [],
-        passChanged: from.passChanged,
-        position: from.position,
-        profileImage: from.profileImage,
-        success: from.success,
+        id: from.id,
+        completeName: from.completeName,
+        employeeNumber: from.employeeNumber,
+        role: from.role,
+        accountNumber: from.accountNumber,
+        accountHolder: from.accountHolder,
         email: from.email,
-        employeeNumber: from.employeeNumber ?? 1,
-        area: from.area,
-        department: from.department,
-        token: from.token,
-        location: from.location,
-        completeName: from.completeName
+        isActive: from.isActive,
+        seats: from.seats,
+        planType: from.planType,
+        monthlyPoints: from.monthlyPoints,
+        accountType: from.accountType,
+        companyName: from.companyName,
+        avatar: from.avatar,
+        giftedPoints: from.giftedPoints,
+        pointsReceived: from.pointsReceived,
+        isVisible: from.isVisible,
+        token: from.token
     );
   }
 

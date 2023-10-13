@@ -1,5 +1,3 @@
-import 'package:bondly_app/features/auth/data/mappers/points_entity_mapper.dart';
-import 'package:bondly_app/features/auth/data/mappers/upgrade_entity_mapper.dart';
 import 'package:bondly_app/features/auth/data/mappers/user_entity_mapper.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/default_auth_repository.dart';
@@ -15,8 +13,6 @@ import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
-import 'package:bondly_app/features/storage/data/local/dao/points_dao.dart';
-import 'package:bondly_app/features/storage/data/local/dao/upgrade_dao.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
 import 'package:bondly_app/src/api_calls_handler.dart';
 import 'package:bondly_app/src/routes.dart';
@@ -47,14 +43,6 @@ class DependencyManager {
     getIt.registerSingletonWithDependencies<UsersDao>(() {
       return getIt<AppDatabase>().usersDao;
     }, dependsOn: [AppDatabase]);
-
-    getIt.registerSingletonWithDependencies<PointsDao>(() {
-      return getIt<AppDatabase>().pointsDao;
-    }, dependsOn: [AppDatabase]);
-
-    getIt.registerSingletonWithDependencies<UpgradeDao>(() {
-      return getIt<AppDatabase>().upgradeDao;
-    }, dependsOn: [AppDatabase]);
   }
 
   void provideModels() {
@@ -69,7 +57,7 @@ class DependencyManager {
         getIt<UserUseCase>(),
         getIt<SessionTokenUseCase>(),
       ),
-      dependsOn: [AppDatabase, UsersDao, PointsDao, UpgradeDao, UsersRepository, UserUseCase]
+      dependsOn: [AppDatabase, UsersDao, UsersRepository, UserUseCase]
     );
   }
 
@@ -95,13 +83,9 @@ class DependencyManager {
     getIt.registerSingletonWithDependencies<UsersRepository>(
       () => DefaultUsersRepository(
           getIt<UsersDao>(),
-          getIt<PointsDao>(),
-          getIt<UpgradeDao>(),
           UserEntityMapper(),
-          PointsEntityMapper(),
-          UpgradeEntityMapper()
       ),
-      dependsOn: [AppDatabase, UsersDao, PointsDao, UpgradeDao]
+      dependsOn: [AppDatabase, UsersDao]
     );
   }
 
@@ -125,7 +109,7 @@ class DependencyManager {
 
     getIt.registerSingletonWithDependencies(
       () => UserUseCase(getIt<UsersRepository>()),
-      dependsOn: [AppDatabase, UsersDao, PointsDao, UpgradeDao, UsersRepository]
+      dependsOn: [AppDatabase, UsersDao, UsersRepository]
     );
   }
 
