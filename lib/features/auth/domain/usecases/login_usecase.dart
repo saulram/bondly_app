@@ -4,9 +4,9 @@ import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dar
 import 'package:multiple_result/multiple_result.dart';
 
 class LoginUseCase {
-  final AuthRepository repository;
+  final AuthRepository _repository;
 
-  LoginUseCase(this.repository);
+  LoginUseCase(this._repository);
 
   Future<Result<User, Exception>> invoke(
       String user,
@@ -17,7 +17,7 @@ class LoginUseCase {
       return Result.error(DefaultCompanyException());
     }
     if (user.isNotEmpty && password.isNotEmpty) {
-      return await repository.doLogin(user, password, company);
+      return await _repository.doLogin(user, password, company);
     } else {
       return Result.error(EmptyLoginFieldsException());
     }

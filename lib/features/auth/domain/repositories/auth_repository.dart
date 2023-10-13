@@ -6,6 +6,7 @@ class EmptyLoginFieldsException implements Exception {}
 class NoConnectionException implements Exception {}
 class TooManyLoginAttemptsException implements Exception {}
 class DefaultCompanyException implements Exception {}
+class TokenNotFoundException implements Exception {}
 
 abstract class AuthRepository {
   Future<Result<User, Exception>> doLogin(String user, String password, String company);

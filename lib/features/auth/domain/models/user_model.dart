@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:bondly_app/features/auth/domain/models/points_model.dart';
+import 'package:bondly_app/features/auth/domain/models/upgrade_model.dart';
+
 User userDataFromJson(String str) => User.fromJson(json.decode(str));
 
 String userDataToJson(User data) => json.encode(data.toJson());
@@ -114,63 +117,5 @@ class User {
     "profileImage": profileImage,
     "token": token,
     "success": success,
-  };
-}
-
-class Points {
-  int? current;
-  int? temporal;
-
-  Points({
-    this.current,
-    this.temporal,
-  });
-
-  Points copyWith({
-    int? current,
-    int? temporal,
-  }) =>
-      Points(
-        current: current ?? this.current,
-        temporal: temporal ?? this.temporal,
-      );
-
-  factory Points.fromJson(Map<String, dynamic> json) => Points(
-    current: json["current"],
-    temporal: json["temporal"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "current": current,
-    "temporal": temporal,
-  };
-}
-
-class Upgrade {
-  int? result;
-  String? badge;
-
-  Upgrade({
-    this.result,
-    this.badge,
-  });
-
-  Upgrade copyWith({
-    int? result,
-    String? badge,
-  }) =>
-      Upgrade(
-        result: result ?? this.result,
-        badge: badge ?? this.badge,
-      );
-
-  factory Upgrade.fromJson(Map<String, dynamic> json) => Upgrade(
-    result: json["result"],
-    badge: json["badge"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "result": result,
-    "badge": badge,
   };
 }
