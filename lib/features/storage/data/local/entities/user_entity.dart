@@ -1,43 +1,45 @@
-import 'package:bondly_app/features/storage/data/string_list_converter.dart';
 import 'package:floor/floor.dart';
 
 @entity
 class UserEntity {
   @primaryKey
   int employeeNumber = 1;
-  bool? passChanged;
+  String? id;
   String? completeName;
-  String? location;
-  String? position;
-  String? area;
-  String? department;
+  String? role;
+  String? accountNumber;
+  String? accountHolder;
   String? email;
-  String? profileImage;
+  bool isActive;
+  int seats;
+  String? planType;
+  int monthlyPoints;
+  String? accountType;
+  String? companyName;
+  String? avatar;
+  int giftedPoints;
+  int pointsReceived;
+  bool isVisible;
   String? token;
-  bool? success;
-
-
-  @TypeConverters([StringListConverter])
-  List<String> roles;
-  @TypeConverters([StringListConverter])
-  List<String> groups;
-  @TypeConverters([StringListConverter])
-  List<String> paths;
 
   UserEntity({
     required this.employeeNumber,
-    this.roles = const [],
-    this.groups = const [],
-    this.paths = const [],
-    this.passChanged,
+    this.id,
     this.completeName,
-    this.location,
-    this.position,
-    this.area,
-    this.department,
+    this.role,
+    this.accountNumber,
+    this.accountHolder,
     this.email,
-    this.profileImage,
-    this.token,
-    this.success,
+    this.isActive = false,
+    this.seats = 0,
+    this.planType,
+    this.monthlyPoints = 0,
+    this.accountType,
+    this.companyName,
+    this.avatar,
+    this.giftedPoints = 0,
+    this.pointsReceived = 0,
+    this.isVisible = false,
+    this.token
   });
 }
