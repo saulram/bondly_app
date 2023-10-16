@@ -1,7 +1,7 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
-import 'package:bondly_app/features/home/ui/home_screen.dart';
+import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,9 +18,7 @@ class AppRouter {
     routes: <RouteBase>[
       GoRoute(
           path: startScreenRoute,
-          builder: (context, state) => const Scaffold(
-                body: Center(child: CircularProgressIndicator.adaptive()),
-              ),
+          builder: (context, state) =>  HomeScreen(),
           routes: [
             GoRoute(
               path: loginScreenRoute.replaceFirst(startScreenRoute, ""),
@@ -29,8 +27,8 @@ class AppRouter {
               )
             ),
             GoRoute(
-              path: loginScreenRoute.replaceFirst(startScreenRoute, ""),
-              builder: (context, state) => const HomeScreen()
+              path: "home",
+              builder: (context, state) =>  HomeScreen()
             ),
           ]),
     ],
@@ -40,7 +38,7 @@ class AppRouter {
       if (!model.loginState) {
         return loginScreenRoute;
       } else {
-        return homeScreenRoute;
+        return null;
       }
     },
   );
