@@ -18,7 +18,7 @@ class BodyLayout extends StatelessWidget {
     return Column(
       children: [
         if (enableBanners)
-          _buildBannersCarousel(getIt<HomeViewModel>().banners),
+          _buildBannersCarousel(getIt<HomeViewModel>().bannersList),
         Expanded(child: child),
       ],
     );

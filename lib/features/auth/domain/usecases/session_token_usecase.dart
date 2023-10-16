@@ -21,6 +21,7 @@ class SessionTokenUseCase {
       return Result.error(TokenNotFoundException());
     }
   }
+
   void update(String? token) {
     if (token != null) {
       _sharedPreferences.setString(_tokenKey, token);
