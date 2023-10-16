@@ -77,7 +77,7 @@ class DependencyManager {
       AuthAPI(getIt<ApiCallsHandler>()),
     );
     getIt.registerSingleton<BannersAPI>(
-      BannersAPI(getIt<ApiCallsHandler>(), getIt<SessionTokenUseCase>()),
+      BannersAPI(getIt<ApiCallsHandler>()),
     );
   }
 

@@ -7,9 +7,9 @@ class GetCompanyBannersUseCase {
 
   GetCompanyBannersUseCase(this.repository);
 
-  Future<Result<CompanyBanners, Exception>> invoke() async {
+  Future<Result<CompanyBanners, Exception>> invoke(String token) async {
     try {
-      return await repository.getBanners();
+      return await repository.getBanners(token);
     } catch (exception) {
       return Result.error(NoConnectionException());
     }

@@ -13,9 +13,9 @@ class DefaultBannersRepository extends BannersRepository {
   DefaultBannersRepository(this._bannersAPI);
 
   @override
-  Future<Result<CompanyBanners, Exception>> getBanners() async {
+  Future<Result<CompanyBanners, Exception>> getBanners(String token) async {
     try {
-      return Result.success(await _bannersAPI.getCompanyBanners());
+      return Result.success(await _bannersAPI.getCompanyBanners(token));
     } catch (exception) {
       return Result.error(NoConnectionException());
     }

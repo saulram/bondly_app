@@ -21,7 +21,6 @@ class HomeViewModel extends NavigationModel {
   HomeViewModel(this._userUseCase, this._tokenUseCase, this._bannersUseCase) {
     log.i("HomeViewModel created");
     maybeSetUpUser();
-    getCompanyBanners();
   }
 
   Future<void> maybeSetUpUser() async {
@@ -30,6 +29,7 @@ class HomeViewModel extends NavigationModel {
       this.user = user;
       log.i("HomeViewModel### User: ${user.toJson()}");
       notifyListeners();
+      getCompanyBanners();
     }, (error) {
       log.e(error.toString());
       _tokenUseCase.update(null);
@@ -53,17 +53,30 @@ class HomeViewModel extends NavigationModel {
     notifyListeners();
   }
 
-  List<String> banners = [];
+  List<String> _bannersList = [];
+  List<String> get bannersList => _bannersList;
+  set bannersList(List<String> urisList) {
+    _bannersList = urisList;
+    log.i("HomeViewModel### BannersList: $urisList");
+    notifyListeners();
+  }
 
   ///Handle Banners
   CompanyBanners? _banners;
+
   Future<void> getCompanyBanners() async {
+    String token = user?.token ?? "";
+    log.i("Get Company Banners for user: $token");
     final Result<CompanyBanners, Exception> result =
-        await _bannersUseCase.invoke();
+        await _bannersUseCase.invoke(token);
     result.when((banners) {
       _banners = banners;
+
       log.i("HomeViewModel### Banners: ${banners.toJson()}");
-      notifyListeners();
+      List<String> uris = _banners!.banners!.map((banner) {
+        return banner.image!;
+      }).toList();
+      bannersList = uris;
     }, (error) {
       log.e(error.toString());
     });

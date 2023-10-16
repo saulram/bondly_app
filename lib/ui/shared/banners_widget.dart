@@ -37,7 +37,7 @@ class _BannersCarouselState extends State<BannersCarousel> {
       child: Stack(
         children: [
           widget.imageUris!.isEmpty
-              ? CircularProgressIndicator()
+              ? const CircularProgressIndicator()
               : InfiniteCarousel.builder(
                   itemCount: widget.imageUris!.length,
                   itemExtent: MediaQuery.of(context).size.width * 0.95,
@@ -47,9 +47,8 @@ class _BannersCarouselState extends State<BannersCarousel> {
                   axisDirection: Axis.horizontal,
                   loop: true,
                   itemBuilder: (context, index, realIndex) {
-                    return Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Container(
+                    return Container(
+                        margin: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
                           boxShadow: [
@@ -60,13 +59,11 @@ class _BannersCarouselState extends State<BannersCarousel> {
                               offset: const Offset(0, 3),
                             ),
                           ],
-                          image: DecorationImage(
-                            image: NetworkImage(widget.imageUris![index]),
-                            fit: BoxFit.cover,
-                          ),
                         ),
-                      ),
-                    );
+                        child: Image.network(
+                          "https://api.bondly.mx/${widget.imageUris![index]}",
+                          fit: BoxFit.cover,
+                        ));
                   },
                 ),
           _buildIconButton(Iconsax.arrow_circle_left, () {
