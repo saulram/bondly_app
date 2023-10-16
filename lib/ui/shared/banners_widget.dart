@@ -23,6 +23,7 @@ class _BannersCarouselState extends State<BannersCarousel> {
       top: top,
       bottom: bottom,
       child: GestureDetector(
+        onTap: onPressed,
         child: Container(
           padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(color: bodyColor, shape: BoxShape.circle),
