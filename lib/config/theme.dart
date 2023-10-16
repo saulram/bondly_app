@@ -55,6 +55,18 @@ class AppTheme extends ChangeNotifier {
         borderSide: const BorderSide(color: AppColors.secondaryColor),
       ),
     ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: AppColors.primaryColor,
+      selectedItemColor: AppColors.secondaryColor,
+      unselectedItemColor: AppColors.bodyColorDark,
+      type: BottomNavigationBarType.fixed,
+      selectedIconTheme: IconThemeData(
+        color: AppColors.secondaryColor,
+      ),
+      unselectedIconTheme: IconThemeData(
+        color: AppColors.bodyColorDark,
+      ),
+    ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: AppColors.primaryColorLight,
@@ -127,6 +139,19 @@ class AppTheme extends ChangeNotifier {
           color: Colors.white,
         ),
       ),
+    ),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: AppColors.backgroundColor,
+      selectedItemColor: AppColors.secondaryColor,
+      unselectedItemColor: AppColors.darkBackgroundColor,
+      type: BottomNavigationBarType.fixed,
+      selectedIconTheme: IconThemeData(
+        color: AppColors.secondaryColor,
+      ),
+      unselectedIconTheme: IconThemeData(
+        color: AppColors.darkBackgroundColor,
+      ),
+
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
