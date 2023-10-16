@@ -13,7 +13,7 @@ class BannersCarousel extends StatefulWidget {
 
 class _BannersCarouselState extends State<BannersCarousel> {
   final controller = InfiniteScrollController();
-  final Color bodyColor = AppColors.bodyColor;
+  final Color bodyColor = AppColors.primaryButtonColor;
 
   Widget _buildIconButton(IconData iconData, VoidCallback onPressed,
       {left, right, top, bottom}) {
@@ -22,10 +22,12 @@ class _BannersCarouselState extends State<BannersCarousel> {
       right: right,
       top: top,
       bottom: bottom,
-      child: IconButton(
-        onPressed: onPressed,
-        color: bodyColor,
-        icon: Icon(iconData),
+      child: GestureDetector(
+        child: Container(
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(color: bodyColor, shape: BoxShape.circle),
+          child: Center(child: Icon(iconData, color: Colors.white)),
+        ),
       ),
     );
   }
@@ -60,9 +62,12 @@ class _BannersCarouselState extends State<BannersCarousel> {
                             ),
                           ],
                         ),
-                        child: Image.network(
-                          "https://api.bondly.mx/${widget.imageUris![index]}",
-                          fit: BoxFit.cover,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Image.network(
+                            "https://api.bondly.mx/${widget.imageUris![index]}",
+                            fit: BoxFit.cover,
+                          ),
                         ));
                   },
                 ),
