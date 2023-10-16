@@ -11,6 +11,7 @@ import 'package:bondly_app/features/auth/domain/usecases/session_token_usecase.d
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
@@ -49,6 +50,7 @@ class DependencyManager {
     getIt.registerSingleton<AppRouter>(AppRouter());
     getIt.registerSingleton<NavigationModel>(NavigationModel());
     getIt.registerSingleton<AppModel>(AppModel());
+    getIt.registerSingleton<HomeViewModel>(HomeViewModel());
     getIt.registerSingletonWithDependencies<LoginViewModel>(
         () => LoginViewModel(
         getIt<LoginUseCase>(),
