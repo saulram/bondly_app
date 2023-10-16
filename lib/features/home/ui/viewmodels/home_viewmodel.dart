@@ -18,5 +18,10 @@ class HomeViewModel extends NavigationModel{
     notifyListeners();
   }
 
+  ///Handle Banners
+    List<String> banners = [
+      "https://api.bondly.mx/public/upload/1696542724903.jpeg",
+  "https://api.bondly.mx/public/upload/1696542724903.jpeg"];
+
 
 }
