@@ -36,37 +36,39 @@ class _BannersCarouselState extends State<BannersCarousel> {
       aspectRatio: 12 / 6,
       child: Stack(
         children: [
-          InfiniteCarousel.builder(
-            itemCount: widget.imageUris!.length,
-            itemExtent: MediaQuery.of(context).size.width * 0.95,
-            anchor: 0.0,
-            velocityFactor: .1,
-            controller: controller,
-            axisDirection: Axis.horizontal,
-            loop: true,
-            itemBuilder: (context, index, realIndex) {
-              return Padding(
-                padding: const EdgeInsets.all(10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        spreadRadius: 1,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
+          widget.imageUris!.isEmpty
+              ? CircularProgressIndicator()
+              : InfiniteCarousel.builder(
+                  itemCount: widget.imageUris!.length,
+                  itemExtent: MediaQuery.of(context).size.width * 0.95,
+                  anchor: 0.0,
+                  velocityFactor: .1,
+                  controller: controller,
+                  axisDirection: Axis.horizontal,
+                  loop: true,
+                  itemBuilder: (context, index, realIndex) {
+                    return Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                          image: DecorationImage(
+                            image: NetworkImage(widget.imageUris![index]),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
-                    ],
-                    image: DecorationImage(
-                      image: NetworkImage(widget.imageUris![index]),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
           _buildIconButton(Iconsax.arrow_circle_left, () {
             controller.previousItem();
           }, left: 0.0, right: null, top: 50.0, bottom: 50.0),

@@ -19,7 +19,7 @@ class ScaffoldLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const BondlyAppBar(),
+      appBar: BondlyAppBar(),
       //TBD add endDrawer With the different routes.
       endDrawer: const Drawer(backgroundColor: AppColors.backgroundColor),
       body: body,

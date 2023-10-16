@@ -11,6 +11,10 @@ import 'package:bondly_app/features/auth/domain/usecases/session_token_usecase.d
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/data/repositories/api/banners_api.dart';
+import 'package:bondly_app/features/home/data/repositories/default_banners_repository.dart';
+import 'package:bondly_app/features/home/domain/repositories/banners_repository.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
@@ -27,19 +31,18 @@ class DependencyManager {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     registerDatabaseObjects();
     registerApiHandler();
-    provideApis();
+
     provideRepositories();
+
     provideUseCases(sharedPreferences);
+    provideApis();
     provideModels();
     await getIt.allReady();
   }
 
   void registerDatabaseObjects() {
     getIt.registerSingletonAsync<AppDatabase>(
-      () async => $FloorAppDatabase
-          .databaseBuilder('bondly.db')
-          .build()
-    );
+        () async => $FloorAppDatabase.databaseBuilder('bondly.db').build());
 
     getIt.registerSingletonWithDependencies<UsersDao>(() {
       return getIt<AppDatabase>().usersDao;
@@ -50,29 +53,33 @@ class DependencyManager {
     getIt.registerSingleton<AppRouter>(AppRouter());
     getIt.registerSingleton<NavigationModel>(NavigationModel());
     getIt.registerSingleton<AppModel>(AppModel());
-    getIt.registerSingleton<HomeViewModel>(HomeViewModel());
+    getIt.registerSingletonWithDependencies<HomeViewModel>(
+        () => HomeViewModel(getIt<UserUseCase>(), getIt<SessionTokenUseCase>(),
+            getIt<GetCompanyBannersUseCase>()),
+        dependsOn: [UserUseCase]);
     getIt.registerSingletonWithDependencies<LoginViewModel>(
         () => LoginViewModel(
-        getIt<LoginUseCase>(),
-        getIt<GetCompaniesUseCase>(),
-        getIt<GetLoginStateUseCase>(),
-        getIt<UserUseCase>(),
-        getIt<SessionTokenUseCase>(),
-      ),
-      dependsOn: [AppDatabase, UsersDao, UsersRepository, UserUseCase]
-    );
+              getIt<LoginUseCase>(),
+              getIt<GetCompaniesUseCase>(),
+              getIt<GetLoginStateUseCase>(),
+              getIt<UserUseCase>(),
+              getIt<SessionTokenUseCase>(),
+            ),
+        dependsOn: [AppDatabase, UsersDao, UsersRepository, UserUseCase]);
   }
 
   void registerApiHandler() {
     getIt.registerSingleton<ApiCallsHandler>(
-      //TO-DO: Fetch these values from right place
-      ApiCallsHandler("1", "1")
-    );
+        //TO-DO: Fetch these values from right place
+        ApiCallsHandler("1", "1"));
   }
 
   void provideApis() {
     getIt.registerSingleton<AuthAPI>(
       AuthAPI(getIt<ApiCallsHandler>()),
+    );
+    getIt.registerSingleton<BannersAPI>(
+      BannersAPI(getIt<ApiCallsHandler>(), getIt<SessionTokenUseCase>()),
     );
   }
 
@@ -81,14 +88,15 @@ class DependencyManager {
     getIt.registerSingleton<AuthRepository>(
       DefaultAuthRepository(getIt<AuthAPI>()),
     );
+    getIt.registerSingleton<BannersRepository>(
+        DefaultBannersRepository(getIt<BannersAPI>()));
 
     getIt.registerSingletonWithDependencies<UsersRepository>(
-      () => DefaultUsersRepository(
-          getIt<UsersDao>(),
-          UserEntityMapper(),
-      ),
-      dependsOn: [AppDatabase, UsersDao]
-    );
+        () => DefaultUsersRepository(
+              getIt<UsersDao>(),
+              UserEntityMapper(),
+            ),
+        dependsOn: [AppDatabase, UsersDao]);
   }
 
   void provideUseCases(SharedPreferences sharedPreferences) {
@@ -100,19 +108,18 @@ class DependencyManager {
     getIt.registerSingleton<GetCompaniesUseCase>(
       GetCompaniesUseCase(getIt<AuthRepository>()),
     );
+    getIt.registerSingleton<GetCompanyBannersUseCase>(
+        GetCompanyBannersUseCase(getIt<BannersRepository>()));
 
     getIt.registerSingleton<GetLoginStateUseCase>(
-      GetLoginStateUseCase(getIt<SharedPreferences>())
-    );
+        GetLoginStateUseCase(getIt<SharedPreferences>()));
 
     getIt.registerSingleton<SessionTokenUseCase>(
-      SessionTokenUseCase(getIt<SharedPreferences>())
-    );
+        SessionTokenUseCase(getIt<SharedPreferences>()));
 
     getIt.registerSingletonWithDependencies(
-      () => UserUseCase(getIt<UsersRepository>()),
-      dependsOn: [AppDatabase, UsersDao, UsersRepository]
-    );
+        () => UserUseCase(getIt<UsersRepository>()),
+        dependsOn: [AppDatabase, UsersDao, UsersRepository]);
   }
 
   Future<void> dispose() async {
