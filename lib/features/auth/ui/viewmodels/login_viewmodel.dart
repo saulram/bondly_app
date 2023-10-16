@@ -8,7 +8,6 @@ import 'package:bondly_app/features/auth/domain/usecases/session_token_usecase.d
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
-import 'package:bondly_app/src/routes.dart';
 import 'package:multiple_result/multiple_result.dart';
 
 class LoginViewModel extends NavigationModel {
