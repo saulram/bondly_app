@@ -47,6 +47,7 @@ dependencies:
   floor: ^1.4.2
   sqflite: ^2.3.0
   iconsax: ^0.0.8
+  infinite_carousel: ^1.0.3
 
 dev_dependencies:
   floor_generator: ^1.4.2
