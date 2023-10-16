@@ -47,7 +47,7 @@ class LoginViewModel extends NavigationModel {
         state = SuccessLogin();
         notifyListeners();
 
-        navigation.pushReplacement(AppRouter.homeScreenRoute);
+        navigation.pop();
       },
       (error) {
         var errorType = LoginErrorType.authError;
