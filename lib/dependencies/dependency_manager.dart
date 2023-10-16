@@ -31,11 +31,9 @@ class DependencyManager {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     registerDatabaseObjects();
     registerApiHandler();
-
-    provideRepositories();
-
-    provideUseCases(sharedPreferences);
     provideApis();
+    provideRepositories();
+    provideUseCases(sharedPreferences);
     provideModels();
     await getIt.allReady();
   }
