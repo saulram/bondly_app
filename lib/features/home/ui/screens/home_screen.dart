@@ -1,5 +1,6 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/single_post_widget.dart';
 import 'package:bondly_app/ui/shared/app_body_layout.dart';
@@ -47,7 +48,22 @@ class _HomeScreenState extends State<HomeScreen> {
         model.onPageChanged(index);
       },
       children: [
-        const SinglePostWidget(),
+        SingleChildScrollView(
+          child: Column(
+            children: [
+              //TBD IMPLEMENT API CALLS AND MAKE THIS DYNAMIC.
+
+              SinglePostWidget(
+                post: FeedPost(
+                    image:
+                        "https://api.bondly.mx/public/upload/1693518208339.jpg"),
+              ),
+              SinglePostWidget(
+                post: FeedPost(),
+              )
+            ],
+          ),
+        ),
         Container(
           color: Colors.green,
         ),
