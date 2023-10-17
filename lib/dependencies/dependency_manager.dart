@@ -31,7 +31,7 @@ class DependencyManager {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     registerDatabaseObjects();
     registerApiHandler();
-    provideApis();
+    provideApis(sharedPreferences);
     provideRepositories();
     provideUseCases(sharedPreferences);
     provideModels();
@@ -72,12 +72,15 @@ class DependencyManager {
         ApiCallsHandler("1", "1"));
   }
 
-  void provideApis() {
+  void provideApis(SharedPreferences sharedPreferences) {
     getIt.registerSingleton<AuthAPI>(
       AuthAPI(getIt<ApiCallsHandler>()),
     );
     getIt.registerSingleton<BannersAPI>(
-      BannersAPI(getIt<ApiCallsHandler>()),
+      BannersAPI(
+          authToken: sharedPreferences.getString(SessionTokenUseCase.tokenKey),
+          getIt<ApiCallsHandler>()
+      ),
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
+import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bondly_app/features/auth/domain/usecases/session_token_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -13,7 +14,6 @@ class HomeViewModel extends NavigationModel {
   final SessionTokenUseCase _tokenUseCase;
   final GetCompanyBannersUseCase _bannersUseCase;
   User? user;
-  String? token;
   Logger log = Logger(
     printer: PrettyPrinter(methodCount: 0),
   );
@@ -45,7 +45,7 @@ class HomeViewModel extends NavigationModel {
 
   void onTabTapped(int index) {
     pageController.animateToPage(index,
-        duration: Duration(milliseconds: 500), curve: Curves.ease);
+        duration: const Duration(milliseconds: 500), curve: Curves.ease);
   }
 
   void onPageChanged(int index) {
@@ -65,10 +65,9 @@ class HomeViewModel extends NavigationModel {
   CompanyBanners? _banners;
 
   Future<void> getCompanyBanners() async {
-    String token = user?.token ?? "";
-    log.i("Get Company Banners for user: $token");
+    log.i("Get Company Banners for user: ${user?.completeName}");
     final Result<CompanyBanners, Exception> result =
-        await _bannersUseCase.invoke(token);
+        await _bannersUseCase.invoke();
     result.when((banners) {
       _banners = banners;
 
@@ -79,6 +78,9 @@ class HomeViewModel extends NavigationModel {
       bannersList = uris;
     }, (error) {
       log.e(error.toString());
+      if (error is TokenNotFoundException) {
+        // Dispatch logout
+      }
     });
   }
 }
