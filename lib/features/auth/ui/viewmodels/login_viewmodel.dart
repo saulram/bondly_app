@@ -8,6 +8,7 @@ import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
 import 'package:multiple_result/multiple_result.dart';
 
 class LoginViewModel extends NavigationModel {
@@ -52,7 +53,7 @@ class LoginViewModel extends NavigationModel {
         state = SuccessLogin();
         notifyListeners();
 
-        navigation.pop();
+        navigation.go(HomeScreen.route);
       },
       (error) {
         var errorType = LoginErrorType.authError;
