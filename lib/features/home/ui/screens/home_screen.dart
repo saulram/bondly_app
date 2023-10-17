@@ -25,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    model.maybeSetUpUser();
+
     return ModelProvider(
       model: model,
       child: ModelBuilder<HomeViewModel>(
