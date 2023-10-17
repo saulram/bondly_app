@@ -12,7 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 
 class LoginScreen extends StatefulWidget {
-  static const String companiesParamFlag = "companiesParamFlag";
+  static const String route = "/loginScreen";
 
   final LoginViewModel model;
 
