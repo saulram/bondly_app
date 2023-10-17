@@ -5,6 +5,7 @@ import "dart:convert";
 import 'dart:io' show SocketException, IOException;
 
 import 'package:bondly_app/config/environment.dart';
+import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:flutter/foundation.dart';
 import "package:http/http.dart" as http;
 import 'package:logger/logger.dart';
@@ -104,10 +105,13 @@ abstract class CallsHandler {
 
 class ApiCallsHandler extends CallsHandler {
 
-  ApiCallsHandler(
-    String appVersion,
-    String buildNumber,
-  ) : super(appVersion, buildNumber);
+  final SessionTokenHandler sessionTokenHandler;
+
+  ApiCallsHandler({
+    required String appVersion,
+    required String buildNumber,
+    required this.sessionTokenHandler
+  }) : super(appVersion, buildNumber);
 
   final http.Client _baseClient = http.Client();
   http.Client get _client {
@@ -168,6 +172,12 @@ class ApiCallsHandler extends CallsHandler {
       extraHeaders.addAll(baseHeaders);
     } else {
       extraHeaders = baseHeaders;
+    }
+
+    if (sessionTokenHandler.get() != null) {
+      extraHeaders.addAll({
+        "Authorization": sessionTokenHandler.get()!
+      });
     }
 
     try {

@@ -7,19 +7,13 @@ import 'package:logger/logger.dart';
 
 class BannersAPI {
   final ApiCallsHandler _callsHandler;
-  final String? authToken;
 
-  BannersAPI(this._callsHandler, {required this.authToken});
+  BannersAPI(this._callsHandler);
 
   Future<CompanyBanners> getCompanyBanners() async {
     try {
-      if (authToken == null) {
-        throw TokenNotFoundException();
-      }
-
       var response = await _callsHandler.get(path: "banner/", extraHeaders: {
         "Content-Type": "application/json",
-        "Authorization": authToken!
       });
 
       return CompanyBanners.fromJson(json.decode(response.body));
