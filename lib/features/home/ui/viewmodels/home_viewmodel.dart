@@ -20,7 +20,6 @@ class HomeViewModel extends NavigationModel {
 
   HomeViewModel(this._userUseCase, this._tokenHandler, this._bannersUseCase) {
     log.i("HomeViewModel created");
-    maybeSetUpUser();
   }
 
   Future<void> maybeSetUpUser() async {
