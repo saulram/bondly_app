@@ -1,6 +1,6 @@
+import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
-import 'package:bondly_app/features/auth/domain/usecases/session_token_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/domain/models/company_banners_model.dart';
@@ -11,14 +11,14 @@ import 'package:multiple_result/multiple_result.dart';
 
 class HomeViewModel extends NavigationModel {
   final UserUseCase _userUseCase;
-  final SessionTokenUseCase _tokenUseCase;
+  final SessionTokenHandler _tokenHandler;
   final GetCompanyBannersUseCase _bannersUseCase;
   User? user;
   Logger log = Logger(
     printer: PrettyPrinter(methodCount: 0),
   );
 
-  HomeViewModel(this._userUseCase, this._tokenUseCase, this._bannersUseCase) {
+  HomeViewModel(this._userUseCase, this._tokenHandler, this._bannersUseCase) {
     log.i("HomeViewModel created");
     maybeSetUpUser();
   }
@@ -32,7 +32,7 @@ class HomeViewModel extends NavigationModel {
       getCompanyBanners();
     }, (error) {
       log.e(error.toString());
-      _tokenUseCase.update(null);
+      _tokenHandler.clear();
     });
   }
 

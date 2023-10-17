@@ -1,10 +1,10 @@
 import 'package:bondly_app/config/strings_login.dart';
+import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bondly_app/features/auth/domain/usecases/get_login_companies_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_state_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
-import 'package:bondly_app/features/auth/domain/usecases/session_token_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -15,7 +15,7 @@ class LoginViewModel extends NavigationModel {
   final GetCompaniesUseCase _companiesUseCase;
   final GetLoginStateUseCase _loginStateUseCase;
   final UserUseCase _userUseCase;
-  final SessionTokenUseCase _tokenUseCase;
+  final SessionTokenHandler _tokenHandler;
 
   LoginUIState? state;
   List<String> companies = [];
@@ -25,7 +25,7 @@ class LoginViewModel extends NavigationModel {
     this._companiesUseCase,
     this._loginStateUseCase,
     this._userUseCase,
-    this._tokenUseCase
+    this._tokenHandler
   );
 
   Future<void> onLoginAction(
@@ -39,9 +39,15 @@ class LoginViewModel extends NavigationModel {
     final Result<User, Exception> result = await _useCase.invoke(username, password, company);
     result.when(
       (user) {
+        if (user.token == null) {
+          state = FailedLogin(LoginErrorType.authError);
+          notifyListeners();
+          return;
+        }
+
         _loginStateUseCase.update(user.token);
         _userUseCase.update(user);
-        _tokenUseCase.update(user.token);
+        _tokenHandler.save(user.token!);
 
         state = SuccessLogin();
         notifyListeners();
