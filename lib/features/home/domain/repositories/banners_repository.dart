@@ -8,7 +8,7 @@ abstract class BannersRepository {
   /// Retrieves the company banners.
   ///
   /// Returns a [Result] object that contains either the [CompanyBanners] or an [Exception].
-  Future<Result<CompanyBanners, Exception>> getBanners(String token);
+  Future<Result<CompanyBanners, Exception>> getBanners();
 }
 
 /// Exception thrown when there is no internet connection.
