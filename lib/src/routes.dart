@@ -18,18 +18,14 @@ class AppRouter {
     routes: <RouteBase>[
       GoRoute(
           path: startScreenRoute,
-          builder: (context, state) =>  HomeScreen(),
+          builder: (context, state) => const HomeScreen(),
           routes: [
             GoRoute(
-              path: loginScreenRoute.replaceFirst(startScreenRoute, ""),
-              builder: (context, state) => LoginScreen(
-                getIt<LoginViewModel>()
-              )
-            ),
+                path: loginScreenRoute.replaceFirst(startScreenRoute, ""),
+                builder: (context, state) =>
+                    LoginScreen(getIt<LoginViewModel>())),
             GoRoute(
-              path: "home",
-              builder: (context, state) =>  HomeScreen()
-            ),
+                path: "home", builder: (context, state) => const HomeScreen()),
           ]),
     ],
     redirect: (BuildContext context, GoRouterState state) {

@@ -1,8 +1,8 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
+import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
-import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
@@ -13,8 +13,7 @@ class SinglePostWidget extends StatelessWidget {
   //TBD IMPLEMENT COMMENT AND LIKE FUNCTIONALITY
 
   final FeedData post;
-  SinglePostWidget({super.key, required this.post});
-  ImageHelper imageHelper = ImageHelper();
+  const SinglePostWidget({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +49,7 @@ class SinglePostWidget extends StatelessWidget {
             _buildPostBody(),
             const SizedBox(height: 10),
             post.image != null
-                ? _buildPostImage()
+                ? _buildPostImage(context)
                 : _buildBadgePostImage(context),
             const SizedBox(height: 10),
             _buildActions()
@@ -70,10 +69,10 @@ class SinglePostWidget extends StatelessWidget {
           backgroundImage: NetworkImage(post.sender.avatar ??
               'https://th.bing.com/th/id/OIP.6MALULga-w8M2ybAW3KtyAHaHa?pid=ImgDet&rs=1'),
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         Column(children: [
           Text(
-            post.sender?.completeName ?? 'John Doe',
+            post.sender.completeName,
             style: Theme.of(context).textTheme.labelLarge,
           ),
           Text(
@@ -85,13 +84,15 @@ class SinglePostWidget extends StatelessWidget {
           child: SizedBox(),
         ),
         Chip(
-            label: Text(
-          type,
-          style: GoogleFonts.montserrat(
-            color: AppColors.tertiaryColor,
-            fontSize: 12,
+          label: Text(
+            type,
+            style: GoogleFonts.montserrat(
+              color: AppColors.tertiaryColor,
+              fontSize: 12,
+            ),
           ),
-        )),
+          backgroundColor: AppColors.tertiaryColorLight,
+        ),
       ],
     );
   }
@@ -113,7 +114,14 @@ class SinglePostWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(50),
           child: Image.network("https://api.bondly.mx/${post.badge?.image}",
               width: 50,
-              height: 50, errorBuilder: (context, error, stackTrace) {
+              height: 50, loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return const SizedBox(
+              height: 50,
+              width: 50,
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }, errorBuilder: (context, error, stackTrace) {
             Logger().e(error, stackTrace.toString());
             return const SizedBox(
               height: 50,
@@ -132,18 +140,34 @@ class SinglePostWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildPostImage() {
+  Widget _buildPostImage(BuildContext context) {
     return ClipRRect(
         borderRadius: BorderRadius.circular(15),
-        child: Image.network("https://api.bondly.mx/${post.image}",
-            errorBuilder: (context, error, stackTrace) {
-          Logger().e(error, stackTrace.toString());
-          return const SizedBox(
-            height: 50,
-            width: 50,
-            child: Center(child: Text('Error loading badge image')),
-          );
-        }, fit: BoxFit.cover));
+        child: Hero(
+          tag: post.id!,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => FullScreenImage(
+                    image: post.image!,
+                    tag: post.id!,
+                  ),
+                ),
+              );
+            },
+            child: Image.network("https://api.bondly.mx/${post.image}",
+                errorBuilder: (context, error, stackTrace) {
+              Logger().e(error, stackTrace.toString());
+              return const SizedBox(
+                height: 50,
+                width: 50,
+                child: Center(child: Text('Error loading badge image')),
+              );
+            }, fit: BoxFit.cover),
+          ),
+        ));
   }
 
   Widget _buildActions() {

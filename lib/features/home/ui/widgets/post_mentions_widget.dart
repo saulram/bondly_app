@@ -34,7 +34,7 @@ class PostMentionsWidget extends StatelessWidget {
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             // Handle the mention tap
-            print("User ID: $userId");
+            debugPrint("Mention tapped: $userId");
           },
       ));
 
