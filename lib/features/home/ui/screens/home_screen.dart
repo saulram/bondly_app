@@ -1,6 +1,5 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
-import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/single_post_widget.dart';
 import 'package:bondly_app/ui/shared/app_body_layout.dart';
@@ -20,13 +19,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     model = getIt<HomeViewModel>();
+    model.setUp();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    model.maybeSetUpUser();
-
     return ModelProvider(
       model: model,
       child: ModelBuilder<HomeViewModel>(
@@ -50,20 +48,15 @@ class _HomeScreenState extends State<HomeScreen> {
         model.onPageChanged(index);
       },
       children: [
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              //TBD IMPLEMENT API CALLS AND MAKE THIS DYNAMIC.
-
-              SinglePostWidget(
-                post: FeedPost(
-                    image:
-                        "https://api.bondly.mx/public/upload/1693518208339.jpg"),
-              ),
-              SinglePostWidget(
-                post: FeedPost(),
-              )
-            ],
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: model.feeds.data.length,
+            itemBuilder: (context, index) {
+              return SinglePostWidget(
+                post: model.feeds.data[index],
+              );
+            },
           ),
         ),
         Container(
