@@ -110,6 +110,10 @@ class HomeViewModel extends NavigationModel {
     final Result<CompanyFeed, Exception> result = await _feedsUseCase.invoke();
     result.when((feeds) {
       log.i("HomeViewModel### Feeds: ${feeds.data.length}");
+      //sort feeds by date "createdAt" first element is the most recent
+      feeds.data.sort((a, b) {
+        return b.createdAt.compareTo(a.createdAt);
+      });
       this.feeds = feeds;
     }, (error) {
       log.e(error.toString());

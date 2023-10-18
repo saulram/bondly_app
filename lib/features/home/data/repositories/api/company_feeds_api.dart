@@ -20,10 +20,7 @@ class CompanyFeedsAPI {
 
   Future<CompanyFeed> getCompanyFeeds() async {
     try {
-      var response =
-          await _callsHandler.get(path: "accountFeeds/feeds/", extraHeaders: {
-        "Content-Type": "application/json",
-      });
+      var response = await _callsHandler.get(path: "accountFeeds/feeds/");
       log.i("Company Feeds Response: ${response.body}");
       Map<String, dynamic> jsonMap = json.decode(response.body);
 

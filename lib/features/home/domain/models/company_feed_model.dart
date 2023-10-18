@@ -6,8 +6,9 @@ class CompanyFeed {
 
   factory CompanyFeed.fromJson(Map<String, dynamic> json) {
     var dataList = json['data'] as List;
+    //sort dataList for createdAt
     List<FeedData> feedDataList =
-        dataList.map((data) => FeedData.fromJson(data)).toList();
+        dataList.map((feed) => FeedData.fromJson(feed)).toList();
 
     return CompanyFeed(success: json['success'], data: feedDataList);
   }
@@ -24,8 +25,8 @@ class FeedData {
   final Badge? badge;
   final List<Comment> comments;
   final List<Like> likes;
-  final String createdAt;
-  final String updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final int v;
   final bool visible;
   final String? image;
@@ -62,24 +63,25 @@ class FeedData {
     }
 
     return FeedData(
-      id: json['_id'],
-      account: json['account'],
-      header: json['header'],
-      body: json['body'],
-      footer: json['footer'],
-      sender: Sender.fromJson(json['sender_id']),
-      type: json['type'],
-      badge: badge,
-      comments: comments,
-      likes: likes,
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
-      v: json['__v'],
-      visible: json['visible'],
-      image: json['image'] != null
-          ? "https://api.bondly.mx/${json['image']} "
-          : null,
-    );
+        id: json['_id'],
+        account: json['account'],
+        header: json['header'],
+        body: json['body'],
+        footer: json['footer'],
+        sender: Sender.fromJson(json['sender_id']),
+        type: json['type'],
+        badge: badge,
+        comments: comments,
+        likes: likes,
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'])
+            : DateTime.now(),
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'])
+            : DateTime.now(),
+        v: json['__v'],
+        visible: json['visible'],
+        image: json['image']);
   }
 }
 
@@ -174,9 +176,7 @@ class Badge {
       id: json['_id'],
       categoryId: json['category_id'],
       name: json['name'],
-      image: json['image'] != null
-          ? "https://api.bondly.mx/${json['image']} "
-          : null,
+      image: json['image'],
       value: json['value'],
       isActive: json['isActive'],
       v: json['__v'],

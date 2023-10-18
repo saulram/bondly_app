@@ -48,13 +48,16 @@ class _HomeScreenState extends State<HomeScreen> {
         model.onPageChanged(index);
       },
       children: [
-        ListView.builder(
-          itemCount: model.feeds.data.length,
-          itemBuilder: (context, index) {
-            return SinglePostWidget(
-              post: model.feeds.data[index],
-            );
-          },
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: model.feeds.data.length,
+            itemBuilder: (context, index) {
+              return SinglePostWidget(
+                post: model.feeds.data[index],
+              );
+            },
+          ),
         ),
         Container(
           color: Colors.green,
