@@ -1,15 +1,18 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
+import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:logger/logger.dart';
 
 class SinglePostWidget extends StatelessWidget {
   //TBD IMPLEMENT COMMENT AND LIKE FUNCTIONALITY
 
-  final FeedPost post;
-  const SinglePostWidget({super.key, required this.post});
+  final FeedData post;
+  SinglePostWidget({super.key, required this.post});
+  ImageHelper imageHelper = ImageHelper();
 
   @override
   Widget build(BuildContext context) {
@@ -41,11 +44,11 @@ class SinglePostWidget extends StatelessWidget {
         child: Column(
           children: [
             _buildPostHeader(),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             _buildPostBody(),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             post.image != null ? _buildPostImage() : _buildBadgePostImage(),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             _buildActions()
           ],
         ));
@@ -65,12 +68,19 @@ class SinglePostWidget extends StatelessWidget {
   Widget _buildPostImage() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(15),
-      child: Image.network(
-        post.image ?? 'https://api.bondly.mx/public/upload/1693518208339.jpg',
-        fit: BoxFit.cover,
-        height: 200,
-        width: double.infinity,
-      ),
+      child: FutureBuilder(
+          future: imageHelper.displayFromNetwork(imageUri: post.image!),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            return Image.memory(
+              snapshot.data!,
+              fit: BoxFit.cover,
+              height: 200,
+              width: double.infinity,
+            );
+          }),
     );
   }
 
@@ -79,21 +89,49 @@ class SinglePostWidget extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(50),
-          child: Image.network(
-            post.badgeId?['image'] ??
-                'https://th.bing.com/th/id/OIP.6MALULga-w8M2ybAW3KtyAHaHa?pid=ImgDet&rs=1',
-            fit: BoxFit.cover,
-            height: 50,
-            width: 50,
+          child: FutureBuilder(
+            future: imageHelper.displayFromNetwork(
+                imageUri: post.badge?.image ?? ''),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              } else if (snapshot.hasError) {
+                return const SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: Center(child: Text('Error loading badge image')),
+                );
+              } else {
+                return Image.memory(
+                  snapshot.data!,
+                  fit: BoxFit.cover,
+                  height: 50,
+                  width: 50,
+                  errorBuilder: ((context, error, stackTrace) {
+                    Logger().e(error, stackTrace.toString());
+                    return const SizedBox(
+                      height: 50,
+                      width: 50,
+                      child: Center(child: Text('Error loading badge image')),
+                    );
+                  }),
+                );
+              }
+            },
           ),
         ),
         SizedBox(height: 5),
         Text(
-          post.badgeId?['name'] ?? 'Badge Name',
+          post.badge?.name ?? 'Badge Name',
           style: GoogleFonts.montserrat(
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: AppColors.tertiaryColor),
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: AppColors.tertiaryColor,
+          ),
         ),
       ],
     );
@@ -115,13 +153,13 @@ class SinglePostWidget extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 15,
-          backgroundImage: NetworkImage(post.senderId?['avatar'] ??
+          backgroundImage: NetworkImage(post.sender.avatar ??
               'https://th.bing.com/th/id/OIP.6MALULga-w8M2ybAW3KtyAHaHa?pid=ImgDet&rs=1'),
         ),
         SizedBox(width: 10),
         Column(children: [
           Text(
-            post.senderId?['name'] ?? 'John Doe',
+            post.sender?.completeName ?? 'John Doe',
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           ),
           Text(

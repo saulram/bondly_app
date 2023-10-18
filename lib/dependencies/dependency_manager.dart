@@ -13,9 +13,13 @@ import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/data/repositories/api/banners_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/company_feeds_api.dart';
 import 'package:bondly_app/features/home/data/repositories/default_banners_repository.dart';
+import 'package:bondly_app/features/home/data/repositories/default_company_feeds_repository.dart';
 import 'package:bondly_app/features/home/domain/repositories/banners_repository.dart';
+import 'package:bondly_app/features/home/domain/repositories/company_feeds_respository.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
@@ -53,8 +57,7 @@ class DependencyManager {
 
   void registerSessionTokenHandler() {
     getIt.registerSingleton<SessionTokenHandler>(
-      AuthSessionTokenHandler(getIt<SharedPreferences>())
-    );
+        AuthSessionTokenHandler(getIt<SharedPreferences>()));
   }
 
   void provideModels() {
@@ -63,7 +66,7 @@ class DependencyManager {
     getIt.registerSingleton<AppModel>(AppModel());
     getIt.registerSingletonWithDependencies<HomeViewModel>(
         () => HomeViewModel(getIt<UserUseCase>(), getIt<SessionTokenHandler>(),
-            getIt<GetCompanyBannersUseCase>()),
+            getIt<GetCompanyBannersUseCase>(), getIt<GetCompanyFeedsUseCase>()),
         dependsOn: [UserUseCase]);
     getIt.registerSingletonWithDependencies<LoginViewModel>(
         () => LoginViewModel(
@@ -80,11 +83,9 @@ class DependencyManager {
     getIt.registerSingleton<ApiCallsHandler>(
         //TO-DO: Fetch these values from right place
         ApiCallsHandler(
-          appVersion: "1",
-          buildNumber: "1",
-          sessionTokenHandler: getIt<SessionTokenHandler>()
-        )
-    );
+            appVersion: "1",
+            buildNumber: "1",
+            sessionTokenHandler: getIt<SessionTokenHandler>()));
   }
 
   void provideApis() {
@@ -93,6 +94,9 @@ class DependencyManager {
     );
     getIt.registerSingleton<BannersAPI>(
       BannersAPI(getIt<ApiCallsHandler>()),
+    );
+    getIt.registerSingleton<CompanyFeedsAPI>(
+      CompanyFeedsAPI(getIt<ApiCallsHandler>()),
     );
   }
 
@@ -103,6 +107,8 @@ class DependencyManager {
     );
     getIt.registerSingleton<BannersRepository>(
         DefaultBannersRepository(getIt<BannersAPI>()));
+    getIt.registerSingleton<CompanyFeedsRepository>(
+        DefaultCompanyFeedsRespository(getIt<CompanyFeedsAPI>()));
 
     getIt.registerSingletonWithDependencies<UsersRepository>(
         () => DefaultUsersRepository(
@@ -122,6 +128,9 @@ class DependencyManager {
     );
     getIt.registerSingleton<GetCompanyBannersUseCase>(
         GetCompanyBannersUseCase(getIt<BannersRepository>()));
+
+    getIt.registerSingleton<GetCompanyFeedsUseCase>(
+        GetCompanyFeedsUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingleton<GetLoginStateUseCase>(
         GetLoginStateUseCase(getIt<SharedPreferences>()));
