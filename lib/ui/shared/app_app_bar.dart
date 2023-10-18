@@ -19,8 +19,9 @@ class BondlyAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
     return AppBar(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
       title: Image.asset(
         "assets/img_logo.png",
         width: 100,
@@ -30,7 +31,7 @@ class BondlyAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: GestureDetector(
           onTap: () { context.push(ProfileScreen.route); },
           child: CircleAvatar(
-            backgroundColor: AppColors.primaryColor,
+            backgroundColor: theme.primaryColor,
             maxRadius: 20,
             backgroundImage: NetworkImage(getIt<HomeViewModel>().user?.avatar ??
                 "https://www.gauchercommunity.org/wp-content/uploads/2020/09/avatar-placeholder.png"),

@@ -25,6 +25,7 @@ class _BannersCarouselState extends State<BannersCarousel> {
       child: GestureDetector(
         onTap: onPressed,
         child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16.0),
           padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(color: bodyColor, shape: BoxShape.circle),
           child: Center(child: Icon(iconData, color: Colors.white)),
@@ -70,6 +71,7 @@ class _BannersCarouselState extends State<BannersCarousel> {
                           child: Image.network(
                             "https://api.bondly.mx/${widget.imageUris![index]}",
                             fit: BoxFit.cover,
+                            alignment: Alignment.topLeft,
                           ),
                         ));
                   },
