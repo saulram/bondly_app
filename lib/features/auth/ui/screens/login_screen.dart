@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
@@ -14,9 +15,9 @@ import 'package:logger/logger.dart';
 class LoginScreen extends StatefulWidget {
   static const String route = "/loginScreen";
 
-  final LoginViewModel model;
+  final LoginViewModel model = getIt<LoginViewModel>();
 
-  const LoginScreen(this.model, {Key? key}) : super(key: key);
+  LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
