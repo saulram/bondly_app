@@ -16,15 +16,11 @@ class AppRouter {
     routes: [
       GoRoute(
           path: startScreenRoute,
-          builder: (context, state) => StartScreen(
-            model: getIt<AppModel>(),
-          ),
+          builder: (context, state) => StartScreen(),
       ),
       GoRoute(
           path: LoginScreen.route,
-          builder: (context, state) => LoginScreen(
-              getIt<LoginViewModel>()
-          )
+          builder: (context, state) => LoginScreen()
       ),
       GoRoute(
           path: HomeScreen.route,
