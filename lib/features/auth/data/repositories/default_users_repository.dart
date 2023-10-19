@@ -36,4 +36,9 @@ class DefaultUsersRepository extends UsersRepository {
     _usersDao.saveUser(_userMapper.mapReverse(user));
   }
 
+  @override
+  Future<void> clear() async {
+    _usersDao.removeAll();
+  }
+
 }

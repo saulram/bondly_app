@@ -1,4 +1,3 @@
-import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
 import 'package:bondly_app/config/theme.dart';
@@ -183,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
           SizedBox(height: 8.dp),
           DropdownButtonFormField(
             value: LoginStrings.selectYourCompany,
-            dropdownColor: AppColors.tertiaryColor,
+            dropdownColor: Theme.of(context).cardColor,
             items: widget.model.companies.map((e) {
               return DropdownMenuItem(
                   value: e,

@@ -6,4 +6,5 @@ class UserUnavailableException implements Exception {}
 abstract class UsersRepository {
   Future<Result<User, Exception>> getUser();
   Future<void> insertUser(User user);
+  Future<void> clear();
 }
