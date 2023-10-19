@@ -29,25 +29,26 @@ class FeedData {
   final DateTime updatedAt;
   final int v;
   final bool visible;
+  final bool? isLiked;
   final String? image;
 
-  FeedData({
-    required this.id,
-    required this.account,
-    required this.header,
-    required this.body,
-    required this.footer,
-    required this.sender,
-    required this.type,
-    this.badge,
-    required this.comments,
-    required this.likes,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
-    required this.visible,
-    this.image,
-  });
+  FeedData(
+      {required this.id,
+      required this.account,
+      required this.header,
+      required this.body,
+      required this.footer,
+      required this.sender,
+      required this.type,
+      this.badge,
+      required this.comments,
+      required this.likes,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.v,
+      required this.visible,
+      this.image,
+      this.isLiked});
 
   factory FeedData.fromJson(Map<String, dynamic> json) {
     var commentsList = json['comments'] as List;
@@ -81,6 +82,7 @@ class FeedData {
             : DateTime.now(),
         v: json['__v'],
         visible: json['visible'],
+        isLiked: json['userLike'] ?? false,
         image: json['image']);
   }
 }

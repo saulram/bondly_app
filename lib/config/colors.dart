@@ -1,10 +1,10 @@
-
 import 'package:flutter/animation.dart';
 
 class AppColors {
   //background
   static const Color backgroundColor = Color(0xFFf5f5f5);
   static const Color darkBackgroundColor = Color(0xFF1a1a1a);
+  static const Color greyBackGroundColor = Color(0xffe8e7ec);
 
   //App Global Colors:
   static const Color primaryColor = Color(0xff655b80);

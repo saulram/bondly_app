@@ -18,14 +18,24 @@ class ScaffoldLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const BondlyAppBar(),
-      //TBD add endDrawer With the different routes.
-      endDrawer: const Drawer(backgroundColor: AppColors.backgroundColor),
-      body: body,
-      bottomNavigationBar: enableBottomNavBar
-          ? _buildBottomNavBar(getIt<HomeViewModel>())
-          : null,
+    return GestureDetector(
+      onTap: () {
+        var f = FocusScope.of(context);
+
+        if (!f.hasPrimaryFocus) {
+          f.unfocus();
+        }
+      },
+      child: Scaffold(
+        appBar: const BondlyAppBar(),
+        resizeToAvoidBottomInset: true,
+        //TBD add endDrawer With the different routes.
+        endDrawer: const Drawer(backgroundColor: AppColors.backgroundColor),
+        body: body,
+        bottomNavigationBar: enableBottomNavBar
+            ? _buildBottomNavBar(getIt<HomeViewModel>())
+            : null,
+      ),
     );
   }
 
