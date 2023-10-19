@@ -1,7 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-// ignore_for_file: library_private_types_in_public_api
-
 part of 'bondly_database.dart';
 
 // **************************************************************************
@@ -189,6 +187,11 @@ class _$UsersDao extends UsersDao {
         arguments: [id],
         queryableName: 'UserEntity',
         isView: false);
+  }
+
+  @override
+  Future<void> removeAll() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM UserEntity');
   }
 
   @override

@@ -1,8 +1,5 @@
-import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
-import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
-import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/screens/profile_screen.dart';
 import 'package:bondly_app/features/start/ui/screens/start_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -28,7 +25,7 @@ class AppRouter {
       ),
       GoRoute(
           path: ProfileScreen.route,
-          builder: (context, state) => const ProfileScreen()
+          builder: (context, state) => ProfileScreen()
       )
     ],
   );

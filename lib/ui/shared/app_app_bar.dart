@@ -27,7 +27,7 @@ class BondlyAppBar extends StatelessWidget implements PreferredSizeWidget {
         width: 100,
       ),
       leading: Container(
-        margin: const EdgeInsets.all(5),
+        margin: const EdgeInsets.all(8),
         child: GestureDetector(
           onTap: () { context.push(ProfileScreen.route); },
           child: CircleAvatar(

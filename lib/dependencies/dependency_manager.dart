@@ -9,6 +9,7 @@ import 'package:bondly_app/features/auth/domain/repositories/users_repository.da
 import 'package:bondly_app/features/auth/domain/usecases/get_login_companies_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_state_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -26,6 +27,7 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart'
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
+import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
 import 'package:bondly_app/src/api_calls_handler.dart';
@@ -68,6 +70,13 @@ class DependencyManager {
     getIt.registerSingleton<AppRouter>(AppRouter());
     getIt.registerSingleton<NavigationModel>(NavigationModel());
     getIt.registerSingleton<AppModel>(AppModel());
+    getIt.registerSingletonWithDependencies<ProfileViewModel>(
+        () => ProfileViewModel(
+          userUseCase: getIt<UserUseCase>(),
+          logoutUseCase: getIt<LogoutUseCase>(),
+        ),
+        dependsOn: [AppDatabase, UsersDao, UsersRepository, LogoutUseCase]
+    );
     getIt.registerSingletonWithDependencies<HomeViewModel>(
         () => HomeViewModel(
             getIt<UserUseCase>(),
@@ -85,7 +94,8 @@ class DependencyManager {
               getIt<UserUseCase>(),
               getIt<SessionTokenHandler>(),
             ),
-        dependsOn: [AppDatabase, UsersDao, UsersRepository, UserUseCase]);
+        dependsOn: [AppDatabase, UsersDao, UsersRepository, UserUseCase]
+    );
   }
 
   void registerApiHandler() {
@@ -159,6 +169,13 @@ class DependencyManager {
 
     getIt.registerSingletonWithDependencies(
         () => UserUseCase(getIt<UsersRepository>()),
+        dependsOn: [AppDatabase, UsersDao, UsersRepository]);
+
+    getIt.registerSingletonWithDependencies(
+        () => LogoutUseCase(
+            sharedPreferences: getIt<SharedPreferences>(),
+            usersRepository: getIt<UsersRepository>()
+        ),
         dependsOn: [AppDatabase, UsersDao, UsersRepository]);
   }
 

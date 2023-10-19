@@ -13,6 +13,8 @@ class AppTheme extends ChangeNotifier {
   final ThemeData _dark = ThemeData(
     primaryColor: AppColors.primaryColor,
     primaryColorLight: AppColors.primaryColorLight,
+    cardColor: AppColors.tertiaryColor,
+    unselectedWidgetColor: AppColors.backgroundColor,
     textTheme: TextTheme(
       titleLarge: GoogleFonts.montserrat(
         color: AppColors.bodyColorDark,
@@ -42,7 +44,6 @@ class AppTheme extends ChangeNotifier {
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-
       counterStyle: GoogleFonts.poppins(color: AppColors.bodyColorDark,fontWeight: FontWeight.w300),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
@@ -97,6 +98,8 @@ class AppTheme extends ChangeNotifier {
   final ThemeData _light = ThemeData(
     primaryColor: AppColors.primaryColor,
     primaryColorLight: AppColors.primaryColorLight,
+    cardColor: AppColors.tertiaryColorLight,
+    unselectedWidgetColor: AppColors.darkBackgroundColor,
     textTheme: TextTheme(
       titleLarge: GoogleFonts.montserrat(
         color: AppColors.bodyColor,
