@@ -49,6 +49,7 @@ dependencies:
   iconsax: ^0.0.8
   infinite_carousel: ^1.0.3
   moment_dart: ^1.1.0
+  flutter_mentions: ^2.0.1
 
 dev_dependencies:
   floor_generator: ^1.4.2

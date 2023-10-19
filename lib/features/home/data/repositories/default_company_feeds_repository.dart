@@ -1,6 +1,10 @@
+import 'package:bondly_app/features/home/data/repositories/api/badges_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/categories_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/company_feeds_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/create_comment_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/handle_like_api.dart';
+import 'package:bondly_app/features/home/domain/models/category_badges.dart';
+import 'package:bondly_app/features/home/domain/models/company_categories.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/domain/repositories/company_feeds_respository.dart';
 import 'package:multiple_result/multiple_result.dart';
@@ -13,9 +17,11 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
   final CompanyFeedsAPI _feedsAPI;
   final CreateCommentAPI _createCommentAPI;
   final HandleLikeAPI _handleLikeAPI;
+  final CategoriesAPI _categoriesAPI;
+  final BadgesAPI _badgesAPI;
 
-  DefaultCompanyFeedsRespository(
-      this._feedsAPI, this._createCommentAPI, this._handleLikeAPI);
+  DefaultCompanyFeedsRespository(this._feedsAPI, this._createCommentAPI,
+      this._handleLikeAPI, this._categoriesAPI, this._badgesAPI);
   @override
   Future<Result<CompanyFeed, Exception>> getCompanyFeeds() async {
     try {
@@ -44,6 +50,24 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
   Future<Result<bool, Exception>> likePost(String feedId) async {
     try {
       return Result.success(await _handleLikeAPI.handlelike(feedId));
+    } catch (exception) {
+      return Result.error(NoConnectionException());
+    }
+  }
+
+  @override
+  Future<Result<Badges, Exception>> getBadges(String categoryId) async {
+    try {
+      return Result.success(await _badgesAPI.getCategoryBadges(categoryId));
+    } catch (exception) {
+      return Result.error(NoConnectionException());
+    }
+  }
+
+  @override
+  Future<Result<Categories, Exception>> getCategories() async {
+    try {
+      return Result.success(await _categoriesAPI.getCompanyCategories());
     } catch (exception) {
       return Result.error(NoConnectionException());
     }
