@@ -50,13 +50,17 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: model.feeds.data.length,
-            itemBuilder: (context, index) {
-              return SinglePostWidget(
-                post: model.feeds.data[index],
-              );
-            },
+          child: RefreshIndicator.adaptive(
+            onRefresh: model.getCompanyFeeds,
+            child: ListView.builder(
+              itemCount: model.feeds.data.length,
+              itemBuilder: (context, index) {
+                return SinglePostWidget(
+                  post: model.feeds.data[index],
+                  index: index,
+                );
+              },
+            ),
           ),
         ),
         Container(

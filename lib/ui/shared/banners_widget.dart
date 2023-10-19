@@ -40,7 +40,9 @@ class _BannersCarouselState extends State<BannersCarousel> {
       child: Stack(
         children: [
           widget.imageUris!.isEmpty
-              ? const CircularProgressIndicator()
+              ? const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                )
               : InfiniteCarousel.builder(
                   itemCount: widget.imageUris!.length,
                   itemExtent: MediaQuery.of(context).size.width * 0.95,

@@ -5,8 +5,10 @@ import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/domain/models/company_banners_model.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
+import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
+import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:logger/logger.dart';
 import 'package:multiple_result/multiple_result.dart';
@@ -16,14 +18,21 @@ class HomeViewModel extends NavigationModel {
   final SessionTokenHandler _tokenHandler;
   final GetCompanyBannersUseCase _bannersUseCase;
   final GetCompanyFeedsUseCase _feedsUseCase;
+  final CreateFeedCommentUseCase _createFeedCommentUseCase;
+  final HandleLikesUseCase _handleLikesUseCase;
 
   User? user;
   Logger log = Logger(
     printer: PrettyPrinter(methodCount: 0),
   );
 
-  HomeViewModel(this._userUseCase, this._tokenHandler, this._bannersUseCase,
-      this._feedsUseCase) {
+  HomeViewModel(
+      this._userUseCase,
+      this._tokenHandler,
+      this._bannersUseCase,
+      this._feedsUseCase,
+      this._createFeedCommentUseCase,
+      this._handleLikesUseCase) {
     log.i("HomeViewModel created");
   }
 
@@ -115,6 +124,36 @@ class HomeViewModel extends NavigationModel {
         return b.createdAt.compareTo(a.createdAt);
       });
       this.feeds = feeds;
+    }, (error) {
+      log.e(error.toString());
+      if (error is TokenNotFoundException) {
+        // Dispatch logout
+      }
+    });
+  }
+
+  Future<void> createComment(String feedId, String message, int index) async {
+    log.i("Create Comment for feed: $feedId");
+    final Result<FeedData, Exception> result =
+        await _createFeedCommentUseCase.invoke(feedId, message);
+    result.when((feedUpdated) {
+      log.i("HomeViewModel### Comment: ${feedUpdated}");
+      getCompanyFeeds();
+    }, (error) {
+      log.e(error.toString());
+      if (error is TokenNotFoundException) {
+        // Dispatch logout
+      }
+    });
+  }
+
+  Future<void> handleLikes(String feedId) async {
+    log.i("Handle Like for feed: $feedId");
+    final Result<bool, Exception> result =
+        await _handleLikesUseCase.invoke(feedId);
+    result.when((isLiked) {
+      log.i("HomeViewModel### isLiked: $isLiked");
+      getCompanyFeeds();
     }, (error) {
       log.e(error.toString());
       if (error is TokenNotFoundException) {

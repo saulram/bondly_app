@@ -1,7 +1,10 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/theme.dart';
+import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
+import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
+import 'package:bondly_app/features/home/ui/widgets/post_coments_widget.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,18 +12,23 @@ import 'package:iconsax/iconsax.dart';
 import 'package:logger/logger.dart';
 import 'package:moment_dart/moment_dart.dart';
 
-class SinglePostWidget extends StatelessWidget {
+class SinglePostWidget extends StatefulWidget {
   //TBD IMPLEMENT COMMENT AND LIKE FUNCTIONALITY
 
   final FeedData post;
-  const SinglePostWidget({super.key, required this.post});
+  final int index;
+  const SinglePostWidget({super.key, required this.post, required this.index});
 
+  @override
+  State<SinglePostWidget> createState() => _SinglePostWidgetState();
+}
+
+class _SinglePostWidgetState extends State<SinglePostWidget> {
+  bool toggleComents = false;
+  bool likesBusy = false;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    //if post.image is not null so that means we have an image and is not a badge post
-    //we must build the ui based on that.
-    //otherwise we should get badge_id with badge.image
 
     return _buildBadgePost(size, context);
   }
@@ -28,7 +36,6 @@ class SinglePostWidget extends StatelessWidget {
   Container _buildBadgePost(Size size, BuildContext context) {
     return Container(
         width: size.width * .9,
-        padding: const EdgeInsets.all(10),
         margin: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
             border: Border.all(color: AppColors.tertiaryColorLight),
@@ -44,35 +51,55 @@ class SinglePostWidget extends StatelessWidget {
             ]),
         child: Column(
           children: [
-            _buildPostHeader(context),
-            const SizedBox(height: 10),
-            _buildPostBody(),
-            const SizedBox(height: 10),
-            post.image != null
-                ? _buildPostImage(context)
-                : _buildBadgePostImage(context),
-            const SizedBox(height: 10),
-            _buildActions()
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  _buildPostHeader(context),
+                  const SizedBox(height: 10),
+                  _buildPostBody(),
+                  const SizedBox(height: 10),
+                  widget.post.image != null
+                      ? _buildPostImage(context)
+                      : _buildBadgePostImage(context),
+                  const SizedBox(height: 10),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: AppColors.greyBackGroundColor,
+              ),
+              child: Column(
+                children: [
+                  _buildActions(context),
+                  toggleComents ? _commentsSection(context) : const SizedBox(),
+                ],
+              ),
+            )
           ],
         ));
   }
 
   Widget _buildPostHeader(BuildContext context) {
-    Moment postDate = Moment(post.createdAt.toLocal());
+    Moment postDate = Moment(widget.post.createdAt.toLocal());
     //format postType to be always first letter uppercase
-    String type = post.type[0].toUpperCase() + post.type.substring(1);
+    String type =
+        widget.post.type[0].toUpperCase() + widget.post.type.substring(1);
 
     return Row(
       children: [
         CircleAvatar(
           radius: 15,
-          backgroundImage: NetworkImage(post.sender.avatar ??
+          backgroundImage: NetworkImage(widget.post.sender.avatar ??
               'https://th.bing.com/th/id/OIP.6MALULga-w8M2ybAW3KtyAHaHa?pid=ImgDet&rs=1'),
         ),
         const SizedBox(width: 10),
         Column(children: [
           Text(
-            post.sender.completeName,
+            widget.post.sender.completeName,
             style: Theme.of(context).textTheme.labelLarge,
           ),
           Text(
@@ -99,7 +126,7 @@ class SinglePostWidget extends StatelessWidget {
 
   Widget _buildPostBody() {
     return PostMentionsWidget(
-      text: post.body,
+      text: widget.post.body,
       style: GoogleFonts.montserrat(
           fontSize: 12,
           fontWeight: FontWeight.w400,
@@ -112,7 +139,8 @@ class SinglePostWidget extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(50),
-          child: Image.network("https://api.bondly.mx/${post.badge?.image}",
+          child: Image.network(
+              "https://api.bondly.mx/${widget.post.badge?.image}",
               width: 50,
               height: 50, loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;
@@ -132,7 +160,7 @@ class SinglePostWidget extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         Text(
-          post.badge?.name ?? 'Badge Name',
+          widget.post.badge?.name ?? 'Badge Name',
           style: context.themeData.textTheme.titleSmall
               ?.copyWith(color: AppColors.tertiaryColor),
         ),
@@ -144,20 +172,20 @@ class SinglePostWidget extends StatelessWidget {
     return ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Hero(
-          tag: post.id!,
+          tag: widget.post.id!,
           child: GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => FullScreenImage(
-                    image: post.image!,
-                    tag: post.id!,
+                    image: widget.post.image!,
+                    tag: widget.post.id!,
                   ),
                 ),
               );
             },
-            child: Image.network("https://api.bondly.mx/${post.image}",
+            child: Image.network("https://api.bondly.mx/${widget.post.image}",
                 errorBuilder: (context, error, stackTrace) {
               Logger().e(error, stackTrace.toString());
               return const SizedBox(
@@ -170,14 +198,82 @@ class SinglePostWidget extends StatelessWidget {
         ));
   }
 
-  Widget _buildActions() {
-    return const Row(
+  Widget _buildActions(BuildContext context) {
+    return Row(
       children: [
-        Expanded(child: SizedBox()),
-        Icon(Iconsax.heart, color: AppColors.secondaryColor),
-        SizedBox(width: 10),
-        Icon(Iconsax.message, color: AppColors.tertiaryColor),
+        const Expanded(child: SizedBox()),
+        likesBusy ? const CircularProgressIndicator.adaptive() : _buildLike(),
+        const SizedBox(width: 10),
+        _buildComents(context),
       ],
+    );
+  }
+
+  Widget _buildLike() {
+    return InkWell(
+      onTap: () {
+        _handleLikes();
+      },
+      child: Row(
+        children: [
+          Icon(
+            Iconsax.heart,
+            color: widget.post.isLiked == true
+                ? AppColors.secondaryColor
+                : AppColors.primaryColor,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            widget.post.likes.length.toString(),
+            style: GoogleFonts.montserrat(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: AppColors.secondaryColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleLikes() {
+    setState(() {
+      likesBusy = true;
+    });
+    getIt<HomeViewModel>().handleLikes(widget.post.id!).then((value) {
+      setState(() {
+        likesBusy = false;
+      });
+    });
+  }
+
+  Widget _buildComents(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          toggleComents = !toggleComents;
+        });
+      },
+      child: Row(
+        children: [
+          const Icon(Iconsax.message, color: AppColors.tertiaryColor),
+          const SizedBox(width: 5),
+          Text(
+            widget.post.comments.length.toString(),
+            style: GoogleFonts.montserrat(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: AppColors.tertiaryColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _commentsSection(BuildContext context) {
+    return PostCommentsWidget(
+      comments: widget.post.comments,
+      feedId: widget.post.id!,
+      feedIndex: widget.index,
     );
   }
 }

@@ -9,6 +9,9 @@ abstract class CompanyFeedsRepository {
   ///
   /// Returns a [Result] object that contains either the [List<FeedPost>] or an [Exception].
   Future<Result<CompanyFeed, Exception>> getCompanyFeeds();
+  Future<Result<FeedData, Exception>> createComment(
+      String feedId, String message);
+  Future<Result<bool, Exception>> likePost(String feedId);
 }
 
 /// Exception thrown when there is no internet connection.
