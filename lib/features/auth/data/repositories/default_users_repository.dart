@@ -5,6 +5,7 @@ import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
 import 'package:multiple_result/multiple_result.dart';
 
 class DefaultUsersRepository extends UsersRepository {
+  static const String name = "DefaultUsersRepository";
   final UsersDao _usersDao;
   final UserEntityMapper _userMapper;
 

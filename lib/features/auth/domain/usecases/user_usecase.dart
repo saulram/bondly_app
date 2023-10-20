@@ -6,8 +6,9 @@ import 'package:multiple_result/multiple_result.dart';
 
 class UserUseCase {
   final UsersRepository _repository;
+  final UsersRepository _remoteRepository;
 
-  UserUseCase(this._repository);
+  UserUseCase(this._repository, this._remoteRepository);
 
   void update(User user) {
     try {
@@ -17,7 +18,12 @@ class UserUseCase {
     }
   }
 
-  Future<Result<User, Exception>> invoke() async {
+  Future<Result<User, Exception>> invoke({bool remote = false}) async {
+    if (remote) {
+      var userResult = await _remoteRepository.getUser();
+      userResult.when((user) => update(user), (error) => error);
+      return userResult;
+    }
     return await _repository.getUser();
   }
 }

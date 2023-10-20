@@ -1,5 +1,8 @@
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
+import 'package:bondly_app/features/profile/ui/screens/monthly_balance_screen.dart';
+import 'package:bondly_app/features/profile/ui/screens/my_activity_screen.dart';
+import 'package:bondly_app/features/profile/ui/screens/my_rewards_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/profile_screen.dart';
 import 'package:bondly_app/features/start/ui/screens/start_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -26,6 +29,18 @@ class AppRouter {
       GoRoute(
           path: ProfileScreen.route,
           builder: (context, state) => ProfileScreen()
+      ),
+      GoRoute(
+          path: MyActivityScreen.route,
+          builder: (context, state) => const MyActivityScreen()
+      ),
+      GoRoute(
+          path: MyRewardsScreen.route,
+          builder: (context, state) => const MyRewardsScreen()
+      ),
+      GoRoute(
+          path: MonthlyBalanceScreen.route,
+          builder: (context, state) => const MonthlyBalanceScreen()
       )
     ],
   );

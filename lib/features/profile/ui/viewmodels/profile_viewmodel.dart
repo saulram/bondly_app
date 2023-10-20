@@ -18,20 +18,31 @@ class ProfileViewModel extends NavigationModel {
     required this.logoutUseCase
   });
 
-  void load() async {
-    Result<User, Exception> result = await userUseCase.invoke();
+  void load({bool remote = true}) async {
+    busy = true;
+    notifyListeners();
+
+    Result<User, Exception> result = await userUseCase.invoke(remote: remote);
     result.when(
       (user) {
         this.user = user;
+        busy = false;
         notifyListeners();
       },
       (error) {
+        busy = false;
+        notifyListeners();
         if (error is UserUnavailableException) {
-          logoutUseCase.invoke();
-          navigation.go(LoginScreen.route);
+          closeSession();
         }
+        load(remote: false);
         Logger().e(error);
       }
     );
+  }
+
+  Future<void> closeSession() async {
+    await logoutUseCase.invoke();
+    navigation.go(LoginScreen.route);
   }
 }
