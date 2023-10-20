@@ -12,6 +12,7 @@ class UserUseCase {
 
   void update(User user) {
     try {
+      _repository.clear();
       _repository.insertUser(user);
     } catch (exception) {
       Logger().e((exception as Exception).toString());

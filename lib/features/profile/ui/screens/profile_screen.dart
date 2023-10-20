@@ -1,16 +1,20 @@
+import 'dart:io';
+
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
 import 'package:bondly_app/features/profile/ui/screens/monthly_balance_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_activity_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_rewards_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/selectable_menu_option.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:logger/logger.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   static String route = "/profileScreen";
@@ -28,6 +32,8 @@ class ProfileScreenState extends State<ProfileScreen> {
       "https://www.gauchercommunity.org/wp-content/uploads/2020/09/avatar-placeholder.png";
 
   double headerHeight = 200;
+  File? _image;
+  final picker = ImagePicker();
 
   @override
   void initState() {
@@ -114,12 +120,31 @@ class ProfileScreenState extends State<ProfileScreen> {
         ),
         Stack(
           children: [
-            CircleAvatar(
-              key: const Key("AvatarWidget"),
-              backgroundColor: theme.cardColor,
-              maxRadius: 50,
-              backgroundImage: NetworkImage(
-                  model.user?.avatar ?? defaultAvatar
+            _image == null ?
+            GestureDetector(
+              onTap: () {
+                displayAvatar(
+                  image: model.user?.avatar ?? defaultAvatar
+                );
+              },
+              child: CircleAvatar(
+                key: const Key("AvatarWidget"),
+                backgroundColor: theme.cardColor,
+                maxRadius: 50,
+                backgroundImage: NetworkImage(
+                    model.user?.avatar ?? defaultAvatar
+                ),
+              ),
+            ) :
+            GestureDetector(
+              onTap: () {
+                displayAvatar(image: "");
+              },
+              child: CircleAvatar(
+                key: const Key("AvatarWidget"),
+                backgroundColor: theme.cardColor,
+                maxRadius: 50,
+                backgroundImage: FileImage(_image!),
               ),
             ),
             Positioned(
@@ -136,7 +161,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                 child: IconButton(
                     key: const Key("EditButton"),
                     onPressed: () {
-                      Logger().i("Editing image");
+                      showOptions();
                     },
                     icon: const Icon(
                       Icons.edit,
@@ -270,4 +295,85 @@ class ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  // Image Picker function to get image from gallery
+  Future<void> getImageFromGallery() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      }
+    });
+  }
+
+  //Image Picker function to get image from camera
+  Future<void> getImageFromCamera() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      }
+    });
+  }
+
+  Future<void> showOptions() async {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          Container(
+            color: AppColors.secondaryColor,
+            child: CupertinoActionSheetAction(
+              child: Text(
+                StringsProfile.fromGallery,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge!
+                    .copyWith(color: Colors.white),
+              ),
+              onPressed: () {
+                // close the options modal
+                Navigator.of(context).pop();
+                // get image from gallery
+                getImageFromGallery();
+              },
+            ),
+          ),
+          Container(
+            color: AppColors.secondaryColor,
+            child: CupertinoActionSheetAction(
+              child: Text(
+                  StringsProfile.fromCamera,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge!
+                      .copyWith(color: Colors.white)
+              ),
+              onPressed: () {
+                // close the options modal
+                Navigator.of(context).pop();
+                // get image from camera
+                getImageFromCamera();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void displayAvatar({required String image}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FullScreenImage(
+          image: image,
+          tag: "AvatarWidget",
+          isFile: image.isEmpty,
+          imageFile: _image,
+        ),
+      ),
+    );
+  }
 }

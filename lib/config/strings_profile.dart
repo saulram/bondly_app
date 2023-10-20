@@ -8,6 +8,8 @@ class StringsProfile {
   static const String myActivity = "Mi actividad";
   static const String monthlyReport = "Estado de cuenta";
   static const String rewards = "Recompensas";
+  static const String fromGallery = "Abrir Galería";
+  static const String fromCamera = "Abrir Cámara";
 
   static String welcomeGreeting(String name) {
     return "Hola,\n$name";
