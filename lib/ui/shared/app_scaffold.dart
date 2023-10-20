@@ -9,11 +9,13 @@ import 'package:iconsax/iconsax.dart';
 class ScaffoldLayout extends StatelessWidget {
   final Widget body;
   final bool enableBottomNavBar;
+  final String? avatar;
 
   const ScaffoldLayout({
     Key? key,
     required this.body,
     this.enableBottomNavBar = false,
+    this.avatar,
   }) : super(key: key);
 
   @override
@@ -27,7 +29,7 @@ class ScaffoldLayout extends StatelessWidget {
         }
       },
       child: Scaffold(
-        appBar: const BondlyAppBar(),
+        appBar: BondlyAppBar(avatar),
         resizeToAvoidBottomInset: true,
         //TBD add endDrawer With the different routes.
         endDrawer: const Drawer(backgroundColor: AppColors.backgroundColor),

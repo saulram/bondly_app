@@ -1,6 +1,4 @@
 import 'package:bondly_app/config/colors.dart';
-import 'package:bondly_app/dependencies/dependency_manager.dart';
-import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,8 +8,10 @@ import 'package:iconsax/iconsax.dart';
 class BondlyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? child;
   final double height;
+  final String? avatar;
+  final String defaultAvatar = "https://www.gauchercommunity.org/wp-content/uploads/2020/09/avatar-placeholder.png";
 
-  const BondlyAppBar({
+  const BondlyAppBar(this.avatar, {
     super.key,
     this.child,
     this.height = kToolbarHeight,
@@ -33,8 +33,7 @@ class BondlyAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: CircleAvatar(
             backgroundColor: theme.primaryColor,
             maxRadius: 20,
-            backgroundImage: NetworkImage(getIt<HomeViewModel>().user?.avatar ??
-                "https://www.gauchercommunity.org/wp-content/uploads/2020/09/avatar-placeholder.png"),
+            backgroundImage: NetworkImage(avatar ?? defaultAvatar),
           ),
         ),
       ),
