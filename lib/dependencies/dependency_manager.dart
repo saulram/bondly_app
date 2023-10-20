@@ -1,8 +1,10 @@
 import 'package:bondly_app/features/auth/data/handlers/auth_session_token_handler.dart';
 import 'package:bondly_app/features/auth/data/mappers/user_entity_mapper.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
+import 'package:bondly_app/features/auth/data/repositories/api/users_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/default_auth_repository.dart';
 import 'package:bondly_app/features/auth/data/repositories/default_users_repository.dart';
+import 'package:bondly_app/features/auth/data/repositories/remote_users_repository.dart';
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bondly_app/features/auth/domain/repositories/users_repository.dart';
@@ -75,7 +77,12 @@ class DependencyManager {
           userUseCase: getIt<UserUseCase>(),
           logoutUseCase: getIt<LogoutUseCase>(),
         ),
-        dependsOn: [AppDatabase, UsersDao, UsersRepository, LogoutUseCase]
+        dependsOn: [
+          AppDatabase,
+          UsersDao,
+          LogoutUseCase,
+          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name),
+        ]
     );
     getIt.registerSingletonWithDependencies<HomeViewModel>(
         () => HomeViewModel(
@@ -94,7 +101,12 @@ class DependencyManager {
               getIt<UserUseCase>(),
               getIt<SessionTokenHandler>(),
             ),
-        dependsOn: [AppDatabase, UsersDao, UsersRepository, UserUseCase]
+        dependsOn: [
+          AppDatabase,
+          UsersDao,
+          UserUseCase,
+          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name),
+        ]
     );
   }
 
@@ -123,6 +135,9 @@ class DependencyManager {
     getIt.registerSingleton<HandleLikeAPI>(
       HandleLikeAPI(getIt<ApiCallsHandler>()),
     );
+    getIt.registerSingleton<UsersAPI>(
+      UsersAPI(getIt<ApiCallsHandler>()),
+    );
   }
 
   void provideRepositories() {
@@ -132,6 +147,7 @@ class DependencyManager {
     );
     getIt.registerSingleton<BannersRepository>(
         DefaultBannersRepository(getIt<BannersAPI>()));
+
     getIt.registerSingleton<CompanyFeedsRepository>(
         DefaultCompanyFeedsRespository(getIt<CompanyFeedsAPI>(),
             getIt<CreateCommentAPI>(), getIt<HandleLikeAPI>()));
@@ -141,7 +157,13 @@ class DependencyManager {
               getIt<UsersDao>(),
               UserEntityMapper(),
             ),
+        instanceName: DefaultUsersRepository.name,
         dependsOn: [AppDatabase, UsersDao]);
+
+    getIt.registerSingletonAsync<UsersRepository>(
+        () async => RemoteUsersRepository(getIt<UsersAPI>()),
+        instanceName: RemoteUsersRepository.name
+    );
   }
 
   void provideUseCases() {
@@ -168,15 +190,29 @@ class DependencyManager {
         GetLoginStateUseCase(getIt<SharedPreferences>()));
 
     getIt.registerSingletonWithDependencies(
-        () => UserUseCase(getIt<UsersRepository>()),
-        dependsOn: [AppDatabase, UsersDao, UsersRepository]);
+        () => UserUseCase(
+            getIt<UsersRepository>(instanceName: DefaultUsersRepository.name),
+            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)
+        ),
+        dependsOn: [
+          AppDatabase,
+          UsersDao,
+          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name),
+          InitDependency(UsersRepository, instanceName: RemoteUsersRepository.name)
+        ]
+    );
 
     getIt.registerSingletonWithDependencies(
         () => LogoutUseCase(
             sharedPreferences: getIt<SharedPreferences>(),
-            usersRepository: getIt<UsersRepository>()
+            usersRepository: getIt<UsersRepository>(instanceName: DefaultUsersRepository.name)
         ),
-        dependsOn: [AppDatabase, UsersDao, UsersRepository]);
+        dependsOn: [
+          AppDatabase,
+          UsersDao,
+          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name)
+        ]
+    );
   }
 
   Future<void> dispose() async {

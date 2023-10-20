@@ -10,7 +10,7 @@ class LogoutUseCase {
     required this.usersRepository
   });
 
-  void invoke() {
+  Future<void> invoke() async {
     try {
       // Call logout
     } finally {

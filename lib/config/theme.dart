@@ -42,6 +42,15 @@ class AppTheme extends ChangeNotifier {
       labelSmall: GoogleFonts.montserrat(
         color: AppColors.bodyColorDark,
       ),
+      headlineLarge: GoogleFonts.montserrat(
+        color: AppColors.bodyColorDark,
+      ),
+      headlineMedium: GoogleFonts.montserrat(
+        color: AppColors.bodyColorDark,
+      ),
+      headlineSmall: GoogleFonts.montserrat(
+        color: AppColors.bodyColorDark,
+      ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       counterStyle: GoogleFonts.poppins(color: AppColors.bodyColorDark,fontWeight: FontWeight.w300),
@@ -120,6 +129,15 @@ class AppTheme extends ChangeNotifier {
       bodySmall: GoogleFonts.montserrat(color: AppColors.bodyColor),
       labelLarge: GoogleFonts.montserrat(color: AppColors.bodyColor),
       labelMedium: GoogleFonts.montserrat(
+        color: AppColors.bodyColor,
+      ),
+      headlineLarge: GoogleFonts.montserrat(
+        color: AppColors.bodyColor,
+      ),
+      headlineMedium: GoogleFonts.montserrat(
+        color: AppColors.bodyColor,
+      ),
+      headlineSmall: GoogleFonts.montserrat(
         color: AppColors.bodyColor,
       ),
       labelSmall: GoogleFonts.montserrat(color: AppColors.bodyColor),
