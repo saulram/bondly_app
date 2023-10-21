@@ -10,12 +10,14 @@ class ScaffoldLayout extends StatelessWidget {
   final Widget body;
   final bool enableBottomNavBar;
   final String? avatar;
+  final VoidCallback? afterProfileCall;
 
   const ScaffoldLayout({
     Key? key,
     required this.body,
     this.enableBottomNavBar = false,
     this.avatar,
+    this.afterProfileCall
   }) : super(key: key);
 
   @override
@@ -29,7 +31,7 @@ class ScaffoldLayout extends StatelessWidget {
         }
       },
       child: Scaffold(
-        appBar: BondlyAppBar(avatar),
+        appBar: BondlyAppBar(avatar, afterProfileCall: afterProfileCall,),
         resizeToAvoidBottomInset: true,
         //TBD add endDrawer With the different routes.
         endDrawer: const Drawer(backgroundColor: AppColors.backgroundColor),
