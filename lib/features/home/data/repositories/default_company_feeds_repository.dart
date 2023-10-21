@@ -1,5 +1,7 @@
+import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/home/data/repositories/api/badges_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/categories_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/company_collaborators.dart';
 import 'package:bondly_app/features/home/data/repositories/api/company_feeds_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/create_comment_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/handle_like_api.dart';
@@ -19,9 +21,15 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
   final HandleLikeAPI _handleLikeAPI;
   final CategoriesAPI _categoriesAPI;
   final BadgesAPI _badgesAPI;
+  final CompanyCollaboratorsAPI _companyCollaboratorsAPI;
 
-  DefaultCompanyFeedsRespository(this._feedsAPI, this._createCommentAPI,
-      this._handleLikeAPI, this._categoriesAPI, this._badgesAPI);
+  DefaultCompanyFeedsRespository(
+      this._feedsAPI,
+      this._createCommentAPI,
+      this._handleLikeAPI,
+      this._categoriesAPI,
+      this._badgesAPI,
+      this._companyCollaboratorsAPI);
   @override
   Future<Result<CompanyFeed, Exception>> getCompanyFeeds() async {
     try {
@@ -68,6 +76,16 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
   Future<Result<Categories, Exception>> getCategories() async {
     try {
       return Result.success(await _categoriesAPI.getCompanyCategories());
+    } catch (exception) {
+      return Result.error(NoConnectionException());
+    }
+  }
+
+  @override
+  Future<Result<List<User>, Exception>> getCompanyCollaborators() async {
+    try {
+      return Result.success(
+          await _companyCollaboratorsAPI.getCompanyCollaborator());
     } catch (exception) {
       return Result.error(NoConnectionException());
     }

@@ -12,9 +12,11 @@ import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dar
 import 'package:bondly_app/features/home/domain/usecases/get_category_badges.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_categories.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_company_collaborators.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:logger/logger.dart';
 import 'package:multiple_result/multiple_result.dart';
 
@@ -31,6 +33,9 @@ class HomeViewModel extends NavigationModel {
   final HandleLikesUseCase _handleLikesUseCase;
   final GetCategoriesUseCase _getCategoriesUseCase;
   final GetCategoryBadgesUseCase _getCategoryBadgesUseCase;
+  final GetCompanyCollaboratorsUseCase _getCompanyCollaboratorsUseCase;
+  final GlobalKey<FlutterMentionsState> mentionsKey =
+      GlobalKey<FlutterMentionsState>();
 
   User? user;
   Logger log = Logger(
@@ -45,7 +50,8 @@ class HomeViewModel extends NavigationModel {
       this._createFeedCommentUseCase,
       this._handleLikesUseCase,
       this._getCategoriesUseCase,
-      this._getCategoryBadgesUseCase) {
+      this._getCategoryBadgesUseCase,
+      this._getCompanyCollaboratorsUseCase) {
     log.i("HomeViewModel created");
   }
 
@@ -74,6 +80,7 @@ class HomeViewModel extends NavigationModel {
       getCompanyBanners(),
       getCompanyFeeds(),
       getCompanyCategories(),
+      getCompanyCollaborators()
     ]);
   }
 
@@ -256,5 +263,74 @@ class HomeViewModel extends NavigationModel {
   set selectedBadge(Badge? badge) {
     _selectedBadge = badge;
     notifyListeners();
+  }
+
+  List<User> _collaborators = [];
+  List<User> get collaborators => _collaborators;
+  set collaborators(List<User> collaborators) {
+    _collaborators = collaborators;
+    notifyListeners();
+  }
+
+  List<Map<String, dynamic>> _collaboratorsList = [];
+  List<Map<String, dynamic>> get collaboratorsList => _collaboratorsList;
+  set collaboratorsList(List<Map<String, dynamic>> data) {
+    _collaboratorsList = data;
+
+    notifyListeners();
+  }
+
+  Future<void> getCompanyCollaborators() async {
+    log.i("Get Company Collaborators for company: ${user?.companyName}");
+    final Result<List<User>, Exception> result =
+        await _getCompanyCollaboratorsUseCase.invoke();
+    result.when((collaborators) {
+      log.i("HomeViewModel### Collaborators: ${collaborators.length}");
+      collaboratorsList = collaborators
+          .map((collaborator) => {
+                "id": collaborator.id ?? "No Name",
+                "display": collaborator.completeName ?? "No Name",
+                "avatar": collaborator.avatar != null
+                    ? "https://api.bondly.mx/${collaborator.avatar}"
+                    : "https://api.minimalavatars.com/avatar/random/png",
+                "user_id": collaborator.id ?? "No Id"
+              })
+          .toList();
+    }, (error) {
+      log.e(" ### ComapanyCollaborators Error: $error");
+      if (error is TokenNotFoundException) {
+        // Dispatch logout
+      }
+    });
+  }
+
+  List<String> _collaboratorsIds = [];
+  List<String> get collaboratorsIds => _collaboratorsIds;
+  set collaboratorsIds(List<String> ids) {
+    _collaboratorsIds = ids;
+    notifyListeners();
+  }
+
+  void pushCollaboratorId(String id) {
+    collaboratorsIds = [...collaboratorsIds, id];
+  }
+
+  /// Returns a list of sanitized mentions by checking if the current text in the mentions
+  /// controller contains any of the collaborator IDs.
+  Future<List<String>> verifyIds() async {
+    List<String> sanitizedMentions = [];
+    collaboratorsIds.map((e) {
+      log.i("HomeViewModel### verifyIds: ${e}");
+      if (mentionsKey.currentState!.controller!.text.contains(e)) {
+        sanitizedMentions.add(e);
+      }
+    });
+    return sanitizedMentions;
+  }
+
+  Future<void> handleSubmitAcknowledgment() async {
+    List<String?> ids = await verifyIds();
+    log.i("HomeViewModel### handleSubmitAcknowledgment: ${ids.length}");
+    log.i("HomeViewModel### handleSubmitAcknowledgment: ${ids}");
   }
 }
