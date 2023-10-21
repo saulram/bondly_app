@@ -1,3 +1,5 @@
+import 'package:bondly_app/config/strings_main.dart';
+
 class CompanyFeed {
   final bool success;
   final List<FeedData> data;
@@ -147,7 +149,9 @@ class Sender {
       giftedPoints: json['giftedPoints'],
       pointsReceived: json['pointsReceived'],
       visible: json['visible'],
-      avatar: json['avatar'],
+      avatar: json["avatar"] == null || json["avatar"].toString().contains("http")
+          ? json["avatar"]
+          : StringsMain.baseImagesUrl + json["avatar"].toString(),
     );
   }
 }

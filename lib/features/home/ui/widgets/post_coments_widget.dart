@@ -103,6 +103,7 @@ class _PostCommentsWidgetState extends State<PostCommentsWidget> {
         children: [
           CircleAvatar(
             radius: 15,
+            backgroundColor: Theme.of(context).primaryColor,
             backgroundImage: NetworkImage(comment.user.avatar ?? ''),
           ),
           const SizedBox(width: 10),

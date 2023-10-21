@@ -8,7 +8,6 @@ class FullScreenImage extends StatefulWidget {
   final String image;
   final String tag;
   final bool isFile;
-  final bool useBaseUrl;
   final File? imageFile;
 
   const FullScreenImage({
@@ -16,7 +15,6 @@ class FullScreenImage extends StatefulWidget {
     required this.image,
     required this.tag,
     this.isFile = false,
-    this.useBaseUrl = false,
     this.imageFile
   });
 
@@ -39,9 +37,9 @@ class _FullScreenImageState extends State<FullScreenImage> {
                   maxScale: 1.8,
                   child: widget.isFile ? Image.file(widget.imageFile!)
                     : Image.network(
-                      widget.useBaseUrl
-                          ? "https://api.bondly.mx/${widget.image}"
-                          : widget.image,
+                      widget.image.contains("http")
+                          ? widget.image
+                          : "https://api.bondly.mx/${widget.image}",
                       fit: BoxFit.contain,
                     ),
                 ),
@@ -49,17 +47,20 @@ class _FullScreenImageState extends State<FullScreenImage> {
               Positioned(
                 top: kToolbarHeight,
                 left: 10,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: const BorderRadius.all(Radius.circular(24.0))
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Iconsax.arrow_left,
-                        color: AppColors.bodyColorDark),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      borderRadius: const BorderRadius.all(Radius.circular(24.0))
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Iconsax.arrow_left,
+                          color: AppColors.bodyColorDark),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
                 ),
               )
