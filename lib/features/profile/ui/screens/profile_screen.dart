@@ -42,6 +42,12 @@ class ProfileScreenState extends State<ProfileScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _image = null;
+  }
+
+  @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
 
@@ -129,7 +135,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               },
               child: CircleAvatar(
                 key: const Key("AvatarWidget"),
-                backgroundColor: theme.cardColor,
+                backgroundColor: theme.primaryColor,
                 maxRadius: 50,
                 backgroundImage: NetworkImage(
                     model.user?.avatar ?? defaultAvatar
@@ -142,7 +148,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               },
               child: CircleAvatar(
                 key: const Key("AvatarWidget"),
-                backgroundColor: theme.cardColor,
+                backgroundColor: theme.primaryColor,
                 maxRadius: 50,
                 backgroundImage: FileImage(_image!),
               ),

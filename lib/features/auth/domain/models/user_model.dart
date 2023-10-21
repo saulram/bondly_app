@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:bondly_app/config/strings_main.dart';
+
 User userDataFromJson(String str) => User.fromJson(json.decode(str));
 
 String userDataToJson(User data) => json.encode(data.toJson());
@@ -64,7 +66,9 @@ class User {
       monthlyPoints: json["monthlyPoints"] ?? 0,
       accountType: json["accountType"],
       companyName: json["companyName"],
-      avatar: json["avatar"],
+      avatar: json["avatar"] == null || json["avatar"].toString().contains("http")
+          ? json["avatar"]
+          : StringsMain.baseImagesUrl + json["avatar"].toString(),
       giftedPoints: json["giftedPoints"] ?? 0,
       pointsReceived: json["pointsReceived"] ?? 0,
       isVisible: json["visible"] ?? false,
