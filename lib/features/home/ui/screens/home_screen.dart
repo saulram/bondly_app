@@ -37,7 +37,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: _buildBody(),
             ),
             enableBottomNavBar: true,
-            avatar: model.user?.avatar
+            avatar: model.user?.avatar,
+            afterProfileCall: model.setUp,
           );
         },
       ),
