@@ -42,4 +42,9 @@ class DefaultUsersRepository extends UsersRepository {
     _usersDao.removeAll();
   }
 
+  @override
+  Future<void> updateAvatar(List<dynamic> params) {
+    throw UnimplementedError();
+  }
+
 }

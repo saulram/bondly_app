@@ -29,6 +29,7 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart'
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
+import 'package:bondly_app/features/profile/domain/update_user_usecase.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
@@ -76,6 +77,7 @@ class DependencyManager {
         () => ProfileViewModel(
           userUseCase: getIt<UserUseCase>(),
           logoutUseCase: getIt<LogoutUseCase>(),
+          updateUserUseCase: getIt<UpdateUserUseCase>(),
         ),
         dependsOn: [
           AppDatabase,
@@ -211,6 +213,17 @@ class DependencyManager {
           AppDatabase,
           UsersDao,
           InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name)
+        ]
+    );
+
+    getIt.registerSingletonWithDependencies(
+            () => UpdateUserUseCase(
+            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)
+        ),
+        dependsOn: [
+          AppDatabase,
+          UsersDao,
+          InitDependency(UsersRepository, instanceName: RemoteUsersRepository.name)
         ]
     );
   }

@@ -303,22 +303,34 @@ class ProfileScreenState extends State<ProfileScreen> {
 
   // Image Picker function to get image from gallery
   Future<void> getImageFromGallery() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 40,
+      maxWidth: 1000,
+      maxHeight: 1000
+    );
 
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
+        widget.model.updateAvatar(_image!);
       }
     });
   }
 
   //Image Picker function to get image from camera
   Future<void> getImageFromCamera() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 40,
+      maxWidth: 1000,
+      maxHeight: 1000
+    );
 
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
+        widget.model.updateAvatar(_image!);
       }
     });
   }
@@ -339,9 +351,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                     .copyWith(color: Colors.white),
               ),
               onPressed: () {
-                // close the options modal
                 Navigator.of(context).pop();
-                // get image from gallery
                 getImageFromGallery();
               },
             ),
@@ -357,9 +367,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                       .copyWith(color: Colors.white)
               ),
               onPressed: () {
-                // close the options modal
                 Navigator.of(context).pop();
-                // get image from camera
                 getImageFromCamera();
               },
             ),
