@@ -26,7 +26,19 @@ class RemoteUsersRepository extends UsersRepository {
   }
 
   @override
-  Future<void> insertUser(User user) {
+  Future<void> insertUser(User user) async {
     throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateAvatar(List<dynamic> params) async {
+    try {
+      if (params.isEmpty) {
+        throw UserUpdateException();
+      }
+      await _usersApi.updateAvatar(params.first, params.last);
+    } catch(exception) {
+      rethrow;
+    }
   }
 }
