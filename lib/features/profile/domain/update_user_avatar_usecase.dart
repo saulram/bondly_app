@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:bondly_app/features/auth/domain/repositories/users_repository.dart';
 
-class UpdateUserUseCase {
+class UpdateUserAvatarUseCase {
   final UsersRepository remoteRepository;
 
-  UpdateUserUseCase(this.remoteRepository);
+  UpdateUserAvatarUseCase(this.remoteRepository);
 
   Future<void> invoke(String userId, File file) async {
     if (userId.isEmpty) {

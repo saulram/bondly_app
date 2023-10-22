@@ -6,14 +6,14 @@ import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
-import 'package:bondly_app/features/profile/domain/update_user_usecase.dart';
+import 'package:bondly_app/features/profile/domain/update_user_avatar_usecase.dart';
 import 'package:logger/logger.dart';
 import 'package:multiple_result/multiple_result.dart';
 
 class ProfileViewModel extends NavigationModel {
   final UserUseCase userUseCase;
   final LogoutUseCase logoutUseCase;
-  final UpdateUserUseCase updateUserUseCase;
+  final UpdateUserAvatarUseCase updateUserUseCase;
 
   User? user;
   bool showUserUpdateError = false;
