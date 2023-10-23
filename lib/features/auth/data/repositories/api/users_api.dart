@@ -33,4 +33,15 @@ class UsersAPI {
       throw NoConnectionException();
     }
   }
+
+  Future<void> loadActivity(String id) async {
+    try {
+      await _callsHandler.get(
+          path: "activity/user"
+      );
+    } catch (exception) {
+      Logger().e(exception.toString());
+      throw NoConnectionException();
+    }
+  }
 }

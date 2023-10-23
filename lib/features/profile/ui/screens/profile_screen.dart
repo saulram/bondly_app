@@ -87,26 +87,29 @@ class ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildTopBar(ThemeData theme) {
     return Container(
-      margin: const EdgeInsets.only(right: 48.0),
       color: Colors.transparent,
       width: double.infinity,
       height: 56.0,
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(
-              Iconsax.arrow_left,
-              color: Colors.white,
-            ),
-            onPressed: () => context.pop(),
-          ),
           Expanded(
-              child: Center(
-                child: Text(
-                  StringsProfile.profileTitle,
-                  style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+            child: Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Iconsax.arrow_left,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => context.pop(),
                 ),
-              )
+                Center(
+                  child: Text(
+                    StringsProfile.profileTitle,
+                    style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+                  ),
+                ),
+              ],
+            )
           )
         ],
       ),

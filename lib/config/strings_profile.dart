@@ -11,6 +11,12 @@ class StringsProfile {
   static const String fromGallery = "Abrir Galería";
   static const String fromCamera = "Abrir Cámara";
 
+  static const String myActivityHeader = "Tus interacciones en Bondly";
+  static const String myActivitySubHeader = "En el listado encontrarás:\n"
+      "- Tus puntos recibidos a través de insignias\n"
+      "- Los \"me gusta\" de tus compañeros\n"
+      "- Las recompensas que has canjeado";
+
   static String welcomeGreeting(String name) {
     return "Hola,\n$name";
   }
