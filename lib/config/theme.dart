@@ -14,6 +14,7 @@ class AppTheme extends ChangeNotifier {
     primaryColor: AppColors.primaryColor,
     primaryColorLight: AppColors.primaryColorLight,
     cardColor: AppColors.tertiaryColor,
+    dividerColor: AppColors.darkDividerColor,
     unselectedWidgetColor: AppColors.backgroundColor,
     textTheme: TextTheme(
       titleLarge: GoogleFonts.montserrat(
@@ -119,6 +120,7 @@ class AppTheme extends ChangeNotifier {
     primaryColor: AppColors.primaryColor,
     primaryColorLight: AppColors.primaryColorLight,
     cardColor: AppColors.tertiaryColorLight,
+    dividerColor: AppColors.dividerColor,
     unselectedWidgetColor: AppColors.darkBackgroundColor,
     textTheme: TextTheme(
       titleLarge: GoogleFonts.montserrat(

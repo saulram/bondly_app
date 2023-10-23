@@ -6,6 +6,9 @@ class AppColors {
   static const Color darkBackgroundColor = Color(0xFF1a1a1a);
   static const Color greyBackGroundColor = Color(0xffe8e7ec);
 
+  static const Color dividerColor = Color(0xfff7f7fd);
+  static const Color darkDividerColor = Color(0xff342f2f);
+
   //App Global Colors:
   static const Color primaryColor = Color(0xff655b80);
   static const Color primaryColorLight = Color(0xff928AAA);
