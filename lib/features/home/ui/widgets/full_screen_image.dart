@@ -50,8 +50,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
                 child: Material(
                   color: Colors.transparent,
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
+                    decoration: const BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(24.0))
                     ),
                     child: IconButton(

@@ -183,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         SizedBox(
-          width: 260,
+          width: 230,
           child: Column(
             children: [
               FlutterMentions(
