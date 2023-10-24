@@ -6,9 +6,9 @@ import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_coments_widget.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
+import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:logger/logger.dart';
 import 'package:moment_dart/moment_dart.dart';
 
@@ -33,12 +33,13 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   }
 
   Container _buildBadgePost(Size size, BuildContext context) {
+    var theme = Theme.of(context);
     return Container(
         width: size.width * .9,
         margin: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-            border: Border.all(color: AppColors.tertiaryColorLight),
-            color: AppColors.backgroundColor,
+            border: Border.all(color: theme.cardColor),
+            color: theme.dividerColor,
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
@@ -56,7 +57,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
                 children: [
                   _buildPostHeader(context),
                   const SizedBox(height: 10),
-                  _buildPostBody(),
+                  _buildPostBody(theme),
                   const SizedBox(height: 10),
                   widget.post.image != null
                       ? _buildPostImage(context)
@@ -69,7 +70,9 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
-                color: AppColors.greyBackGroundColor,
+                color: context.isDarkMode
+                    ? AppColors.greyBackGroundColorDark
+                    : AppColors.greyBackGroundColor,
               ),
               child: Column(
                 children: [
@@ -97,16 +100,19 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
               : "https://api.minimalavatars.com/avatar/avatar/png"),
         ),
         const SizedBox(width: 10),
-        Column(children: [
-          Text(
-            widget.post.sender.completeName,
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
-          Text(
-            postDate.format('DD/MM/YYYY hh:mm'),
-            style: context.themeData.textTheme.labelSmall,
-          ),
-        ]),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.post.sender.completeName.trim(),
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            Text(
+              postDate.format('DD/MM/YYYY hh:mm'),
+              style: context.themeData.textTheme.labelSmall,
+            ),
+          ]
+        ),
         const Expanded(
           child: SizedBox(),
         ),
@@ -114,23 +120,24 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
           label: Text(
             type,
             style: GoogleFonts.montserrat(
-              color: AppColors.tertiaryColor,
+              color: context.isDarkMode
+                  ? AppColors.tertiaryColorLight
+                  : AppColors.tertiaryColor,
               fontSize: 12,
             ),
           ),
-          backgroundColor: AppColors.tertiaryColorLight,
+          backgroundColor: context.isDarkMode
+              ? AppColors.tertiaryColor
+              : AppColors.tertiaryColorLight,
         ),
       ],
     );
   }
 
-  Widget _buildPostBody() {
+  Widget _buildPostBody(ThemeData theme) {
     return PostMentionsWidget(
       text: widget.post.body,
-      style: GoogleFonts.montserrat(
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-          color: AppColors.bodyColor),
+      style: theme.textTheme.bodyMedium,
     );
   }
 
@@ -162,7 +169,10 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
         Text(
           widget.post.badge?.name ?? 'Badge Name',
           style: context.themeData.textTheme.titleSmall
-              ?.copyWith(color: AppColors.tertiaryColor),
+              ?.copyWith(color: context.isDarkMode
+              ? AppColors.tertiaryColorLight
+              : AppColors.tertiaryColor
+          ),
         ),
       ],
     );
@@ -217,10 +227,18 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
       child: Row(
         children: [
           Icon(
-            Iconsax.heart,
+            widget.post.isLiked == true
+                ? IconsaxBold.heart
+                : IconsaxOutline.heart,
             color: widget.post.isLiked == true
-                ? AppColors.secondaryColor
-                : AppColors.primaryColor,
+                ? (context.isDarkMode
+                      ? AppColors.secondaryColorLight
+                      : AppColors.secondaryColor
+                  )
+                : (context.isDarkMode
+                      ? AppColors.greyBackGroundColor
+                      : AppColors.primaryColor
+                  ),
           ),
           const SizedBox(width: 5),
           Text(
@@ -228,7 +246,10 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
             style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: AppColors.secondaryColor),
+                color: context.isDarkMode
+                    ? AppColors.secondaryColorLight
+                    : AppColors.secondaryColor
+            ),
           ),
         ],
       ),
@@ -255,14 +276,22 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
       },
       child: Row(
         children: [
-          const Icon(Iconsax.message, color: AppColors.tertiaryColor),
+          Icon(
+            IconsaxOutline.message,
+            color: context.isDarkMode
+                ? AppColors.tertiaryColorLight
+                : AppColors.tertiaryColor
+          ),
           const SizedBox(width: 5),
           Text(
             widget.post.comments.length.toString(),
             style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: AppColors.tertiaryColor),
+                color:  context.isDarkMode
+                    ? AppColors.tertiaryColorLight
+                    : AppColors.tertiaryColor
+            ),
           ),
         ],
       ),

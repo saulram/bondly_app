@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/theme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -50,7 +51,10 @@ class _PostMentionsWidgetState extends State<PostMentionsWidget> {
       // Add the mention
       textSpans.add(TextSpan(
         text: "@$userName",
-        style: widget.style?.copyWith(color: AppColors.secondaryColor),
+        style: style?.copyWith(color: context.isDarkMode
+            ? AppColors.secondaryColorLight
+            : AppColors.secondaryColor
+        ),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             debugPrint("Mention tapped: $userId");

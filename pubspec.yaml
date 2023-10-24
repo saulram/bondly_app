@@ -46,7 +46,7 @@ dependencies:
   crypto: ^3.0.3
   floor: ^1.4.2
   sqflite: ^2.3.0
-  iconsax: ^0.0.8
+  ficonsax: ^0.0.3
   infinite_carousel: ^1.0.3
   moment_dart: ^1.1.0
   image_picker: ^1.0.4
