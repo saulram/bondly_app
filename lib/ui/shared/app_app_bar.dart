@@ -36,10 +36,13 @@ class BondlyAppBar extends StatelessWidget implements PreferredSizeWidget {
                 (value) => afterProfileCall?.call()
             );
           },
-          child: CircleAvatar(
-            backgroundColor: theme.primaryColor,
-            maxRadius: 20,
-            backgroundImage: NetworkImage(avatar ?? defaultAvatar),
+          child: Hero(
+            tag: "AvatarWidget",
+            child: CircleAvatar(
+              backgroundColor: theme.primaryColor,
+              maxRadius: 20,
+              backgroundImage: NetworkImage(avatar ?? defaultAvatar),
+            ),
           ),
         ),
       ),
