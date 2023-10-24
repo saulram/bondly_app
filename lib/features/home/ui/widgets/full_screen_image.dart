@@ -26,7 +26,6 @@ class _FullScreenImageState extends State<FullScreenImage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: AppColors.darkBackgroundColor,
         body: Hero(
           tag: widget.tag,
           child: Stack(
@@ -50,12 +49,13 @@ class _FullScreenImageState extends State<FullScreenImage> {
                 child: Material(
                   color: Colors.transparent,
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: const BorderRadius.all(Radius.circular(24.0))
                     ),
                     child: IconButton(
-                      icon: const Icon(Iconsax.arrow_left,
-                          color: AppColors.bodyColorDark),
+                      icon:  Icon(Iconsax.arrow_left,
+                          color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
                       onPressed: () {
                         Navigator.pop(context);
                       },
