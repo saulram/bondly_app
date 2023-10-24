@@ -5,8 +5,6 @@ class Badge {
   final String? image;
   final int value;
   final bool isActive;
-  final int v;
-  final bool visible;
 
   Badge({
     required this.id,
@@ -15,8 +13,6 @@ class Badge {
     required this.image,
     required this.value,
     required this.isActive,
-    required this.v,
-    required this.visible,
   });
 
   factory Badge.fromJson(Map<String, dynamic> json) {
@@ -27,8 +23,6 @@ class Badge {
       image: json['image'],
       value: json['value'],
       isActive: json['isActive'],
-      v: json['__v'],
-      visible: json['visible'],
     );
   }
 }
