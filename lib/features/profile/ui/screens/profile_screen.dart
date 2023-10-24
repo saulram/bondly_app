@@ -133,12 +133,15 @@ class ProfileScreenState extends State<ProfileScreen> {
                   image: model.user?.avatar ?? defaultAvatar
                 );
               },
-              child: CircleAvatar(
-                key: const Key("AvatarWidget"),
-                backgroundColor: theme.primaryColor,
-                maxRadius: 50,
-                backgroundImage: NetworkImage(
-                    model.user?.avatar ?? defaultAvatar
+              child: Hero(
+                tag: "AvatarWidget",
+                child: CircleAvatar(
+                  key: const Key("AvatarWidget"),
+                  backgroundColor: theme.primaryColor,
+                  maxRadius: 50,
+                  backgroundImage: NetworkImage(
+                      model.user?.avatar ?? defaultAvatar
+                  ),
                 ),
               ),
             ) :
