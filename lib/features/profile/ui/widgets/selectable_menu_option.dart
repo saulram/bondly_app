@@ -1,6 +1,6 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 
 class SelectableMenuOption extends StatelessWidget {
   final IconData icon;
@@ -46,7 +46,7 @@ class SelectableMenuOption extends StatelessWidget {
                 ),
               ),
               Icon(
-                Iconsax.arrow_right_34,
+                IconsaxOutline.arrow_right_3,
                 color: theme.unselectedWidgetColor,
               )
             ],

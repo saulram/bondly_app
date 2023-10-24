@@ -1,9 +1,8 @@
-import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
+import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:moment_dart/moment_dart.dart';
 
 class PostCommentsWidget extends StatefulWidget {
@@ -37,6 +36,8 @@ class _PostCommentsWidgetState extends State<PostCommentsWidget> {
   }
 
   Widget _buildCommentsHeader() {
+    var theme = Theme.of(context);
+
     return SizedBox(
       height: 65,
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -53,7 +54,8 @@ class _PostCommentsWidgetState extends State<PostCommentsWidget> {
             minLines: 1,
             decoration: InputDecoration(
               hintText: 'Agrega un comentario',
-              fillColor: AppColors.backgroundColor,
+              hintStyle: theme.textTheme.bodyMedium,
+              fillColor: theme.dividerColor,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(50),
                 borderSide: const BorderSide(color: Colors.transparent),
@@ -66,7 +68,7 @@ class _PostCommentsWidgetState extends State<PostCommentsWidget> {
                 borderRadius: BorderRadius.circular(50),
                 borderSide: const BorderSide(color: Colors.transparent),
               ),
-              focusColor: AppColors.backgroundColor,
+              focusColor: theme.dividerColor,
               filled: true,
             ),
           ),
@@ -78,7 +80,10 @@ class _PostCommentsWidgetState extends State<PostCommentsWidget> {
                 onPressed: () {
                   _handleCreateComment();
                 },
-                icon: const Icon(Iconsax.arrow_right),
+                icon: Icon(
+                  IconsaxOutline.arrow_right,
+                  color: Theme.of(context).unselectedWidgetColor,
+                ),
               ),
       ]),
     );

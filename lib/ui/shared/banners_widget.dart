@@ -1,6 +1,6 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 
 class BannersCarousel extends StatefulWidget {
@@ -76,10 +76,10 @@ class _BannersCarouselState extends State<BannersCarousel> {
                         ));
                   },
                 ),
-          _buildIconButton(Iconsax.arrow_circle_left, () {
+          _buildIconButton(IconsaxOutline.arrow_circle_left, () {
             controller.previousItem();
           }, left: 0.0, right: null, top: 50.0, bottom: 50.0),
-          _buildIconButton(Iconsax.arrow_circle_right, () {
+          _buildIconButton(IconsaxOutline.arrow_circle_right, () {
             controller.nextItem();
           }, left: null, right: 0.0, top: 50.0, bottom: 50.0),
         ],

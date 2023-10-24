@@ -10,10 +10,10 @@ import 'package:bondly_app/features/profile/ui/screens/my_activity_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_rewards_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/selectable_menu_option.dart';
+import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -97,7 +97,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               children: [
                 IconButton(
                   icon: const Icon(
-                    Iconsax.arrow_left,
+                    IconsaxOutline.arrow_left,
                     color: Colors.white,
                   ),
                   onPressed: () => context.pop(),
@@ -266,21 +266,21 @@ class ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   SelectableMenuOption(
                       title: StringsProfile.myActivity,
-                      icon: Iconsax.notification_bing,
+                      icon: IconsaxOutline.notification_bing,
                       onTap: () {
                         context.push(MyActivityScreen.route);
                       }
                   ),
                   SelectableMenuOption(
                       title: StringsProfile.rewards,
-                      icon: Iconsax.cup,
+                      icon: IconsaxOutline.cup,
                       onTap: () {
                         context.push(MyRewardsScreen.route);
                       }
                   ),
                   SelectableMenuOption(
                       title: StringsProfile.monthlyReport,
-                      icon: Iconsax.money,
+                      icon: IconsaxOutline.money,
                       onTap: () {
                         context.push(MonthlyBalanceScreen.route);
                       }

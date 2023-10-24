@@ -1,8 +1,7 @@
 import 'dart:io';
 
-import 'package:bondly_app/config/colors.dart';
+import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 
 class FullScreenImage extends StatefulWidget {
   final String image;
@@ -54,7 +53,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
                       borderRadius: const BorderRadius.all(Radius.circular(24.0))
                     ),
                     child: IconButton(
-                      icon:  Icon(Iconsax.arrow_left,
+                      icon: Icon(IconsaxOutline.arrow_left,
                           color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.white),
                       onPressed: () {
                         Navigator.pop(context);

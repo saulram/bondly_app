@@ -1,9 +1,9 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/ui/shared/app_body_layout.dart';
+import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:iconsax/iconsax.dart';
 
 class MyActivityScreen extends StatefulWidget {
 
@@ -33,7 +33,7 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
               leading: GestureDetector(
                 onTap: context.pop,
                 child: const Icon(
-                  Iconsax.arrow_left,
+                  IconsaxOutline.arrow_left,
                 ),
               ),
               backgroundColor: theme.scaffoldBackgroundColor,
@@ -126,7 +126,7 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
       children: [
         _buildHeader(theme),
         _buildActivityItem(
-          icon: Iconsax.add,
+          icon: IconsaxOutline.add,
           title: "Has canjeado una recompensa",
           description: "Canjeaste recompensa del posho feli",
           date: "08/12/22",
