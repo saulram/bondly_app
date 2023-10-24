@@ -18,6 +18,7 @@ import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/data/repositories/api/badges_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/banners_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/categories_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/company_collaborators.dart';
 import 'package:bondly_app/features/home/data/repositories/api/company_feeds_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/create_comment_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/handle_like_api.dart';
@@ -29,6 +30,7 @@ import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dar
 import 'package:bondly_app/features/home/domain/usecases/get_category_badges.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_categories.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_company_collaborators.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
@@ -100,6 +102,7 @@ class DependencyManager {
               getIt<HandleLikesUseCase>(),
               getIt<GetCategoriesUseCase>(),
               getIt<GetCategoryBadgesUseCase>(),
+              getIt<GetCompanyCollaboratorsUseCase>(),
             ),
         dependsOn: [UserUseCase]);
     getIt.registerSingletonWithDependencies<LoginViewModel>(
@@ -130,23 +133,45 @@ class DependencyManager {
 
   void provideApis() {
     getIt.registerSingleton<AuthAPI>(
-      AuthAPI(getIt<ApiCallsHandler>()),
+      AuthAPI(
+        getIt<ApiCallsHandler>(),
+      ),
     );
     getIt.registerSingleton<BannersAPI>(
-      BannersAPI(getIt<ApiCallsHandler>()),
+      BannersAPI(
+        getIt<ApiCallsHandler>(),
+      ),
     );
     getIt.registerSingleton<CompanyFeedsAPI>(
-      CompanyFeedsAPI(getIt<ApiCallsHandler>()),
+      CompanyFeedsAPI(
+        getIt<ApiCallsHandler>(),
+      ),
     );
     getIt.registerSingleton<CreateCommentAPI>(
-      CreateCommentAPI(getIt<ApiCallsHandler>()),
+      CreateCommentAPI(
+        getIt<ApiCallsHandler>(),
+      ),
     );
     getIt.registerSingleton<HandleLikeAPI>(
-      HandleLikeAPI(getIt<ApiCallsHandler>()),
+      HandleLikeAPI(
+        getIt<ApiCallsHandler>(),
+      ),
     );
     getIt.registerSingleton<CategoriesAPI>(
-        CategoriesAPI(getIt<ApiCallsHandler>()));
-    getIt.registerSingleton<BadgesAPI>(BadgesAPI(getIt<ApiCallsHandler>()));
+      CategoriesAPI(
+        getIt<ApiCallsHandler>(),
+      ),
+    );
+    getIt.registerSingleton<BadgesAPI>(
+      BadgesAPI(
+        getIt<ApiCallsHandler>(),
+      ),
+    );
+    getIt.registerSingleton<CompanyCollaboratorsAPI>(
+      CompanyCollaboratorsAPI(
+        getIt<ApiCallsHandler>(),
+      ),
+    );
     getIt.registerSingleton<UsersAPI>(
       UsersAPI(getIt<ApiCallsHandler>()),
     );
@@ -155,10 +180,15 @@ class DependencyManager {
   void provideRepositories() {
     // This probably could be a factory
     getIt.registerSingleton<AuthRepository>(
-      DefaultAuthRepository(getIt<AuthAPI>()),
+      DefaultAuthRepository(
+        getIt<AuthAPI>(),
+      ),
     );
     getIt.registerSingleton<BannersRepository>(
-        DefaultBannersRepository(getIt<BannersAPI>()));
+      DefaultBannersRepository(
+        getIt<BannersAPI>(),
+      ),
+    );
 
     getIt.registerSingleton<CompanyFeedsRepository>(
       DefaultCompanyFeedsRespository(
@@ -167,16 +197,18 @@ class DependencyManager {
         getIt<HandleLikeAPI>(),
         getIt<CategoriesAPI>(),
         getIt<BadgesAPI>(),
+        getIt<CompanyCollaboratorsAPI>(),
       ),
     );
 
     getIt.registerSingletonWithDependencies<UsersRepository>(
-        () => DefaultUsersRepository(
-              getIt<UsersDao>(),
-              UserEntityMapper(),
-            ),
-        instanceName: DefaultUsersRepository.name,
-        dependsOn: [AppDatabase, UsersDao]);
+      () => DefaultUsersRepository(
+        getIt<UsersDao>(),
+        UserEntityMapper(),
+      ),
+      instanceName: DefaultUsersRepository.name,
+      dependsOn: [AppDatabase, UsersDao],
+    );
 
     getIt.registerSingletonAsync<UsersRepository>(
         () async => RemoteUsersRepository(getIt<UsersAPI>()),
@@ -185,25 +217,44 @@ class DependencyManager {
 
   void provideUseCases() {
     getIt.registerSingleton<LoginUseCase>(
-      LoginUseCase(getIt<AuthRepository>()),
+      LoginUseCase(
+        getIt<AuthRepository>(),
+      ),
     );
 
     getIt.registerSingleton<GetCompaniesUseCase>(
-      GetCompaniesUseCase(getIt<AuthRepository>()),
+      GetCompaniesUseCase(
+        getIt<AuthRepository>(),
+      ),
     );
     getIt.registerSingleton<GetCompanyBannersUseCase>(
-        GetCompanyBannersUseCase(getIt<BannersRepository>()));
+      GetCompanyBannersUseCase(
+        getIt<BannersRepository>(),
+      ),
+    );
 
     getIt.registerSingleton<GetCompanyFeedsUseCase>(
-        GetCompanyFeedsUseCase(getIt<CompanyFeedsRepository>()));
+      GetCompanyFeedsUseCase(
+        getIt<CompanyFeedsRepository>(),
+      ),
+    );
 
     getIt.registerSingleton<CreateFeedCommentUseCase>(
-        CreateFeedCommentUseCase(getIt<CompanyFeedsRepository>()));
+      CreateFeedCommentUseCase(
+        getIt<CompanyFeedsRepository>(),
+      ),
+    );
 
     getIt.registerSingleton<HandleLikesUseCase>(
-        HandleLikesUseCase(getIt<CompanyFeedsRepository>()));
+      HandleLikesUseCase(
+        getIt<CompanyFeedsRepository>(),
+      ),
+    );
     getIt.registerSingleton<GetCategoryBadgesUseCase>(
-        GetCategoryBadgesUseCase(getIt<CompanyFeedsRepository>()));
+      GetCategoryBadgesUseCase(
+        getIt<CompanyFeedsRepository>(),
+      ),
+    );
 
     getIt.registerSingleton<GetCategoriesUseCase>(
       GetCategoriesUseCase(
@@ -212,7 +263,10 @@ class DependencyManager {
     );
 
     getIt.registerSingleton<GetLoginStateUseCase>(
-        GetLoginStateUseCase(getIt<SharedPreferences>()));
+      GetLoginStateUseCase(
+        getIt<SharedPreferences>(),
+      ),
+    );
 
     getIt.registerSingletonWithDependencies(
         () => UserUseCase(

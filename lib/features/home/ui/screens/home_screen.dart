@@ -60,15 +60,24 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 10),
-                _buildAcknowledgmentsSection(),
                 const SizedBox(
-                  height: 50,
+                  height: 10,
                 ),
                 SizedBox(
-                  height: 300,
+                  height: 500,
                   child: ListView.builder(
                     itemCount: model.feeds.data.length,
                     itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return Column(
+                          children: [
+                            _buildAcknowledgmentsSection(),
+                            const SizedBox(height: 10),
+                            SinglePostWidget(
+                                post: model.feeds.data[index], index: index)
+                          ],
+                        );
+                      }
                       return SinglePostWidget(
                         post: model.feeds.data[index],
                         index: index,
@@ -174,70 +183,46 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         SizedBox(
-          width: 200,
+          width: 260,
           child: Column(
             children: [
               FlutterMentions(
-                key: const Key("mentions"),
+                key: model.mentionsKey,
                 suggestionPosition: SuggestionPosition.Top,
                 maxLines: 5,
                 minLines: 1,
-                decoration: InputDecoration(hintText: 'hello'),
+                onMentionAdd: (mention) {
+                  model.pushCollaboratorId(mention['id']);
+                },
+                onSubmitted: (value) {},
+                decoration: InputDecoration(
+                    hintText: 'Etiqueta a @alguien y reconocelo!'),
                 mentions: [
                   Mention(
                     trigger: '@',
                     style: TextStyle(
-                      color: Colors.amber,
+                      color: AppColors.secondaryColor,
                     ),
-                    data: [
-                      {
-                        'id': '61as61fsa',
-                        'display': 'fayeedP',
-                        'full_name': 'Fayeed Pawaskar',
-                        'photo':
-                            'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-                      },
-                      {
-                        'id': '61asasgasgsag6a',
-                        'display': 'khaled',
-                        'full_name': 'DJ Khaled',
-                        'style': TextStyle(color: Colors.purple),
-                        'photo':
-                            'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-                      },
-                      {
-                        'id': 'asfgasga41',
-                        'display': 'markT',
-                        'full_name': 'Mark Twain',
-                        'photo':
-                            'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-                      },
-                      {
-                        'id': 'asfsaf451a',
-                        'display': 'JhonL',
-                        'full_name': 'Jhon Legend',
-                        'photo':
-                            'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-                      },
-                    ],
+                    data: model.collaboratorsList,
                     matchAll: false,
                     suggestionBuilder: (data) {
                       return Container(
                         padding: EdgeInsets.all(10.0),
+                        width: 150,
                         child: Row(
                           children: <Widget>[
                             CircleAvatar(
                               backgroundImage: NetworkImage(
-                                data['photo'],
+                                data['avatar'],
                               ),
+                              backgroundColor: AppColors.tertiaryColorLight,
                             ),
                             SizedBox(
                               width: 20.0,
                             ),
                             Column(
                               children: <Widget>[
-                                Text(data['full_name']),
-                                Text('@${data['display']}'),
+                                Text("${data['display']}"),
                               ],
                             )
                           ],
@@ -250,8 +235,11 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(
                 height: 10,
               ),
-              ElevatedButton(
-                onPressed: () {},
+              FilledButton(
+                style: Theme.of(context).filledButtonTheme.style,
+                onPressed: () {
+                  model.handleSubmitAcknowledgment();
+                },
                 child: const Text('Reconocer'),
               )
             ],

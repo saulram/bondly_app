@@ -1,3 +1,4 @@
+import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/home/domain/models/category_badges.dart';
 import 'package:bondly_app/features/home/domain/models/company_categories.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
@@ -28,6 +29,10 @@ abstract class CompanyFeedsRepository {
   /// This method retrieves the badges.
   /// Returns a [Result] object that contains either a [Badges] object or an [Exception].
   Future<Result<Badges, Exception>> getBadges(String categoryId);
+
+  /// This method retrieves the company collaborators.
+  /// Returns a [Result] object that contains either a [List] of [User] objects or an [Exception].
+  Future<Result<List<User>, Exception>> getCompanyCollaborators();
 }
 
 /// Exception thrown when there is no internet connection.
