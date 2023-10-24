@@ -1,10 +1,8 @@
 import 'package:bondly_app/features/auth/data/handlers/auth_session_token_handler.dart';
 import 'package:bondly_app/features/auth/data/mappers/user_entity_mapper.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
-import 'package:bondly_app/features/auth/data/repositories/api/users_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/default_auth_repository.dart';
 import 'package:bondly_app/features/auth/data/repositories/default_users_repository.dart';
-import 'package:bondly_app/features/auth/data/repositories/remote_users_repository.dart';
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bondly_app/features/auth/domain/repositories/users_repository.dart';
@@ -153,27 +151,7 @@ class DependencyManager {
       ),
     );
     getIt.registerSingleton<HandleLikeAPI>(
-      HandleLikeAPI(
-        getIt<ApiCallsHandler>(),
-      ),
-    );
-    getIt.registerSingleton<CategoriesAPI>(
-      CategoriesAPI(
-        getIt<ApiCallsHandler>(),
-      ),
-    );
-    getIt.registerSingleton<BadgesAPI>(
-      BadgesAPI(
-        getIt<ApiCallsHandler>(),
-      ),
-    );
-    getIt.registerSingleton<CompanyCollaboratorsAPI>(
-      CompanyCollaboratorsAPI(
-        getIt<ApiCallsHandler>(),
-      ),
-    );
-    getIt.registerSingleton<UsersAPI>(
-      UsersAPI(getIt<ApiCallsHandler>()),
+      HandleLikeAPI(getIt<ApiCallsHandler>()),
     );
   }
 
@@ -185,11 +163,7 @@ class DependencyManager {
       ),
     );
     getIt.registerSingleton<BannersRepository>(
-      DefaultBannersRepository(
-        getIt<BannersAPI>(),
-      ),
-    );
-
+        DefaultBannersRepository(getIt<BannersAPI>()));
     getIt.registerSingleton<CompanyFeedsRepository>(
       DefaultCompanyFeedsRespository(
         getIt<CompanyFeedsAPI>(),
@@ -202,17 +176,11 @@ class DependencyManager {
     );
 
     getIt.registerSingletonWithDependencies<UsersRepository>(
-      () => DefaultUsersRepository(
-        getIt<UsersDao>(),
-        UserEntityMapper(),
-      ),
-      instanceName: DefaultUsersRepository.name,
-      dependsOn: [AppDatabase, UsersDao],
-    );
-
-    getIt.registerSingletonAsync<UsersRepository>(
-        () async => RemoteUsersRepository(getIt<UsersAPI>()),
-        instanceName: RemoteUsersRepository.name);
+        () => DefaultUsersRepository(
+              getIt<UsersDao>(),
+              UserEntityMapper(),
+            ),
+        dependsOn: [AppDatabase, UsersDao]);
   }
 
   void provideUseCases() {
@@ -263,45 +231,11 @@ class DependencyManager {
     );
 
     getIt.registerSingleton<GetLoginStateUseCase>(
-      GetLoginStateUseCase(
-        getIt<SharedPreferences>(),
-      ),
-    );
+        GetLoginStateUseCase(getIt<SharedPreferences>()));
 
     getIt.registerSingletonWithDependencies(
-        () => UserUseCase(
-            getIt<UsersRepository>(instanceName: DefaultUsersRepository.name),
-            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
-        dependsOn: [
-          AppDatabase,
-          UsersDao,
-          InitDependency(UsersRepository,
-              instanceName: DefaultUsersRepository.name),
-          InitDependency(UsersRepository,
-              instanceName: RemoteUsersRepository.name)
-        ]);
-
-    getIt.registerSingletonWithDependencies(
-        () => LogoutUseCase(
-            sharedPreferences: getIt<SharedPreferences>(),
-            usersRepository: getIt<UsersRepository>(
-                instanceName: DefaultUsersRepository.name)),
-        dependsOn: [
-          AppDatabase,
-          UsersDao,
-          InitDependency(UsersRepository,
-              instanceName: DefaultUsersRepository.name)
-        ]);
-
-    getIt.registerSingletonWithDependencies(
-        () => UpdateUserAvatarUseCase(
-            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
-        dependsOn: [
-          AppDatabase,
-          UsersDao,
-          InitDependency(UsersRepository,
-              instanceName: RemoteUsersRepository.name)
-        ]);
+        () => UserUseCase(getIt<UsersRepository>()),
+        dependsOn: [AppDatabase, UsersDao, UsersRepository]);
   }
 
   Future<void> dispose() async {

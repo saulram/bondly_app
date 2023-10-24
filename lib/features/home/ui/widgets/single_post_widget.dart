@@ -93,15 +93,9 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
       children: [
         CircleAvatar(
           radius: 15,
-<<<<<<< HEAD
-          backgroundColor: Theme.of(context).primaryColor,
-          backgroundImage: NetworkImage(widget.post.sender.avatar ??
-              'https://th.bing.com/th/id/OIP.6MALULga-w8M2ybAW3KtyAHaHa?pid=ImgDet&rs=1'),
-=======
           backgroundImage: NetworkImage(widget.post.sender.avatar != null
               ? "https://api.bondly.mx/${widget.post.sender.avatar}"
               : "https://api.minimalavatars.com/avatar/avatar/png"),
->>>>>>> 815d6b2 (final tunning)
         ),
         const SizedBox(width: 10),
         Column(children: [

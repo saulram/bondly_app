@@ -51,6 +51,7 @@ dependencies:
   moment_dart: ^1.1.0
   image_picker: ^1.0.4
   flutter_mentions: ^2.0.1
+  flutter_mentions: ^2.0.1
 
 dev_dependencies:
   floor_generator: ^1.4.2
