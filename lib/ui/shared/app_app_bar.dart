@@ -43,17 +43,7 @@ class BondlyAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      actions: [
-        IconButton(
-          onPressed: () {
-            Scaffold.of(context).openEndDrawer();
-          },
-          icon: const Icon(
-            Iconsax.menu,
-            color: AppColors.primaryColor,
-          ),
-        ),
-      ],
+
     );
   }
 

@@ -1,17 +1,38 @@
+import 'package:bondly_app/features/auth/domain/models/user_model.dart';
+import 'package:bondly_app/features/home/domain/models/category_badges.dart';
+import 'package:bondly_app/features/home/domain/models/company_categories.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:multiple_result/multiple_result.dart';
 
-/// This file contains the [CompanyFeedsRepository] abstract class and several exception classes.
-/// The [CompanyFeedsRepository] class defines the contract for retrieving company banners.
-/// The exception classes are used to handle different error scenarios that may occur during the login process.
+/// This abstract class defines the methods that a company feeds repository should implement.
+/// It provides methods to get company feeds, create comments, like posts, get categories and get badges.
 abstract class CompanyFeedsRepository {
-  /// Retrieves the company banners.
-  ///
-  /// Returns a [Result] object that contains either the [List<FeedPost>] or an [Exception].
+  /// This method retrieves the company feeds.
+  /// Returns a [Result] object that contains either a [CompanyFeed] object or an [Exception].
   Future<Result<CompanyFeed, Exception>> getCompanyFeeds();
+
+  /// This method creates a comment for a specific feed.
+  /// Takes in a [feedId] and a [message] as parameters.
+  /// Returns a [Result] object that contains either a [FeedData] object or an [Exception].
   Future<Result<FeedData, Exception>> createComment(
       String feedId, String message);
+
+  /// This method likes a specific post.
+  /// Takes in a [feedId] as a parameter.
+  /// Returns a [Result] object that contains either a [bool] value or an [Exception].
   Future<Result<bool, Exception>> likePost(String feedId);
+
+  /// This method retrieves the categories.
+  /// Returns a [Result] object that contains either a [Categories] object or an [Exception].
+  Future<Result<Categories, Exception>> getCategories();
+
+  /// This method retrieves the badges.
+  /// Returns a [Result] object that contains either a [Badges] object or an [Exception].
+  Future<Result<Badges, Exception>> getBadges(String categoryId);
+
+  /// This method retrieves the company collaborators.
+  /// Returns a [Result] object that contains either a [List] of [User] objects or an [Exception].
+  Future<Result<List<User>, Exception>> getCompanyCollaborators();
 }
 
 /// Exception thrown when there is no internet connection.

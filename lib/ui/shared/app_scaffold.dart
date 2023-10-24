@@ -34,7 +34,6 @@ class ScaffoldLayout extends StatelessWidget {
         appBar: BondlyAppBar(avatar, afterProfileCall: afterProfileCall,),
         resizeToAvoidBottomInset: true,
         //TBD add endDrawer With the different routes.
-        endDrawer: const Drawer(backgroundColor: AppColors.backgroundColor),
         body: body,
         bottomNavigationBar: enableBottomNavBar
             ? _buildBottomNavBar(getIt<HomeViewModel>())
