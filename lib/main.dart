@@ -4,6 +4,7 @@ import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:provider/provider.dart';
 import 'package:url_strategy/url_strategy.dart';
 // ignore: depend_on_referenced_packages
@@ -55,11 +56,13 @@ class _BondlyAppState extends State<BondlyApp> {
     return ModelProvider(
       model: appModel,
       child: ModelBuilder<AppModel>(builder: (context, modelApp, child) {
-        return MaterialApp.router(
-          title: StringsMain.appName,
-          theme: context.watch<AppTheme>().lightTheme,
-          darkTheme: context.watch<AppTheme>().darkTheme,
-          routerConfig: modelApp.navigation,
+        return Portal(
+          child: MaterialApp.router(
+            title: StringsMain.appName,
+            theme: context.watch<AppTheme>().lightTheme,
+            darkTheme: context.watch<AppTheme>().darkTheme,
+            routerConfig: modelApp.navigation,
+          ),
         );
       }),
     );

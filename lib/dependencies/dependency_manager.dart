@@ -15,7 +15,9 @@ import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/data/repositories/api/badges_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/banners_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/categories_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/company_feeds_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/create_comment_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/handle_like_api.dart';
@@ -24,7 +26,9 @@ import 'package:bondly_app/features/home/data/repositories/default_company_feeds
 import 'package:bondly_app/features/home/domain/repositories/banners_repository.dart';
 import 'package:bondly_app/features/home/domain/repositories/company_feeds_respository.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_category_badges.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_company_categories.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
@@ -75,25 +79,28 @@ class DependencyManager {
     getIt.registerSingleton<AppModel>(AppModel());
     getIt.registerSingletonWithDependencies<ProfileViewModel>(
         () => ProfileViewModel(
-          userUseCase: getIt<UserUseCase>(),
-          logoutUseCase: getIt<LogoutUseCase>(),
-          updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
-        ),
+              userUseCase: getIt<UserUseCase>(),
+              logoutUseCase: getIt<LogoutUseCase>(),
+              updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
+            ),
         dependsOn: [
           AppDatabase,
           UsersDao,
           LogoutUseCase,
-          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name),
-        ]
-    );
+          InitDependency(UsersRepository,
+              instanceName: DefaultUsersRepository.name),
+        ]);
     getIt.registerSingletonWithDependencies<HomeViewModel>(
         () => HomeViewModel(
-            getIt<UserUseCase>(),
-            getIt<SessionTokenHandler>(),
-            getIt<GetCompanyBannersUseCase>(),
-            getIt<GetCompanyFeedsUseCase>(),
-            getIt<CreateFeedCommentUseCase>(),
-            getIt<HandleLikesUseCase>()),
+              getIt<UserUseCase>(),
+              getIt<SessionTokenHandler>(),
+              getIt<GetCompanyBannersUseCase>(),
+              getIt<GetCompanyFeedsUseCase>(),
+              getIt<CreateFeedCommentUseCase>(),
+              getIt<HandleLikesUseCase>(),
+              getIt<GetCategoriesUseCase>(),
+              getIt<GetCategoryBadgesUseCase>(),
+            ),
         dependsOn: [UserUseCase]);
     getIt.registerSingletonWithDependencies<LoginViewModel>(
         () => LoginViewModel(
@@ -107,9 +114,9 @@ class DependencyManager {
           AppDatabase,
           UsersDao,
           UserUseCase,
-          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name),
-        ]
-    );
+          InitDependency(UsersRepository,
+              instanceName: DefaultUsersRepository.name),
+        ]);
   }
 
   void registerApiHandler() {
@@ -137,6 +144,9 @@ class DependencyManager {
     getIt.registerSingleton<HandleLikeAPI>(
       HandleLikeAPI(getIt<ApiCallsHandler>()),
     );
+    getIt.registerSingleton<CategoriesAPI>(
+        CategoriesAPI(getIt<ApiCallsHandler>()));
+    getIt.registerSingleton<BadgesAPI>(BadgesAPI(getIt<ApiCallsHandler>()));
     getIt.registerSingleton<UsersAPI>(
       UsersAPI(getIt<ApiCallsHandler>()),
     );
@@ -151,8 +161,14 @@ class DependencyManager {
         DefaultBannersRepository(getIt<BannersAPI>()));
 
     getIt.registerSingleton<CompanyFeedsRepository>(
-        DefaultCompanyFeedsRespository(getIt<CompanyFeedsAPI>(),
-            getIt<CreateCommentAPI>(), getIt<HandleLikeAPI>()));
+      DefaultCompanyFeedsRespository(
+        getIt<CompanyFeedsAPI>(),
+        getIt<CreateCommentAPI>(),
+        getIt<HandleLikeAPI>(),
+        getIt<CategoriesAPI>(),
+        getIt<BadgesAPI>(),
+      ),
+    );
 
     getIt.registerSingletonWithDependencies<UsersRepository>(
         () => DefaultUsersRepository(
@@ -164,8 +180,7 @@ class DependencyManager {
 
     getIt.registerSingletonAsync<UsersRepository>(
         () async => RemoteUsersRepository(getIt<UsersAPI>()),
-        instanceName: RemoteUsersRepository.name
-    );
+        instanceName: RemoteUsersRepository.name);
   }
 
   void provideUseCases() {
@@ -187,6 +202,14 @@ class DependencyManager {
 
     getIt.registerSingleton<HandleLikesUseCase>(
         HandleLikesUseCase(getIt<CompanyFeedsRepository>()));
+    getIt.registerSingleton<GetCategoryBadgesUseCase>(
+        GetCategoryBadgesUseCase(getIt<CompanyFeedsRepository>()));
+
+    getIt.registerSingleton<GetCategoriesUseCase>(
+      GetCategoriesUseCase(
+        getIt<CompanyFeedsRepository>(),
+      ),
+    );
 
     getIt.registerSingleton<GetLoginStateUseCase>(
         GetLoginStateUseCase(getIt<SharedPreferences>()));
@@ -194,38 +217,37 @@ class DependencyManager {
     getIt.registerSingletonWithDependencies(
         () => UserUseCase(
             getIt<UsersRepository>(instanceName: DefaultUsersRepository.name),
-            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)
-        ),
+            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
         dependsOn: [
           AppDatabase,
           UsersDao,
-          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name),
-          InitDependency(UsersRepository, instanceName: RemoteUsersRepository.name)
-        ]
-    );
+          InitDependency(UsersRepository,
+              instanceName: DefaultUsersRepository.name),
+          InitDependency(UsersRepository,
+              instanceName: RemoteUsersRepository.name)
+        ]);
 
     getIt.registerSingletonWithDependencies(
         () => LogoutUseCase(
             sharedPreferences: getIt<SharedPreferences>(),
-            usersRepository: getIt<UsersRepository>(instanceName: DefaultUsersRepository.name)
-        ),
+            usersRepository: getIt<UsersRepository>(
+                instanceName: DefaultUsersRepository.name)),
         dependsOn: [
           AppDatabase,
           UsersDao,
-          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name)
-        ]
-    );
+          InitDependency(UsersRepository,
+              instanceName: DefaultUsersRepository.name)
+        ]);
 
     getIt.registerSingletonWithDependencies(
-            () => UpdateUserAvatarUseCase(
-            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)
-        ),
+        () => UpdateUserAvatarUseCase(
+            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
         dependsOn: [
           AppDatabase,
           UsersDao,
-          InitDependency(UsersRepository, instanceName: RemoteUsersRepository.name)
-        ]
-    );
+          InitDependency(UsersRepository,
+              instanceName: RemoteUsersRepository.name)
+        ]);
   }
 
   Future<void> dispose() async {
