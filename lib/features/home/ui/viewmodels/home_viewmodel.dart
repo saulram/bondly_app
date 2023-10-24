@@ -291,7 +291,7 @@ class HomeViewModel extends NavigationModel {
                 "id": collaborator.id ?? "No Name",
                 "display": collaborator.completeName ?? "No Name",
                 "avatar": collaborator.avatar != null
-                    ? "https://api.bondly.mx/${collaborator.avatar}"
+                    ? collaborator.avatar
                     : "https://api.minimalavatars.com/avatar/random/png",
                 "user_id": collaborator.id ?? "No Id"
               })
