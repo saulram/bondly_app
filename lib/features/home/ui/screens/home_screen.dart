@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/strings_home.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
@@ -78,9 +79,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         );
                       }
-                      return SinglePostWidget(
-                        post: model.feeds.data[index],
-                        index: index,
+                      return Column(
+                        children: [
+                          SinglePostWidget(
+                            post: model.feeds.data[index],
+                            index: index,
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -117,13 +122,14 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         children: [
           Text(
-            'Tienes ${model.user?.giftedPoints} puntos para reconocer a tus compañeros.',
+            StringsHome.acknowledgmentAmountOfPoints(
+                model.user?.giftedPoints.toString() ?? ''),
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
           Text(
-            'Elige entre los ${model.categories.categories?.length} tipos de insignias y decide que tipo de reconocimiento quieres otorgar',
+           StringsHome.acknowledgmentCategorySubHeader(model.categories.categories?.length.toString() ?? '')  ,
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
@@ -137,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
               : _buildBadgesFromCategorySection(),
           const Divider(),
           model.selectedBadge == null
-              ? SizedBox()
+              ? const SizedBox()
               : _buildCreateAcknowledgment()
         ],
       ),
@@ -195,19 +201,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   model.pushCollaboratorId(mention['id']);
                 },
                 onSubmitted: (value) {},
-                decoration: InputDecoration(
-                    hintText: 'Etiqueta a @alguien y reconocelo!'),
+                decoration: const InputDecoration(
+                    hintText: StringsHome.acknowledgMentInputHint),
                 mentions: [
                   Mention(
                     trigger: '@',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppColors.secondaryColor,
                     ),
                     data: model.collaboratorsList,
                     matchAll: false,
                     suggestionBuilder: (data) {
                       return Container(
-                        padding: EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(10.0),
                         width: 150,
                         child: Row(
                           children: <Widget>[
@@ -217,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               backgroundColor: AppColors.tertiaryColorLight,
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 20.0,
                             ),
                             Column(
@@ -235,13 +241,16 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(
                 height: 10,
               ),
-              FilledButton(
-                style: Theme.of(context).filledButtonTheme.style,
-                onPressed: () {
-                  model.handleSubmitAcknowledgment();
+              model.collaboratorsIds.isNotEmpty && model.mentionsKey.currentState!.controller!.text.isNotEmpty ?  OutlinedButton(
+                style: Theme.of(context).outlinedButtonTheme.style,
+                onPressed: () async {
+                  model.creatingAcknowledgment = true;
+                 await  model.handleSubmitAcknowledgment();
+
+                  model.creatingAcknowledgment = false;
                 },
-                child: const Text('Reconocer'),
-              )
+                child:  model.creatingAcknowledgment ? const CircularProgressIndicator.adaptive() : const Text(StringsHome.acknowledgmentInputButtonText),
+              ) : const SizedBox()
             ],
           ),
         )
@@ -277,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 50,
                           width: 50,
                           child: Image.network(
-                            "https://api.bondly.mx/${model.badges.badges?[index].image}",
+                            "https://api.bondly.mx/${model.badges.badges[index].image}",
                           ),
                         ),
                         Text(
@@ -292,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          model.badges.badges?[index].name ?? '',
+                          model.badges.badges[index].name ?? '',
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall

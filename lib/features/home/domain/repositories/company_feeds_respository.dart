@@ -33,6 +33,9 @@ abstract class CompanyFeedsRepository {
   /// This method retrieves the company collaborators.
   /// Returns a [Result] object that contains either a [List] of [User] objects or an [Exception].
   Future<Result<List<User>, Exception>> getCompanyCollaborators();
+  Future<Result<bool, Exception>> createAcknowledgment(String badgeId,String message, List<String> recipients);
+
+
 }
 
 /// Exception thrown when there is no internet connection.
