@@ -32,7 +32,7 @@ class AppRouter {
       ),
       GoRoute(
           path: MyActivityScreen.route,
-          builder: (context, state) => const MyActivityScreen()
+          builder: (context, state) => MyActivityScreen()
       ),
       GoRoute(
           path: MyRewardsScreen.route,

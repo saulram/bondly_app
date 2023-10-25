@@ -140,10 +140,16 @@ class ApiCallsHandler extends CallsHandler {
 
   Future<http.Response> get({
       required String path,
-      Map<String, dynamic>? params,
+      Map<String, String>? params,
       Map<String, String>? extraHeaders
   }) async {
-   return _enqueueCall(path, Methods.GET, params: params, extraHeaders: extraHeaders);
+   return _enqueueCall(
+       path,
+       Methods.GET,
+       params: params,
+       extraHeaders: extraHeaders,
+       queryParams: params
+   );
   }
 
   Future<http.Response> delete({
@@ -200,9 +206,10 @@ class ApiCallsHandler extends CallsHandler {
       String path,
       Methods method,
       {Map<String, dynamic>? params,
-      Map<String, String>? extraHeaders}
+      Map<String, String>? extraHeaders,
+      Map<String, String>? queryParams}
   ) async {
-    Uri uri = _bondlyUri(path);
+    Uri uri = _bondlyUri(path, params: queryParams);
 
     String payload = "";
     if (params != null) {
