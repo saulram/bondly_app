@@ -1,5 +1,6 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_home.dart';
+import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
@@ -105,11 +106,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Container _buildAcknowledgmentsSection() {
+    var theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: AppColors.tertiaryColorLight),
-          color: AppColors.backgroundColor,
+          border: Border.all(color: theme.cardColor),
+          color: theme.dividerColor,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
@@ -137,11 +139,15 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 10,
           ),
           _buildCategoriesSection(),
-          const Divider(),
+          const Divider(
+            color: AppColors.greyBackGroundColorDark,
+          ),
           model.selectedCategory == null
               ? const SizedBox()
               : _buildBadgesFromCategorySection(),
-          const Divider(),
+          const Divider(
+            color: AppColors.greyBackGroundColorDark,
+          ),
           model.selectedBadge == null
               ? const SizedBox()
               : _buildCreateAcknowledgment()
@@ -151,6 +157,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Row _buildCreateAcknowledgment() {
+    var theme = Theme.of(context);
+
     return Row(
       children: [
         Container(
@@ -170,18 +178,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Text(
                   "",
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  style: theme.textTheme.bodySmall?.copyWith(
                       color: AppColors.primaryColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 10),
+                      fontSize: 10
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 Text(
                   model.selectedBadge?.name ?? '',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  style: theme.textTheme.bodySmall?.copyWith(
                       color: AppColors.primaryColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 10),
+                      fontSize: 10
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -201,8 +211,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   model.pushCollaboratorId(mention['id']);
                 },
                 onSubmitted: (value) {},
-                decoration: const InputDecoration(
-                    hintText: StringsHome.acknowledgMentInputHint),
+                decoration: InputDecoration(
+                  hintText: StringsHome.acknowledgMentInputHint,
+                  hintStyle: theme.textTheme.bodyMedium,
+                  fillColor: theme.dividerColor,
+                ),
                 mentions: [
                   Mention(
                     trigger: '@',
@@ -213,6 +226,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     matchAll: false,
                     suggestionBuilder: (data) {
                       return Container(
+                        color: context.isDarkMode
+                            ? AppColors.greyBackGroundColorDark
+                            : AppColors.greyBackGroundColor,
                         padding: const EdgeInsets.all(10.0),
                         width: 150,
                         child: Row(
