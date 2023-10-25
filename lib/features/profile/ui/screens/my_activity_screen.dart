@@ -1,5 +1,10 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_profile.dart';
+import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/profile/domain/models/user_activity.dart';
+import 'package:bondly_app/features/profile/ui/state/my_activity_ui_state.dart';
+import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_body_layout.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +13,9 @@ import 'package:go_router/go_router.dart';
 class MyActivityScreen extends StatefulWidget {
 
   static const String route = "/myActivityScreen";
+  final MyActivityViewModel model = getIt<MyActivityViewModel>();
 
-  const MyActivityScreen({super.key});
+  MyActivityScreen({super.key});
 
   @override
   State<MyActivityScreen> createState() => _MyActivityScreenState();
@@ -17,16 +23,37 @@ class MyActivityScreen extends StatefulWidget {
 
 class _MyActivityScreenState extends State<MyActivityScreen> {
   bool addMargin = false;
+
   double top = 0.0;
   String _value = "";
+
+  List<UserActivityItem> activities = [];
+
+  @override
+  void initState() {
+    super.initState();
+    widget.model.load();
+  }
 
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: NestedScrollView(
+    return ModelProvider<MyActivityViewModel>(
+      model: widget.model,
+      child: ModelBuilder<MyActivityViewModel>(
+        builder: (context, model, widget) {
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: _buildBody(theme, model),
+          );
+        }
+      ),
+    );
+  }
+
+  Widget _buildBody(ThemeData theme, MyActivityViewModel model) {
+    return NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
@@ -38,9 +65,9 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
               ),
               backgroundColor: theme.scaffoldBackgroundColor,
               iconTheme: IconThemeData(
-                color: theme.unselectedWidgetColor, //change your color here
+                color: theme.unselectedWidgetColor,
               ),
-              expandedHeight: 248.0,
+              expandedHeight: 250.0,
               floating: false,
               pinned: true,
               flexibleSpace: LayoutBuilder(
@@ -51,11 +78,11 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
                     centerTitle: true,
                     background: SafeArea(
                       child: Padding(
-                          padding: const EdgeInsets.only(top: 40.0),
-                          child: BodyLayout(
-                            enableBanners: true,
-                            child: Container(),
-                          ),
+                        padding: const EdgeInsets.only(top: 44.0),
+                        child: BodyLayout(
+                          enableBanners: true,
+                          child: Container(),
+                        ),
                       ),
                     ),
                     title: top < 120.0 ? Text(
@@ -72,19 +99,47 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
             )
           ];
         },
-        body: _buildActivityFeed(theme)
-      ),
+        body: ListView.builder(
+          itemCount: activities.length + (model.nextPage > -1 ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index >= activities.length) {
+              if (model.state is! LoadingActivity) {
+                // Commented to avoid loading bug
+                // model.loadActivity();
+              }
+
+              return Container(
+                  margin: const EdgeInsets.only(top: 16),
+                  child: const CircularProgressIndicator()
+              );
+            }
+
+            if (model.state is SuccessLoad) {
+              activities.addAll((model.state as SuccessLoad).userActivity);
+
+              return _buildActivityItem(
+                  theme,
+                  icon: IconsaxBold.save_add,
+                  title: activities[index].title,
+                  description: activities[index].content,
+                  date: activities[index].createdAt
+              );
+            }
+
+            return Container();
+          }
+        )
     );
   }
 
-  Widget _buildHeader(ThemeData theme) {
+  Widget _buildHeaderCard(ThemeData theme) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       margin: const EdgeInsets.only(
-        left: 12.0,
-        right: 12.0,
-        top: 8.0
+          left: 12.0,
+          right: 12.0,
+          top: 8.0
       ),
       decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -104,16 +159,16 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
           Text(
             StringsProfile.myActivityHeader,
             style: theme.textTheme.titleLarge!.copyWith(
-              color: Colors.white
+                color: Colors.white
             ),
           ),
           const SizedBox(height: 12.0),
           Text(
             StringsProfile.myActivitySubHeader,
             style: theme.textTheme.labelLarge!.copyWith(
-              height: 1.4,
-              fontSize: 16.0,
-              color: Colors.white
+                height: 1.4,
+                fontSize: 16.0,
+                color: Colors.white
             ),
           )
         ],
@@ -121,20 +176,6 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
     );
   }
 
-  Widget _buildActivityFeed(ThemeData theme) {
-    return Column(
-      children: [
-        _buildHeader(theme),
-        _buildActivityItem(
-          icon: IconsaxOutline.add,
-          title: "Has canjeado una recompensa",
-          description: "Canjeaste recompensa del posho feli",
-          date: "08/12/22",
-          theme
-        )
-      ],
-    );
-  }
 
   Widget _buildActivityItem(ThemeData theme, {
     required IconData icon,
@@ -202,6 +243,7 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
       'Recompensas',
       'Social',
     ];
+
     return Container(
       color: theme.scaffoldBackgroundColor,
       height: 60.0,
@@ -261,30 +303,11 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 /*
- return SizedBox(
-      height: 48.0,
-      child: ChipsChoice<String>.single(
-        value: _value,
-        onChanged: (selected) {
-          setState(() {
-            _value = selected;
-            print(selected);
-          });
-        },
-        choiceItems: C2Choice.listFrom<String, String>(
-            source: options,
-            value: (i, v) => v,
-            label: (i, v) => v,
-        ),
-        choiceBuilder: (item, i) {
-          return SizedBox(
-            width: 70,
-            height: 100,
-            child: Text(
-              item.label,
-            ),
-          );
-        },
-      )
-    );
+_buildActivityItem(
+          icon: IconsaxOutline.add,
+          title: "Has canjeado una recompensa",
+          description: "Canjeaste recompensa del posho feli",
+          date: "08/12/22",
+          theme
+        )
 */
