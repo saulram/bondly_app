@@ -35,8 +35,10 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   Container _buildBadgePost(Size size, BuildContext context) {
     var theme = Theme.of(context);
     return Container(
-        width: size.width * .9,
-        margin: const EdgeInsets.symmetric(vertical: 10),
+        width: size.width,
+        margin: const EdgeInsets.symmetric(
+          vertical: 10
+        ),
         decoration: BoxDecoration(
             border: Border.all(color: theme.cardColor),
             color: theme.dividerColor,
