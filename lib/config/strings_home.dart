@@ -1,7 +1,8 @@
 class StringsHome {
-  static const String tabHome = "Home";
+  static const String tabRecognize = "Reconocer";
+  static const String tabFeed = "Feed";
   static const String tabNews = "Avisos";
-  static const String tabBadges = "Insignias";
+  static const String tabBadges = "Embajadas";
   static const String acknowledgMentInputHint ="Escribe tu reconocimiento";
   static const String acknowledgmentInputButtonText = 'Reconocer';
 

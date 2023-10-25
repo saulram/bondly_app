@@ -50,8 +50,12 @@ class ScaffoldLayout extends StatelessWidget {
       },
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(IconsaxOutline.home),
-          label: StringsHome.tabHome,
+          icon: Icon(IconsaxOutline.add_square),
+          label: StringsHome.tabRecognize,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Iconsax.archive_book),
+          label: StringsHome.tabFeed,
         ),
         BottomNavigationBarItem(
           icon: Icon(IconsaxOutline.notification_bing),

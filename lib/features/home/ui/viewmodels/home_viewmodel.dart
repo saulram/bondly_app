@@ -338,10 +338,10 @@ set creatingAcknowledgment(bool creating) {
        selectedBadge!.id!, mentionsKey.currentState!.controller!.markupText, collaboratorsIds);
    result.when((success) {
      log.i("HomeViewModel### Success: $success");
+     getCompanyFeeds();
      collaboratorsIds = [];
      selectedCategory = null;
      selectedBadge = null;
-     getCompanyFeeds();
    }, (error) {
      log.e(error.toString());
      if (error is TokenNotFoundException) {

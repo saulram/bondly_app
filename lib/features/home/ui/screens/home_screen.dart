@@ -58,6 +58,10 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(child: _buildAcknowledgmentsSection(),),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -73,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (index == 0) {
                         return Column(
                           children: [
-                            _buildAcknowledgmentsSection(),
+
                             const SizedBox(height: 10),
                             SinglePostWidget(
                                 post: model.feeds.data[index], index: index)
@@ -95,12 +99,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        Container(
-          color: Colors.green,
-        ),
-        Container(
+                Container(
           color: Colors.yellow,
         ),
+        Container(
+          color: Colors.green,
+
+        )
       ],
     );
   }
@@ -139,18 +144,25 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 10,
           ),
           _buildCategoriesSection(),
-          const Divider(
-            color: AppColors.greyBackGroundColorDark,
-          ),
+
           model.selectedCategory == null
               ? const SizedBox()
-              : _buildBadgesFromCategorySection(),
-          const Divider(
+              : Column(
+                children: [
+                  const Divider(
             color: AppColors.greyBackGroundColorDark,
           ),
+                  _buildBadgesFromCategorySection(),
+                ],
+              ),
           model.selectedBadge == null
               ? const SizedBox()
-              : _buildCreateAcknowledgment()
+              : Column(
+                children: [
+                  const Divider(),
+                  _buildCreateAcknowledgment(),
+                ],
+              )
         ],
       ),
     );
