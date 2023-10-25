@@ -87,6 +87,17 @@ class AppTheme extends ChangeNotifier {
         backgroundColor: MaterialStateProperty.all<Color>(AppColors.darkBackgroundColor),
       )
     ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        shape: const StadiumBorder(),
+        fixedSize:const Size(150,48),
+
+        foregroundColor: AppColors.primaryColor,
+        textStyle: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w700
+        ),
+      ),
+    ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         shape: RoundedRectangleBorder(
@@ -177,6 +188,17 @@ class AppTheme extends ChangeNotifier {
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: AppColors.primaryColorLight,
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        shape: const StadiumBorder(),
+        fixedSize:const Size(150,48),
+
+        foregroundColor: AppColors.primaryColorLight,
+        textStyle: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w700
+        ),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(

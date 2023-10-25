@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
@@ -8,6 +10,7 @@ import 'package:bondly_app/features/home/domain/models/category_badges.dart';
 import 'package:bondly_app/features/home/domain/models/company_banners_model.dart';
 import 'package:bondly_app/features/home/domain/models/company_categories.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
+import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_category_badges.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
@@ -34,6 +37,7 @@ class HomeViewModel extends NavigationModel {
   final GetCategoriesUseCase _getCategoriesUseCase;
   final GetCategoryBadgesUseCase _getCategoryBadgesUseCase;
   final GetCompanyCollaboratorsUseCase _getCompanyCollaboratorsUseCase;
+  final CreateAcknowledgmentUseCase _createAcknowledgmentUseCase;
   final GlobalKey<FlutterMentionsState> mentionsKey =
       GlobalKey<FlutterMentionsState>();
 
@@ -51,7 +55,7 @@ class HomeViewModel extends NavigationModel {
       this._handleLikesUseCase,
       this._getCategoriesUseCase,
       this._getCategoryBadgesUseCase,
-      this._getCompanyCollaboratorsUseCase) {
+      this._getCompanyCollaboratorsUseCase, this._createAcknowledgmentUseCase) {
     log.i("HomeViewModel created");
   }
 
@@ -287,14 +291,15 @@ class HomeViewModel extends NavigationModel {
     result.when((collaborators) {
       log.i("HomeViewModel### Collaborators: ${collaborators.length}");
       collaboratorsList = collaborators
-          .map((collaborator) => {
-                "id": collaborator.id ?? "No Name",
-                "display": collaborator.completeName ?? "No Name",
-                "avatar": collaborator.avatar != null
-                    ? collaborator.avatar
-                    : "https://api.minimalavatars.com/avatar/random/png",
-                "user_id": collaborator.id ?? "No Id"
-              })
+          .map((collaborator)  {
+                 return { "id": collaborator.id ?? "No Name",
+                   "display": collaborator.completeName ?? "No Name",
+                   "avatar": collaborator.avatar ??
+                       "https://api.minimalavatars.com/avatar/random/png",
+                   "user_id": collaborator.id ?? "No Id"
+                 };
+
+              }).cast<Map<String, dynamic>>()
           .toList();
     }, (error) {
       log.e(" ### ComapanyCollaborators Error: $error");
@@ -311,26 +316,38 @@ class HomeViewModel extends NavigationModel {
     notifyListeners();
   }
 
+
   void pushCollaboratorId(String id) {
     collaboratorsIds = [...collaboratorsIds, id];
+    notifyListeners();
   }
 
-  /// Returns a list of sanitized mentions by checking if the current text in the mentions
-  /// controller contains any of the collaborator IDs.
-  Future<List<String>> verifyIds() async {
-    List<String> sanitizedMentions = [];
-    collaboratorsIds.map((e) {
-      log.i("HomeViewModel### verifyIds: ${e}");
-      if (mentionsKey.currentState!.controller!.text.contains(e)) {
-        sanitizedMentions.add(e);
-      }
-    });
-    return sanitizedMentions;
-  }
-
+bool _creatingAcknowledgment = false;
+bool get creatingAcknowledgment => _creatingAcknowledgment;
+set creatingAcknowledgment(bool creating) {
+  _creatingAcknowledgment = creating;
+  notifyListeners();
+}
   Future<void> handleSubmitAcknowledgment() async {
-    List<String?> ids = await verifyIds();
-    log.i("HomeViewModel### handleSubmitAcknowledgment: ${ids.length}");
-    log.i("HomeViewModel### handleSubmitAcknowledgment: ${ids}");
+    log.i("Handle Submit Acknowledgment for user: ${user?.completeName}");
+   //check that we have a selected badge and a message written before make the call to api
+    if (selectedBadge != null && mentionsKey.currentState!.controller!.text.isNotEmpty)
+   {
+     final Result<bool, Exception> result =
+   await _createAcknowledgmentUseCase.invoke(
+       selectedBadge!.id!, mentionsKey.currentState!.controller!.markupText, collaboratorsIds);
+   result.when((success) {
+     log.i("HomeViewModel### Success: $success");
+     collaboratorsIds = [];
+     selectedCategory = null;
+     selectedBadge = null;
+     getCompanyFeeds();
+   }, (error) {
+     log.e(error.toString());
+     if (error is TokenNotFoundException) {
+       // Dispatch logout
+     }
+   });
+    }
   }
 }

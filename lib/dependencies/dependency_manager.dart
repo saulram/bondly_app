@@ -15,6 +15,7 @@ import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/data/repositories/api/akcnowledgments_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/badges_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/banners_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/categories_api.dart';
@@ -26,6 +27,7 @@ import 'package:bondly_app/features/home/data/repositories/default_banners_repos
 import 'package:bondly_app/features/home/data/repositories/default_company_feeds_repository.dart';
 import 'package:bondly_app/features/home/domain/repositories/banners_repository.dart';
 import 'package:bondly_app/features/home/domain/repositories/company_feeds_respository.dart';
+import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_category_badges.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
@@ -103,6 +105,7 @@ class DependencyManager {
             getIt<GetCategoriesUseCase>(),
             getIt<GetCategoryBadgesUseCase>(),
             getIt<GetCompanyCollaboratorsUseCase>(),
+            getIt<CreateAcknowledgmentUseCase>()
             ),
         dependsOn: [UserUseCase]);
     getIt.registerSingletonWithDependencies<LoginViewModel>(
@@ -159,6 +162,9 @@ class DependencyManager {
     getIt.registerSingleton<CompanyCollaboratorsAPI>(
       CompanyCollaboratorsAPI(getIt<ApiCallsHandler>()),
     );
+    getIt.registerSingleton<CreateAcknowledgmentAPI>(
+      CreateAcknowledgmentAPI(getIt<ApiCallsHandler>()),
+    );
   }
 
   void provideRepositories() {
@@ -172,8 +178,8 @@ class DependencyManager {
     getIt.registerSingleton<CompanyFeedsRepository>(
         DefaultCompanyFeedsRespository(getIt<CompanyFeedsAPI>(),
             getIt<CreateCommentAPI>(), getIt<HandleLikeAPI>(),
-          getIt<CategoriesAPI>(),getIt<BadgesAPI>(),getIt<CompanyCollaboratorsAPI>()
-          ));
+          getIt<CategoriesAPI>(),getIt<BadgesAPI>(),getIt<CompanyCollaboratorsAPI>(),getIt<CreateAcknowledgmentAPI>()
+          ),);
 
     getIt.registerSingletonWithDependencies<UsersRepository>(
             () => DefaultUsersRepository(
@@ -211,12 +217,18 @@ class DependencyManager {
 
     getIt.registerSingleton<GetLoginStateUseCase>(
         GetLoginStateUseCase(getIt<SharedPreferences>()));
+
     getIt.registerSingleton<GetCompanyCollaboratorsUseCase>(
         GetCompanyCollaboratorsUseCase(getIt<CompanyFeedsRepository>()));
+
     getIt.registerSingleton<GetCategoriesUseCase>(
         GetCategoriesUseCase(getIt<CompanyFeedsRepository>()));
+
     getIt.registerSingleton<GetCategoryBadgesUseCase>(
         GetCategoryBadgesUseCase(getIt<CompanyFeedsRepository>()));
+
+    getIt.registerSingleton<CreateAcknowledgmentUseCase>(
+        CreateAcknowledgmentUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingletonWithDependencies(
             () => UserUseCase(

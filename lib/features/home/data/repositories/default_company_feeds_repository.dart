@@ -11,6 +11,8 @@ import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/domain/repositories/company_feeds_respository.dart';
 import 'package:multiple_result/multiple_result.dart';
 
+import 'package:bondly_app/features/home/data/repositories/api/akcnowledgments_api.dart';
+
 /// A repository implementation for fetching default banners from the server.
 /// This class implements the [BannersRepository] abstract class.
 /// It uses the [_bannersAPI] instance to fetch the banners from the server.
@@ -22,6 +24,7 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
   final CategoriesAPI _categoriesAPI;
   final BadgesAPI _badgesAPI;
   final CompanyCollaboratorsAPI _companyCollaboratorsAPI;
+  final CreateAcknowledgmentAPI _createAcknowledgmentAPI;
 
   DefaultCompanyFeedsRespository(
       this._feedsAPI,
@@ -29,7 +32,7 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
       this._handleLikeAPI,
       this._categoriesAPI,
       this._badgesAPI,
-      this._companyCollaboratorsAPI);
+      this._companyCollaboratorsAPI, this._createAcknowledgmentAPI);
   @override
   Future<Result<CompanyFeed, Exception>> getCompanyFeeds() async {
     try {
@@ -88,6 +91,16 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
           await _companyCollaboratorsAPI.getCompanyCollaborator());
     } catch (exception) {
       return Result.error(NoConnectionException());
+    }
+  }
+
+  @override
+  Future<Result<bool, Exception>> createAcknowledgment(String badgeId,String message, List<String> recipients)async {
+    try {
+      return Result.success(
+          await _createAcknowledgmentAPI.createAcknowledgment(badgeId,message,recipients));
+    } catch (exception) {
+    return Result.error(NoConnectionException());
     }
   }
 }
