@@ -335,7 +335,7 @@ set creatingAcknowledgment(bool creating) {
    {
      final Result<bool, Exception> result =
    await _createAcknowledgmentUseCase.invoke(
-       selectedBadge!.id!, mentionsKey.currentState!.controller!.markupText, collaboratorsIds);
+       selectedBadge!.id!, mentionsKey.currentState!.controller!.text, collaboratorsIds);
    result.when((success) {
      log.i("HomeViewModel### Success: $success");
      collaboratorsIds = [];
