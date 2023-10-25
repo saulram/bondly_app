@@ -13,7 +13,6 @@ import 'package:logger/logger.dart';
 import 'package:moment_dart/moment_dart.dart';
 
 class SinglePostWidget extends StatefulWidget {
-  //TBD IMPLEMENT COMMENT AND LIKE FUNCTIONALITY
 
   final FeedData post;
   final int index;
