@@ -82,12 +82,12 @@ class ViewModelProvider {
         ]
     );
 
-    getIt.registerSingletonWithDependencies<MyActivityViewModel>(
+    getIt.registerFactory<MyActivityViewModel>(
         () => MyActivityViewModel(
           getIt<GetUserActivityUseCase>(),
           getIt<UserUseCase>(),
-        ),
-        dependsOn: [UserUseCase]
+          getIt<LogoutUseCase>()
+        )
     );
   }
 }
