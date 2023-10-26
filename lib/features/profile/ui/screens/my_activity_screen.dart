@@ -2,8 +2,6 @@ import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
-import 'package:bondly_app/features/profile/domain/models/user_activity.dart';
-import 'package:bondly_app/features/profile/ui/state/my_activity_ui_state.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_body_layout.dart';
 import 'package:ficonsax/ficonsax.dart';
@@ -27,12 +25,16 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
   double top = 0.0;
   String _value = "";
 
-  List<UserActivityItem> activities = [];
-
   @override
   void initState() {
     super.initState();
     widget.model.load();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.model.dispose();
   }
 
   @override
@@ -43,9 +45,35 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
       model: widget.model,
       child: ModelBuilder<MyActivityViewModel>(
         builder: (context, model, widget) {
-          return Scaffold(
-            backgroundColor: theme.scaffoldBackgroundColor,
-            body: _buildBody(theme, model),
+          return Stack(
+            children: [
+              Scaffold(
+                backgroundColor: theme.scaffoldBackgroundColor,
+                body: _buildBody(theme, model),
+              ),
+              !model.errorShown && model.notificationMessage.isNotEmpty
+                  ? Positioned(
+                      bottom: 24.0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                        decoration: BoxDecoration(
+                          color: theme.dividerColor,
+                          border: Border.all(color: AppColors.secondaryColor),
+                          borderRadius: BorderRadius.circular(16.0)
+                        ),
+                        child: Text(
+                          model.notificationMessage,
+                          style: theme.textTheme.bodyLarge!.copyWith(
+                            fontSize: 18.0
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    ) : Container()
+            ],
           );
         }
       ),
@@ -67,7 +95,7 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
               iconTheme: IconThemeData(
                 color: theme.unselectedWidgetColor,
               ),
-              expandedHeight: 250.0,
+              expandedHeight: 260.0,
               floating: false,
               pinned: true,
               flexibleSpace: LayoutBuilder(
@@ -93,41 +121,65 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
                 },
               )
             ),
+            /*
+            Leaving this commented until create filter feature
             SliverPersistentHeader(
               delegate: _SliverAppBarDelegate(_buildChips(theme)),
               pinned: true,
-            )
+            )*/
           ];
         },
-        body: ListView.builder(
-          itemCount: activities.length + (model.nextPage > -1 ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (index >= activities.length) {
-              if (model.state is! LoadingActivity) {
-                // Commented to avoid loading bug
-                // model.loadActivity();
-              }
+        body: NotificationListener<ScrollEndNotification>(
+          onNotification: (notification) {
+            var metrics = notification.metrics;
+            if (metrics.atEdge && metrics.pixels > 0) {
+              model.loadActivity();
+            }
 
-              return Container(
+            return true;
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 24.0),
+            child: ListView.builder(
+              padding: const EdgeInsets.only(top: 16.0),
+              itemCount: model.activities.length + (model.nextPage > -1 ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index < model.activities.length) {
+                  var item = model.activities[index];
+
+                  if (index == 0) {
+                    return Column(
+                      children: [
+                        _buildHeaderCard(theme),
+                        _buildActivityItem(theme,
+                          type: item.type,
+                          title: item.title,
+                          description: item.content,
+                          date: item.createdAt,
+                          read: item.read
+                        )
+                      ],
+                    );
+                  }
+
+                  return _buildActivityItem(theme,
+                      type: item.type,
+                      title: item.title,
+                      description: item.content,
+                      date: item.createdAt,
+                      read: item.read
+                  );
+                }
+
+                return Container(
                   margin: const EdgeInsets.only(top: 16),
-                  child: const CircularProgressIndicator()
-              );
-            }
-
-            if (model.state is SuccessLoad) {
-              activities.addAll((model.state as SuccessLoad).userActivity);
-
-              return _buildActivityItem(
-                  theme,
-                  icon: IconsaxBold.save_add,
-                  title: activities[index].title,
-                  description: activities[index].content,
-                  date: activities[index].createdAt
-              );
-            }
-
-            return Container();
-          }
+                  child: model.notificationMessage.isEmpty && model.busy
+                      ? const Center(child: CircularProgressIndicator())
+                      : Container()
+                );
+              }
+            ),
+          ),
         )
     );
   }
@@ -139,7 +191,6 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
       margin: const EdgeInsets.only(
           left: 12.0,
           right: 12.0,
-          top: 8.0
       ),
       decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -178,10 +229,28 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
 
 
   Widget _buildActivityItem(ThemeData theme, {
-    required IconData icon,
+    required String type,
     required String title,
     required String description,
-    required String date}) {
+    required String date,
+    required bool read
+  }) {
+    IconData icon;
+    switch (type) {
+      case "Reconocimientos":
+        icon = IconsaxBold.medal_star;
+        break;
+      case "Recompensas":
+        icon = IconsaxBold.box;
+        break;
+      default:
+        icon = IconsaxBold.activity;
+        break;
+    }
+
+    var parsedDate = DateTime.parse(date).toString();
+    parsedDate = parsedDate.replaceRange(parsedDate.length - 5, parsedDate.length, "");
+
     return Container(
       margin: const EdgeInsets.only(
         top: 16.0,
@@ -200,38 +269,49 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
         borderRadius: const BorderRadius.all(Radius.circular(16.0)),
         border: Border.all(color: theme.cardColor),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Icon(
-              icon,
-              color: theme.unselectedWidgetColor
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                  icon,
+                  color: theme.unselectedWidgetColor,
+                size: 36.0,
+              ),
+              const SizedBox(width: 8.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.headlineSmall!.copyWith(
+                        fontSize: 18.0
+                      ),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text(
+                        description
+                    ),
+                    const SizedBox(height: 24.0),
+                    Text(
+                      parsedDate
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 24.0,)
+            ],
           ),
-          const SizedBox(width: 8.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.headlineSmall!.copyWith(
-                    fontSize: 18.0
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                    description
-                ),
-                const SizedBox(height: 24.0),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    date
-                  ),
-                ),
-              ],
+          !read ? const Positioned(
+            top: 0,
+            right: 0,
+            child: Icon(
+              IconsaxBold.notification_status,
+              color: AppColors.secondaryColor,
             ),
-          ),
+          ) : Container()
         ],
       )
     );
@@ -302,12 +382,3 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     return false;
   }
 }
-/*
-_buildActivityItem(
-          icon: IconsaxOutline.add,
-          title: "Has canjeado una recompensa",
-          description: "Canjeaste recompensa del posho feli",
-          date: "08/12/22",
-          theme
-        )
-*/

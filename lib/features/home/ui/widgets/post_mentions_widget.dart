@@ -51,7 +51,7 @@ class _PostMentionsWidgetState extends State<PostMentionsWidget> {
       // Add the mention
       textSpans.add(TextSpan(
         text: "@$userName",
-        style: style?.copyWith(color: context.isDarkMode
+        style: widget.style?.copyWith(color: context.isDarkMode
             ? AppColors.secondaryColorLight
             : AppColors.secondaryColor
         ),

@@ -1,69 +1,88 @@
+import 'package:bondly_app/config/strings_profile.dart';
+import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
+import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/profile/domain/models/user_activity.dart';
 import 'package:bondly_app/features/profile/domain/repositories/activity_repository.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
-import 'package:bondly_app/features/profile/ui/state/my_activity_ui_state.dart';
+
 
 class MyActivityViewModel extends NavigationModel {
   final GetUserActivityUseCase _useCase;
   final UserUseCase _userUseCase;
-
-  MyActivityUIState state = Idle();
+  final LogoutUseCase _logoutUseCase;
+  final int limit = 10;
 
   String userId = "";
+  String notificationMessage = "";
+  bool errorShown = false;
   int nextPage = 0;
-  int limit = 10;
+  List<UserActivityItem> activities = [];
 
-  MyActivityViewModel(this._useCase, this._userUseCase);
+  MyActivityViewModel(this._useCase, this._userUseCase, this._logoutUseCase);
 
   Future<void> load() async {
     var result = await _userUseCase.invoke();
     result.when(
       (user) {
         if (user.id == null) {
-          state = FailedLoad(ActivityErrorType.authError);
-          notifyListeners();
         }
         userId = user.id!;
-        notifyListeners();
+        loadActivity();
       }, (error) {
-        state = FailedLoad(ActivityErrorType.authError);
-        notifyListeners();
+        _logoutUseCase.invoke();
+        navigation.go(LoginScreen.route);
       }
     );
   }
 
   Future<void> loadActivity() async {
+    if (userId.isEmpty) {
+      await load();
+    }
+
+    if (busy) return;
+
     busy = true;
-    state = LoadingActivity();
     notifyListeners();
 
     try {
       var result = await _useCase.invoke(userId, limit: limit, page: nextPage);
       result.when(
         (activity) {
-          limit = activity.count;
-          nextPage = activity.nextPage;
-          state = SuccessLoad(activity.activity);
+          nextPage = activity.nextPage > nextPage ? activity.nextPage : -1;
+          activities.addAll(activity.activity);
           notifyListeners();
         },
         (error) {
-          state = FailedLoad(ActivityErrorType.loadError);
+          notificationMessage = StringsProfile.myActivityLoadError;
           if (error is NoMoreContentException) {
-            state = FailedLoad(ActivityErrorType.contentError);
+            notificationMessage = StringsProfile.myActivityLoadComplete;
           }
           notifyListeners();
         }
       );
     } catch (exception) {
-      state = FailedLoad(ActivityErrorType.loadError);
+      notificationMessage = StringsProfile.myActivityLoadError;
       if (exception is NoMoreContentException) {
-        state = FailedLoad(ActivityErrorType.contentError);
+        notificationMessage = StringsProfile.myActivityLoadComplete;
       }
+
       notifyListeners();
     } finally {
       busy = false;
       notifyListeners();
+
+      autoDismiss();
     }
+  }
+
+  void autoDismiss() async {
+    await Future.delayed(const Duration(seconds: 3), () {
+      notificationMessage = "";
+      errorShown = true;
+      notifyListeners();
+    });
   }
 }
