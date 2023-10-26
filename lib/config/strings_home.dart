@@ -5,6 +5,8 @@ class StringsHome {
   static const String tabBadges = "Embajadas";
   static const String acknowledgMentInputHint ="Escribe tu reconocimiento";
   static const String acknowledgmentInputButtonText = 'Reconocer';
+  static const String announcementTitle = 'Avisos';
+  static const String announcementsSubHeader = 'Avisos de la empresa';
 
   static String acknowledgmentCategorySubHeader(String categoryCount) {
     return 'Elige entre los $categoryCount tipos de insignias y decide que tipo de reconocimiento quieres otorgar';

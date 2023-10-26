@@ -18,6 +18,7 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_categories.
 import 'package:bondly_app/features/home/domain/usecases/get_company_collaborators.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
+import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:logger/logger.dart';
@@ -89,11 +90,14 @@ class HomeViewModel extends NavigationModel {
   }
 
   /// Handles navigation of the bottom bar.
-  int _currentIndex = 0;
+  int _currentIndex = 1;
 
   int get currentIndex => _currentIndex;
 
-  PageController pageController = PageController();
+  PageController pageController = PageController(
+    initialPage: 1,
+    keepPage: true,
+  );
 
   /// Animates to the selected page.
   void onTabTapped(int index) {
@@ -349,5 +353,41 @@ set creatingAcknowledgment(bool creating) {
      }
    });
     }
+  }
+  CarouselController carouselController = CarouselController(
+
+  );
+  List<Map<String,dynamic>> _announcements = [
+    {
+      "_id": "64d56b1b4f1255deb7af143a",
+      "title": "Noticia 1",
+      "content": "Bienvenidos a la plataforma",
+      "hidden": true,
+      "createdAt": "2023-08-10T22:56:27.613Z",
+      "updatedAt": "2023-10-03T23:40:16.817Z",
+      "__v": 0,
+      "visible": true
+    },
+    {
+      "_id": "6537e6f8b9cb3bf4a89f7f26",
+      "title": "Nueva recompensa",
+      "content": "Visita las recompensas, hay nuevas opciones para elegir",
+      "hidden": true,
+      "visible": true,
+      "createdAt": "2023-10-24T15:47:04.547Z",
+      "updatedAt": "2023-10-24T15:47:04.547Z",
+      "__v": 0
+    }
+  ];
+
+  List<Map<String,dynamic>> get announcements => _announcements;
+  set announcements(List<Map<String,dynamic>> data) {
+    _announcements = data;
+    notifyListeners();
+  }
+  int currentAnnouncementIndex = 0;
+  void onAnnouncementChanged(int index) {
+    currentAnnouncementIndex = index;
+    notifyListeners();
   }
 }
