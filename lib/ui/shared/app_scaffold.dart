@@ -49,9 +49,8 @@ class ScaffoldLayout extends StatelessWidget {
         homeViewModel.onTabTapped(index);
       },
       items: const [
-
         BottomNavigationBarItem(
-          icon: Icon(Iconsax.archive_book),
+          icon: Icon(IconsaxOutline.archive_book),
           label: StringsHome.tabFeed,
         ),
         BottomNavigationBarItem(

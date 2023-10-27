@@ -2,6 +2,7 @@ import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_body_layout.dart';
 import 'package:ficonsax/ficonsax.dart';
@@ -9,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class MyActivityScreen extends StatefulWidget {
-
   static const String route = "/myActivityScreen";
   final MyActivityViewModel model = getIt<MyActivityViewModel>();
 
@@ -43,40 +43,38 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
 
     return ModelProvider<MyActivityViewModel>(
       model: widget.model,
-      child: ModelBuilder<MyActivityViewModel>(
-        builder: (context, model, widget) {
-          return Stack(
-            children: [
-              Scaffold(
-                backgroundColor: theme.scaffoldBackgroundColor,
-                body: _buildBody(theme, model),
-              ),
-              !model.errorShown && model.notificationMessage.isNotEmpty
-                  ? Positioned(
-                      bottom: 24.0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(8.0),
-                        margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                        decoration: BoxDecoration(
+      child:
+          ModelBuilder<MyActivityViewModel>(builder: (context, model, widget) {
+        return Stack(
+          children: [
+            Scaffold(
+              backgroundColor: theme.scaffoldBackgroundColor,
+              body: _buildBody(theme, model),
+            ),
+            !model.errorShown && model.notificationMessage.isNotEmpty
+                ? Positioned(
+                    bottom: 24.0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 16.0),
+                      decoration: BoxDecoration(
                           color: theme.dividerColor,
                           border: Border.all(color: AppColors.secondaryColor),
-                          borderRadius: BorderRadius.circular(16.0)
-                        ),
-                        child: Text(
-                          model.notificationMessage,
-                          style: theme.textTheme.bodyLarge!.copyWith(
-                            fontSize: 18.0
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      )
-                    ) : Container()
-            ],
-          );
-        }
-      ),
+                          borderRadius: BorderRadius.circular(16.0)),
+                      child: Text(
+                        model.notificationMessage,
+                        style:
+                            theme.textTheme.bodyLarge!.copyWith(fontSize: 18.0),
+                        textAlign: TextAlign.center,
+                      ),
+                    ))
+                : Container()
+          ],
+        );
+      }),
     );
   }
 
@@ -85,42 +83,43 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
-              leading: GestureDetector(
-                onTap: context.pop,
-                child: const Icon(
-                  IconsaxOutline.arrow_left,
+                leading: GestureDetector(
+                  onTap: context.pop,
+                  child: const Icon(
+                    IconsaxOutline.arrow_left,
+                  ),
                 ),
-              ),
-              backgroundColor: theme.scaffoldBackgroundColor,
-              iconTheme: IconThemeData(
-                color: theme.unselectedWidgetColor,
-              ),
-              expandedHeight: 260.0,
-              floating: false,
-              pinned: true,
-              flexibleSpace: LayoutBuilder(
-                builder: (context, constraints) {
-                  top = constraints.biggest.height;
+                backgroundColor: theme.scaffoldBackgroundColor,
+                iconTheme: IconThemeData(
+                  color: theme.unselectedWidgetColor,
+                ),
+                expandedHeight: 260.0,
+                floating: false,
+                pinned: true,
+                flexibleSpace: LayoutBuilder(
+                  builder: (context, constraints) {
+                    top = constraints.biggest.height;
 
-                  return FlexibleSpaceBar(
-                    centerTitle: true,
-                    background: SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 44.0),
-                        child: BodyLayout(
-                          enableBanners: true,
-                          child: Container(),
+                    return FlexibleSpaceBar(
+                      centerTitle: true,
+                      background: SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 44.0),
+                          child: BodyLayout(
+                            enableBanners: true,
+                            child: Container(),
+                          ),
                         ),
                       ),
-                    ),
-                    title: top < 120.0 ? Text(
-                      StringsProfile.myActivity,
-                      style: theme.textTheme.titleLarge,
-                    ) : const SizedBox(),
-                  );
-                },
-              )
-            ),
+                      title: top < 120.0
+                          ? Text(
+                              StringsProfile.myActivity,
+                              style: theme.textTheme.titleLarge,
+                            )
+                          : const SizedBox(),
+                    );
+                  },
+                )),
             /*
             Leaving this commented until create filter feature
             SliverPersistentHeader(
@@ -141,47 +140,43 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
           child: Container(
             margin: const EdgeInsets.only(bottom: 24.0),
             child: ListView.builder(
-              padding: const EdgeInsets.only(top: 16.0),
-              itemCount: model.activities.length + (model.nextPage > -1 ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index < model.activities.length) {
-                  var item = model.activities[index];
+                padding: const EdgeInsets.only(top: 16.0),
+                itemCount:
+                    model.activities.length + (model.nextPage > -1 ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index < model.activities.length) {
+                    var item = model.activities[index];
 
-                  if (index == 0) {
-                    return Column(
-                      children: [
-                        _buildHeaderCard(theme),
-                        _buildActivityItem(theme,
-                          type: item.type,
-                          title: item.title,
-                          description: item.content,
-                          date: item.createdAt,
-                          read: item.read
-                        )
-                      ],
-                    );
+                    if (index == 0) {
+                      return Column(
+                        children: [
+                          _buildHeaderCard(theme),
+                          _buildActivityItem(theme,
+                              type: item.type,
+                              title: item.title,
+                              description: item.content,
+                              date: item.createdAt,
+                              read: item.read)
+                        ],
+                      );
+                    }
+
+                    return _buildActivityItem(theme,
+                        type: item.type,
+                        title: item.title,
+                        description: item.content,
+                        date: item.createdAt,
+                        read: item.read);
                   }
 
-                  return _buildActivityItem(theme,
-                      type: item.type,
-                      title: item.title,
-                      description: item.content,
-                      date: item.createdAt,
-                      read: item.read
-                  );
-                }
-
-                return Container(
-                  margin: const EdgeInsets.only(top: 16),
-                  child: model.notificationMessage.isEmpty && model.busy
-                      ? const Center(child: CircularProgressIndicator())
-                      : Container()
-                );
-              }
-            ),
+                  return Container(
+                      margin: const EdgeInsets.only(top: 16),
+                      child: model.notificationMessage.isEmpty && model.busy
+                          ? const Center(child: CircularProgressIndicator())
+                          : Container());
+                }),
           ),
-        )
-    );
+        ));
   }
 
   Widget _buildHeaderCard(ThemeData theme) {
@@ -189,8 +184,8 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       margin: const EdgeInsets.only(
-          left: 12.0,
-          right: 12.0,
+        left: 12.0,
+        right: 12.0,
       ),
       decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -198,43 +193,34 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
             end: Alignment.bottomRight,
             colors: [
               AppColors.secondaryColor,
-
               theme.primaryColor,
             ],
           ),
-          borderRadius: const BorderRadius.all(Radius.circular(20.0))
-      ),
+          borderRadius: const BorderRadius.all(Radius.circular(20.0))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             StringsProfile.myActivityHeader,
-            style: theme.textTheme.titleLarge!.copyWith(
-                color: Colors.white
-            ),
+            style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
           ),
           const SizedBox(height: 12.0),
           Text(
             StringsProfile.myActivitySubHeader,
-            style: theme.textTheme.labelLarge!.copyWith(
-                height: 1.4,
-                fontSize: 16.0,
-                color: Colors.white
-            ),
+            style: theme.textTheme.labelLarge!
+                .copyWith(height: 1.4, fontSize: 16.0, color: Colors.white),
           )
         ],
       ),
     );
   }
 
-
-  Widget _buildActivityItem(ThemeData theme, {
-    required String type,
-    required String title,
-    required String description,
-    required String date,
-    required bool read
-  }) {
+  Widget _buildActivityItem(ThemeData theme,
+      {required String type,
+      required String title,
+      required String description,
+      required String date,
+      required bool read}) {
     IconData icon;
     switch (type) {
       case "Reconocimientos":
@@ -249,72 +235,66 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
     }
 
     var parsedDate = DateTime.parse(date).toString();
-    parsedDate = parsedDate.replaceRange(parsedDate.length - 5, parsedDate.length, "");
+    parsedDate =
+        parsedDate.replaceRange(parsedDate.length - 5, parsedDate.length, "");
 
     return Container(
-      margin: const EdgeInsets.only(
-        top: 16.0,
-        left: 12.0,
-        right: 12.0
-      ),
-      width: double.infinity,
-      padding: const EdgeInsets.only(
-        top: 12.0,
-        bottom: 12.0,
-        left: 8.0,
-        right: 16.0
-      ),
-      decoration: BoxDecoration(
-        color: theme.dividerColor,
-        borderRadius: const BorderRadius.all(Radius.circular(16.0)),
-        border: Border.all(color: theme.cardColor),
-      ),
-      child: Stack(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(
+        margin: const EdgeInsets.only(top: 16.0, left: 12.0, right: 12.0),
+        width: double.infinity,
+        padding: const EdgeInsets.only(
+            top: 12.0, bottom: 12.0, left: 8.0, right: 16.0),
+        decoration: BoxDecoration(
+          color: theme.dividerColor,
+          borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+          border: Border.all(color: theme.cardColor),
+        ),
+        child: Stack(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
                   icon,
                   color: theme.unselectedWidgetColor,
-                size: 36.0,
-              ),
-              const SizedBox(width: 8.0),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.headlineSmall!.copyWith(
-                        fontSize: 18.0
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text(
-                        description
-                    ),
-                    const SizedBox(height: 24.0),
-                    Text(
-                      parsedDate
-                    ),
-                  ],
+                  size: 36.0,
                 ),
-              ),
-              const SizedBox(width: 24.0,)
-            ],
-          ),
-          !read ? const Positioned(
-            top: 0,
-            right: 0,
-            child: Icon(
-              IconsaxBold.notification_status,
-              color: AppColors.secondaryColor,
+                const SizedBox(width: 8.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: theme.textTheme.headlineSmall!
+                            .copyWith(fontSize: 18.0),
+                      ),
+                      const SizedBox(height: 8.0),
+                      PostMentionsWidget(
+                        text: description,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 24.0),
+                      Text(parsedDate),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  width: 24.0,
+                )
+              ],
             ),
-          ) : Container()
-        ],
-      )
-    );
+            !read
+                ? const Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Icon(
+                      IconsaxBold.notification_status,
+                      color: AppColors.secondaryColor,
+                    ),
+                  )
+                : Container()
+          ],
+        ));
   }
 
   Container _buildChips(ThemeData theme) {
@@ -340,9 +320,7 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
                 label: Text(
                   options[index],
                   style: theme.textTheme.headlineSmall!.copyWith(
-                    color: AppColors.backgroundColor,
-                    fontSize: 18.0
-                  ),
+                      color: AppColors.backgroundColor, fontSize: 18.0),
                 ),
                 selected: _value == options[index],
                 onSelected: (bool selected) {
