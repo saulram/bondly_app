@@ -12,11 +12,13 @@ import 'package:bondly_app/features/home/domain/repositories/banners_repository.
 import 'package:bondly_app/features/home/domain/repositories/company_feeds_respository.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_announcements.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_category_badges.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_categories.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_collaborators.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/profile/domain/repositories/activity_repository.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
@@ -37,79 +39,72 @@ class UseCaseProvider {
     );
 
     getIt.registerSingleton<GetCompanyBannersUseCase>(
-        GetCompanyBannersUseCase(getIt<BannersRepository>())
-    );
+        GetCompanyBannersUseCase(getIt<BannersRepository>()));
 
     getIt.registerSingleton<GetCompanyFeedsUseCase>(
-        GetCompanyFeedsUseCase(getIt<CompanyFeedsRepository>())
-    );
+        GetCompanyFeedsUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingleton<CreateFeedCommentUseCase>(
-        CreateFeedCommentUseCase(getIt<CompanyFeedsRepository>())
-    );
+        CreateFeedCommentUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingleton<HandleLikesUseCase>(
-        HandleLikesUseCase(getIt<CompanyFeedsRepository>())
-    );
+        HandleLikesUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingleton<GetLoginStateUseCase>(
-        GetLoginStateUseCase(getIt<SharedPreferences>())
-    );
+        GetLoginStateUseCase(getIt<SharedPreferences>()));
 
     getIt.registerSingleton<GetCompanyCollaboratorsUseCase>(
-        GetCompanyCollaboratorsUseCase(getIt<CompanyFeedsRepository>())
-    );
+        GetCompanyCollaboratorsUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingleton<GetCategoriesUseCase>(
-        GetCategoriesUseCase(getIt<CompanyFeedsRepository>())
-    );
+        GetCategoriesUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingleton<GetCategoryBadgesUseCase>(
-        GetCategoryBadgesUseCase(getIt<CompanyFeedsRepository>())
-    );
+        GetCategoryBadgesUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingletonWithDependencies(
         () => UserUseCase(
-          getIt<UsersRepository>(instanceName: DefaultUsersRepository.name),
-          getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)
-        ),
+            getIt<UsersRepository>(instanceName: DefaultUsersRepository.name),
+            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
         dependsOn: [
           AppDatabase,
           UsersDao,
-          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name),
-          InitDependency(UsersRepository, instanceName: RemoteUsersRepository.name)
-        ]
-    );
+          InitDependency(UsersRepository,
+              instanceName: DefaultUsersRepository.name),
+          InitDependency(UsersRepository,
+              instanceName: RemoteUsersRepository.name)
+        ]);
 
     getIt.registerSingletonWithDependencies(
         () => LogoutUseCase(
-          sharedPreferences: getIt<SharedPreferences>(),
-          usersRepository: getIt<UsersRepository>(instanceName: DefaultUsersRepository.name)
-        ),
+            sharedPreferences: getIt<SharedPreferences>(),
+            usersRepository: getIt<UsersRepository>(
+                instanceName: DefaultUsersRepository.name)),
         dependsOn: [
           AppDatabase,
           UsersDao,
-          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name)
-        ]
-    );
+          InitDependency(UsersRepository,
+              instanceName: DefaultUsersRepository.name)
+        ]);
 
     getIt.registerSingletonWithDependencies(
         () => UpdateUserAvatarUseCase(
-          getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)
-        ),
+            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
         dependsOn: [
           AppDatabase,
           UsersDao,
-          InitDependency(UsersRepository, instanceName: RemoteUsersRepository.name)
-        ]
-    );
+          InitDependency(UsersRepository,
+              instanceName: RemoteUsersRepository.name)
+        ]);
 
     getIt.registerSingleton<GetUserActivityUseCase>(
-        GetUserActivityUseCase(getIt<ActivityRepository>())
-    );
+        GetUserActivityUseCase(getIt<ActivityRepository>()));
 
     getIt.registerSingleton<CreateAcknowledgmentUseCase>(
-        CreateAcknowledgmentUseCase(getIt<CompanyFeedsRepository>())
-    );
+        CreateAcknowledgmentUseCase(getIt<CompanyFeedsRepository>()));
+    getIt.registerSingleton<GetCompanyAnnouncementsUseCase>(
+        GetCompanyAnnouncementsUseCase(getIt<CompanyFeedsRepository>()));
+    getIt.registerSingleton<GetUserEmbassysUseCase>(
+        GetUserEmbassysUseCase(getIt<CompanyFeedsRepository>()));
   }
 }

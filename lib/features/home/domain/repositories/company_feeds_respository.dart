@@ -1,7 +1,9 @@
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
+import 'package:bondly_app/features/home/domain/models/announcement_model.dart';
 import 'package:bondly_app/features/home/domain/models/category_badges.dart';
 import 'package:bondly_app/features/home/domain/models/company_categories.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
+import 'package:bondly_app/features/home/domain/models/embassys_model.dart';
 import 'package:multiple_result/multiple_result.dart';
 
 /// This abstract class defines the methods that a company feeds repository should implement.
@@ -33,9 +35,15 @@ abstract class CompanyFeedsRepository {
   /// This method retrieves the company collaborators.
   /// Returns a [Result] object that contains either a [List] of [User] objects or an [Exception].
   Future<Result<List<User>, Exception>> getCompanyCollaborators();
-  Future<Result<bool, Exception>> createAcknowledgment(String badgeId,String message, List<String> recipients);
+  Future<Result<bool, Exception>> createAcknowledgment(
+      String badgeId, String message, List<String> recipients);
 
+  ///This method returns the announcements of the company.
+  ///Returns a [Result] object that contains either a [Announcements] object or an [Exception].
 
+  Future<Result<Announcements, Exception>> getCompanyAnnouncements();
+
+  Future<Result<List<Embassy>, Exception>> getUserEmbassys(String userId);
 }
 
 /// Exception thrown when there is no internet connection.

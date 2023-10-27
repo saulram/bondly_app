@@ -1,22 +1,24 @@
-import 'dart:developer';
-
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/domain/models/announcement_model.dart';
 import 'package:bondly_app/features/home/domain/models/badge_model.dart';
 import 'package:bondly_app/features/home/domain/models/category_badges.dart';
 import 'package:bondly_app/features/home/domain/models/company_banners_model.dart';
 import 'package:bondly_app/features/home/domain/models/company_categories.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
+import 'package:bondly_app/features/home/domain/models/embassys_model.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_announcements.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_category_badges.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_categories.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_collaborators.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,6 +31,7 @@ import 'package:multiple_result/multiple_result.dart';
 /// navigation, fetching company banners, feeds, categories, creating comments and handling likes.
 /// It also contains properties to store the user, banners list, feeds and current index of the bottom bar.
 class HomeViewModel extends NavigationModel {
+  ///Use Cases
   final UserUseCase _userUseCase;
   final SessionTokenHandler _tokenHandler;
   final GetCompanyBannersUseCase _bannersUseCase;
@@ -39,6 +42,9 @@ class HomeViewModel extends NavigationModel {
   final GetCategoryBadgesUseCase _getCategoryBadgesUseCase;
   final GetCompanyCollaboratorsUseCase _getCompanyCollaboratorsUseCase;
   final CreateAcknowledgmentUseCase _createAcknowledgmentUseCase;
+  final GetCompanyAnnouncementsUseCase _getCompanyAnnouncementsUseCase;
+  final GetUserEmbassysUseCase _getUserEmbassysUseCase;
+
   final GlobalKey<FlutterMentionsState> mentionsKey =
       GlobalKey<FlutterMentionsState>();
 
@@ -56,7 +62,10 @@ class HomeViewModel extends NavigationModel {
       this._handleLikesUseCase,
       this._getCategoriesUseCase,
       this._getCategoryBadgesUseCase,
-      this._getCompanyCollaboratorsUseCase, this._createAcknowledgmentUseCase) {
+      this._getCompanyCollaboratorsUseCase,
+      this._createAcknowledgmentUseCase,
+      this._getCompanyAnnouncementsUseCase,
+      this._getUserEmbassysUseCase) {
     log.i("HomeViewModel created");
   }
 
@@ -84,8 +93,10 @@ class HomeViewModel extends NavigationModel {
     await Future.wait([
       getCompanyBanners(),
       getCompanyFeeds(),
+      getUserEmbassys(),
       getCompanyCategories(),
-      getCompanyCollaborators()
+      getCompanyCollaborators(),
+      handleGetAnnounceMents(),
     ]);
   }
 
@@ -295,15 +306,16 @@ class HomeViewModel extends NavigationModel {
     result.when((collaborators) {
       log.i("HomeViewModel### Collaborators: ${collaborators.length}");
       collaboratorsList = collaborators
-          .map((collaborator)  {
-                 return { "id": collaborator.id ?? "No Name",
-                   "display": collaborator.completeName ?? "No Name",
-                   "avatar": collaborator.avatar ??
-                       "https://api.minimalavatars.com/avatar/random/png",
-                   "user_id": collaborator.id ?? "No Id"
-                 };
-
-              }).cast<Map<String, dynamic>>()
+          .map((collaborator) {
+            return {
+              "id": collaborator.id ?? "No Name",
+              "display": collaborator.completeName ?? "No Name",
+              "avatar": collaborator.avatar ??
+                  "https://api.minimalavatars.com/avatar/random/png",
+              "user_id": collaborator.id ?? "No Id"
+            };
+          })
+          .cast<Map<String, dynamic>>()
           .toList();
     }, (error) {
       log.e(" ### ComapanyCollaborators Error: $error");
@@ -320,74 +332,94 @@ class HomeViewModel extends NavigationModel {
     notifyListeners();
   }
 
-
   void pushCollaboratorId(String id) {
     collaboratorsIds = [...collaboratorsIds, id];
     notifyListeners();
   }
 
-bool _creatingAcknowledgment = false;
-bool get creatingAcknowledgment => _creatingAcknowledgment;
-set creatingAcknowledgment(bool creating) {
-  _creatingAcknowledgment = creating;
-  notifyListeners();
-}
+  bool _creatingAcknowledgment = false;
+  bool get creatingAcknowledgment => _creatingAcknowledgment;
+  set creatingAcknowledgment(bool creating) {
+    _creatingAcknowledgment = creating;
+    notifyListeners();
+  }
+
   Future<void> handleSubmitAcknowledgment() async {
     log.i("Handle Submit Acknowledgment for user: ${user?.completeName}");
-   //check that we have a selected badge and a message written before make the call to api
-    if (selectedBadge != null && mentionsKey.currentState!.controller!.text.isNotEmpty)
-   {
-     final Result<bool, Exception> result =
-   await _createAcknowledgmentUseCase.invoke(
-       selectedBadge!.id!, mentionsKey.currentState!.controller!.markupText, collaboratorsIds);
-   result.when((success) {
-     log.i("HomeViewModel### Success: $success");
-     getCompanyFeeds();
-     collaboratorsIds = [];
-     selectedCategory = null;
-     selectedBadge = null;
-   }, (error) {
-     log.e(error.toString());
-     if (error is TokenNotFoundException) {
-       // Dispatch logout
-     }
-   });
+    //check that we have a selected badge and a message written before make the call to api
+    if (selectedBadge != null &&
+        mentionsKey.currentState!.controller!.text.isNotEmpty) {
+      final Result<bool, Exception> result =
+          await _createAcknowledgmentUseCase.invoke(
+              selectedBadge!.id!,
+              mentionsKey.currentState!.controller!.markupText,
+              collaboratorsIds);
+      result.when((success) {
+        log.i("HomeViewModel### Success: $success");
+        getCompanyFeeds();
+        collaboratorsIds = [];
+        selectedCategory = null;
+        selectedBadge = null;
+      }, (error) {
+        log.e(error.toString());
+        if (error is TokenNotFoundException) {
+          // Dispatch logout
+        }
+      });
     }
   }
-  CarouselController carouselController = CarouselController(
 
-  );
-  List<Map<String,dynamic>> _announcements = [
-    {
-      "_id": "64d56b1b4f1255deb7af143a",
-      "title": "Noticia 1",
-      "content": "Bienvenidos a la plataforma",
-      "hidden": true,
-      "createdAt": "2023-08-10T22:56:27.613Z",
-      "updatedAt": "2023-10-03T23:40:16.817Z",
-      "__v": 0,
-      "visible": true
-    },
-    {
-      "_id": "6537e6f8b9cb3bf4a89f7f26",
-      "title": "Nueva recompensa",
-      "content": "Visita las recompensas, hay nuevas opciones para elegir",
-      "hidden": true,
-      "visible": true,
-      "createdAt": "2023-10-24T15:47:04.547Z",
-      "updatedAt": "2023-10-24T15:47:04.547Z",
-      "__v": 0
-    }
-  ];
+  CarouselController carouselController = CarouselController();
 
-  List<Map<String,dynamic>> get announcements => _announcements;
-  set announcements(List<Map<String,dynamic>> data) {
+  List<Announcement> _announcements = [];
+
+  List<Announcement> get announcements => _announcements;
+
+  set announcements(List<Announcement> data) {
     _announcements = data;
     notifyListeners();
   }
+
+  Future<void> handleGetAnnounceMents() async {
+    log.i("Get Company Announcements for company: ${user?.companyName}");
+    final Result<Announcements, Exception> result =
+        await _getCompanyAnnouncementsUseCase.invoke();
+    result.when((results) {
+      log.i("HomeViewModel### Announcements: ${results.announcement?.length}");
+      announcements = results.announcement ?? [];
+    }, (error) {
+      log.e(" ### ComapanyCollaborators Error: $error");
+      if (error is TokenNotFoundException) {
+        // Dispatch logout
+      }
+    });
+  }
+
   int currentAnnouncementIndex = 0;
   void onAnnouncementChanged(int index) {
     currentAnnouncementIndex = index;
     notifyListeners();
+  }
+
+  List<Embassy> _embassys = [];
+  List<Embassy> get embassys => _embassys;
+  set embassys(List<Embassy> data) {
+    _embassys = data;
+    notifyListeners();
+  }
+
+  Future<void> getUserEmbassys() async {
+    log.i("Get User Embassys for user: ${user?.completeName}");
+    final Result<List<Embassy>, Exception> result =
+        await _getUserEmbassysUseCase.invoke(user!.id!);
+    result.when((results) {
+      log.i("HomeViewModel### Embassys: ${results.length}");
+      embassys = results;
+    }, (error) {
+      log.e(" ### ComapanyCollaborators Error: $error");
+      if (error is TokenNotFoundException) {
+        // Dispatch logout
+      }
+    });
   }
 }

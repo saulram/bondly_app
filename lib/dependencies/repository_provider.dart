@@ -8,6 +8,8 @@ import 'package:bondly_app/features/auth/data/repositories/remote_users_reposito
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bondly_app/features/auth/domain/repositories/users_repository.dart';
 import 'package:bondly_app/features/home/data/repositories/api/akcnowledgments_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/ambassadors_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/announcements_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/badges_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/banners_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/categories_api.dart';
@@ -32,38 +34,35 @@ class RepositoryProvider {
     );
 
     getIt.registerSingleton<BannersRepository>(
-      DefaultBannersRepository(getIt<BannersAPI>())
-    );
+        DefaultBannersRepository(getIt<BannersAPI>()));
 
     getIt.registerSingleton<CompanyFeedsRepository>(
-      DefaultCompanyFeedsRespository(getIt<CompanyFeedsAPI>(),
+      DefaultCompanyFeedsRespository(
+        getIt<CompanyFeedsAPI>(),
         getIt<CreateCommentAPI>(),
         getIt<HandleLikeAPI>(),
         getIt<CategoriesAPI>(),
         getIt<BadgesAPI>(),
         getIt<CompanyCollaboratorsAPI>(),
-        getIt<CreateAcknowledgmentAPI>()
-      )
+        getIt<CreateAcknowledgmentAPI>(),
+        getIt<AnnouncementsAPI>(),
+        getIt<AmbassadorsAPI>(),
+      ),
     );
 
     getIt.registerSingletonWithDependencies<UsersRepository>(
-      () => DefaultUsersRepository(
-          getIt<UsersDao>(),
-          UserEntityMapper(),
-        ),
+        () => DefaultUsersRepository(
+              getIt<UsersDao>(),
+              UserEntityMapper(),
+            ),
         instanceName: DefaultUsersRepository.name,
-        dependsOn: [AppDatabase, UsersDao]
-    );
+        dependsOn: [AppDatabase, UsersDao]);
 
     getIt.registerSingletonAsync<UsersRepository>(
-      () async => RemoteUsersRepository(getIt<UsersAPI>()),
-        instanceName: RemoteUsersRepository.name
-    );
+        () async => RemoteUsersRepository(getIt<UsersAPI>()),
+        instanceName: RemoteUsersRepository.name);
 
     getIt.registerSingleton<ActivityRepository>(
-      DefaultActivityRepository(getIt<UsersAPI>())
-    );
-
-
+        DefaultActivityRepository(getIt<UsersAPI>()));
   }
 }

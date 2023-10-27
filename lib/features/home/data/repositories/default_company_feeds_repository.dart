@@ -1,17 +1,20 @@
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
+import 'package:bondly_app/features/home/data/repositories/api/akcnowledgments_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/ambassadors_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/announcements_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/badges_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/categories_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/company_collaborators.dart';
 import 'package:bondly_app/features/home/data/repositories/api/company_feeds_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/create_comment_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/handle_like_api.dart';
+import 'package:bondly_app/features/home/domain/models/announcement_model.dart';
 import 'package:bondly_app/features/home/domain/models/category_badges.dart';
 import 'package:bondly_app/features/home/domain/models/company_categories.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
+import 'package:bondly_app/features/home/domain/models/embassys_model.dart';
 import 'package:bondly_app/features/home/domain/repositories/company_feeds_respository.dart';
 import 'package:multiple_result/multiple_result.dart';
-
-import 'package:bondly_app/features/home/data/repositories/api/akcnowledgments_api.dart';
 
 /// A repository implementation for fetching default banners from the server.
 /// This class implements the [BannersRepository] abstract class.
@@ -25,6 +28,8 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
   final BadgesAPI _badgesAPI;
   final CompanyCollaboratorsAPI _companyCollaboratorsAPI;
   final CreateAcknowledgmentAPI _createAcknowledgmentAPI;
+  final AnnouncementsAPI _announcementsAPI;
+  final AmbassadorsAPI _ambassadorsAPI;
 
   DefaultCompanyFeedsRespository(
       this._feedsAPI,
@@ -32,7 +37,10 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
       this._handleLikeAPI,
       this._categoriesAPI,
       this._badgesAPI,
-      this._companyCollaboratorsAPI, this._createAcknowledgmentAPI);
+      this._companyCollaboratorsAPI,
+      this._createAcknowledgmentAPI,
+      this._announcementsAPI,
+      this._ambassadorsAPI);
   @override
   Future<Result<CompanyFeed, Exception>> getCompanyFeeds() async {
     try {
@@ -95,12 +103,32 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
   }
 
   @override
-  Future<Result<bool, Exception>> createAcknowledgment(String badgeId,String message, List<String> recipients)async {
+  Future<Result<bool, Exception>> createAcknowledgment(
+      String badgeId, String message, List<String> recipients) async {
     try {
-      return Result.success(
-          await _createAcknowledgmentAPI.createAcknowledgment(badgeId,message,recipients));
+      return Result.success(await _createAcknowledgmentAPI.createAcknowledgment(
+          badgeId, message, recipients));
     } catch (exception) {
-    return Result.error(NoConnectionException());
+      return Result.error(NoConnectionException());
+    }
+  }
+
+  @override
+  Future<Result<Announcements, Exception>> getCompanyAnnouncements() async {
+    try {
+      return Result.success(await _announcementsAPI.getCompanyAnnouncements());
+    } catch (exception) {
+      return Result.error(NoConnectionException());
+    }
+  }
+
+  @override
+  Future<Result<List<Embassy>, Exception>> getUserEmbassys(
+      String userId) async {
+    try {
+      return Result.success(await _ambassadorsAPI.getUserEmbassys(userId));
+    } catch (exception) {
+      return Result.error(NoConnectionException());
     }
   }
 }
