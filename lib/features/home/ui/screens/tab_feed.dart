@@ -17,17 +17,14 @@ class _FeedTabState extends State<FeedTab> {
     model = widget.model;
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    return  Padding(
+    return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 10),
-            const SizedBox(
-              height: 10,
-            ),
             SizedBox(
               height: 500,
               child: ListView.builder(
@@ -36,7 +33,6 @@ class _FeedTabState extends State<FeedTab> {
                   if (index == 0) {
                     return Column(
                       children: [
-
                         const SizedBox(height: 10),
                         SinglePostWidget(
                             post: model.feeds.data[index], index: index)

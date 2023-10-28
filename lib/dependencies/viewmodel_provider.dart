@@ -11,11 +11,13 @@ import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_announcements.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_category_badges.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_banners.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_categories.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_collaborators.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
+import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
@@ -37,57 +39,55 @@ class ViewModelProvider {
     getIt.registerSingleton<AppModel>(AppModel());
 
     getIt.registerSingletonWithDependencies<ProfileViewModel>(
-            () => ProfileViewModel(
-          userUseCase: getIt<UserUseCase>(),
-          logoutUseCase: getIt<LogoutUseCase>(),
-          updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
-        ),
+        () => ProfileViewModel(
+              userUseCase: getIt<UserUseCase>(),
+              logoutUseCase: getIt<LogoutUseCase>(),
+              updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
+            ),
         dependsOn: [
           AppDatabase,
           UsersDao,
           LogoutUseCase,
-          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name),
-        ]
-    );
+          InitDependency(UsersRepository,
+              instanceName: DefaultUsersRepository.name),
+        ]);
 
     getIt.registerSingletonWithDependencies<HomeViewModel>(
-            () => HomeViewModel(
-          getIt<UserUseCase>(),
-          getIt<SessionTokenHandler>(),
-          getIt<GetCompanyBannersUseCase>(),
-          getIt<GetCompanyFeedsUseCase>(),
-          getIt<CreateFeedCommentUseCase>(),
-          getIt<HandleLikesUseCase>(),
-          getIt<GetCategoriesUseCase>(),
-          getIt<GetCategoryBadgesUseCase>(),
-          getIt<GetCompanyCollaboratorsUseCase>(),
-          getIt<CreateAcknowledgmentUseCase>()
-        ),
-        dependsOn: [UserUseCase]
-    );
+        () => HomeViewModel(
+              getIt<UserUseCase>(),
+              getIt<SessionTokenHandler>(),
+              getIt<GetCompanyBannersUseCase>(),
+              getIt<GetCompanyFeedsUseCase>(),
+              getIt<CreateFeedCommentUseCase>(),
+              getIt<HandleLikesUseCase>(),
+              getIt<GetCategoriesUseCase>(),
+              getIt<GetCategoryBadgesUseCase>(),
+              getIt<GetCompanyCollaboratorsUseCase>(),
+              getIt<CreateAcknowledgmentUseCase>(),
+              getIt<GetCompanyAnnouncementsUseCase>(),
+              getIt<GetUserEmbassysUseCase>(),
+            ),
+        dependsOn: [UserUseCase]);
 
     getIt.registerSingletonWithDependencies<LoginViewModel>(
-            () => LoginViewModel(
-          getIt<LoginUseCase>(),
-          getIt<GetCompaniesUseCase>(),
-          getIt<GetLoginStateUseCase>(),
-          getIt<UserUseCase>(),
-          getIt<SessionTokenHandler>(),
-        ),
+        () => LoginViewModel(
+              getIt<LoginUseCase>(),
+              getIt<GetCompaniesUseCase>(),
+              getIt<GetLoginStateUseCase>(),
+              getIt<UserUseCase>(),
+              getIt<SessionTokenHandler>(),
+            ),
         dependsOn: [
           AppDatabase,
           UsersDao,
           UserUseCase,
-          InitDependency(UsersRepository, instanceName: DefaultUsersRepository.name),
-        ]
-    );
+          InitDependency(UsersRepository,
+              instanceName: DefaultUsersRepository.name),
+        ]);
 
-    getIt.registerFactory<MyActivityViewModel>(
-        () => MyActivityViewModel(
-          getIt<GetUserActivityUseCase>(),
-          getIt<UserUseCase>(),
-          getIt<LogoutUseCase>()
-        )
-    );
+    getIt.registerFactory<MyActivityViewModel>(() => MyActivityViewModel(
+        getIt<GetUserActivityUseCase>(),
+        getIt<UserUseCase>(),
+        getIt<LogoutUseCase>()));
   }
 }

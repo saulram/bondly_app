@@ -3,6 +3,8 @@ import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/mappers/user_activity_response_mapper.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/users_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/akcnowledgments_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/ambassadors_api.dart';
+import 'package:bondly_app/features/home/data/repositories/api/announcements_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/badges_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/banners_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/categories_api.dart';
@@ -35,10 +37,7 @@ class APIProvider {
     );
 
     getIt.registerSingleton<UsersAPI>(
-      UsersAPI(
-          getIt<ApiCallsHandler>(),
-          UserActivityResponseMapper()
-      ),
+      UsersAPI(getIt<ApiCallsHandler>(), UserActivityResponseMapper()),
     );
 
     getIt.registerSingleton<CategoriesAPI>(
@@ -55,6 +54,12 @@ class APIProvider {
 
     getIt.registerSingleton<CreateAcknowledgmentAPI>(
       CreateAcknowledgmentAPI(getIt<ApiCallsHandler>()),
+    );
+    getIt.registerSingleton<AnnouncementsAPI>(
+      AnnouncementsAPI(getIt<ApiCallsHandler>()),
+    );
+    getIt.registerSingleton<AmbassadorsAPI>(
+      AmbassadorsAPI(getIt<ApiCallsHandler>()),
     );
   }
 }

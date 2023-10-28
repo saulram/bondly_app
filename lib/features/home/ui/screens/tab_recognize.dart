@@ -1,11 +1,11 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_home.dart';
+import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
-import 'package:infinite_carousel/infinite_carousel.dart';
 
 class Recognizetab extends StatefulWidget {
   final HomeViewModel model;
@@ -19,7 +19,7 @@ class _RecognizetabState extends State<Recognizetab> {
   late HomeViewModel model;
   @override
   void initState() {
-    model = widget.model;
+    model = getIt<HomeViewModel>();
     super.initState();
   }
 
@@ -38,7 +38,8 @@ class _RecognizetabState extends State<Recognizetab> {
       ),
     );
   }
-  Widget _buildAnouncementsSection (){
+
+  Widget _buildAnouncementsSection() {
     return GoldBorderedContainer(
       child: Column(
         children: [
@@ -54,6 +55,7 @@ class _RecognizetabState extends State<Recognizetab> {
       ),
     );
   }
+
   Widget _buildAnnouncementsList() {
     return Column(
       children: [
@@ -63,8 +65,9 @@ class _RecognizetabState extends State<Recognizetab> {
           child: CarouselSlider(
             carouselController: model.carouselController,
             options: CarouselOptions(
-              height: 80.0, autoPlay: true,
-              autoPlayInterval:const  Duration(seconds: 10),
+              height: 80.0,
+              autoPlay: true,
+              autoPlayInterval: const Duration(seconds: 10),
               autoPlayAnimationDuration: const Duration(milliseconds: 2000),
               autoPlayCurve: Curves.fastOutSlowIn,
               pauseAutoPlayOnTouch: true,
@@ -74,19 +77,22 @@ class _RecognizetabState extends State<Recognizetab> {
                 model.onAnnouncementChanged(index);
               },
             ),
-
             items: model.announcements.map<Widget>((announcement) {
+              debugPrint("Announcement: ${announcement.content}");
               return Builder(
                 builder: (BuildContext context) {
                   return SizedBox(
                       width: MediaQuery.of(context).size.width,
-                      child: Text(announcement["content"], style: Theme.of(context).textTheme.titleMedium,textAlign: TextAlign.center,)
-                  );
+                      child: Text(
+                        "${announcement.content}",
+                        style: Theme.of(context).textTheme.titleMedium,
+                        textAlign: TextAlign.center,
+                      ));
                 },
               );
             }).toList(),
-          ),),
-
+          ),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: model.announcements.map((announcement) {
@@ -98,7 +104,8 @@ class _RecognizetabState extends State<Recognizetab> {
               child: Container(
                 width: 8.0,
                 height: 8.0,
-                margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: model.currentAnnouncementIndex == index

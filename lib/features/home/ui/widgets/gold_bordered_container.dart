@@ -16,7 +16,7 @@ class _GoldBorderedContainerState extends State<GoldBorderedContainer> {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           border: Border.all(color: AppColors.tertiaryColorLight),
-          color: AppColors.backgroundColor,
+          color: Theme.of(context).scaffoldBackgroundColor,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
