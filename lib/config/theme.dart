@@ -54,7 +54,8 @@ class AppTheme extends ChangeNotifier {
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      counterStyle: GoogleFonts.poppins(color: AppColors.bodyColorDark,fontWeight: FontWeight.w300),
+      counterStyle: GoogleFonts.poppins(
+          color: AppColors.bodyColorDark, fontWeight: FontWeight.w300),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: AppColors.bodyColorDark),
@@ -84,19 +85,16 @@ class AppTheme extends ChangeNotifier {
       ),
     ),
     dropdownMenuTheme: DropdownMenuThemeData(
-      menuStyle: MenuStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(AppColors.darkBackgroundColor),
-      )
-    ),
+        menuStyle: MenuStyle(
+      backgroundColor:
+          MaterialStateProperty.all<Color>(AppColors.darkBackgroundColor),
+    )),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         shape: const StadiumBorder(),
-        fixedSize:const Size(150,48),
-
+        fixedSize: const Size(150, 48),
         foregroundColor: AppColors.primaryColor,
-        textStyle: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w700
-        ),
+        textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
@@ -104,12 +102,10 @@ class AppTheme extends ChangeNotifier {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(1),
         ),
-        fixedSize:const Size(250,48),
+        fixedSize: const Size(250, 48),
         foregroundColor: AppColors.bodyColorDark,
         backgroundColor: AppColors.tertiaryColor,
-        textStyle: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w700
-        ),
+        textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
       ),
     ),
     scaffoldBackgroundColor: AppColors.darkBackgroundColor,
@@ -122,6 +118,8 @@ class AppTheme extends ChangeNotifier {
     cardColor: AppColors.tertiaryColorLight,
     dividerColor: AppColors.dividerColor,
     unselectedWidgetColor: AppColors.darkBackgroundColor,
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.secondaryColor),
     textTheme: TextTheme(
       titleLarge: GoogleFonts.montserrat(
         color: AppColors.bodyColor,
@@ -156,7 +154,8 @@ class AppTheme extends ChangeNotifier {
       labelSmall: GoogleFonts.montserrat(color: AppColors.bodyColor),
     ),
     inputDecorationTheme: InputDecorationTheme(
-    counterStyle: GoogleFonts.poppins(color: AppColors.bodyColor,fontWeight: FontWeight.w300),
+      counterStyle: GoogleFonts.poppins(
+          color: AppColors.bodyColor, fontWeight: FontWeight.w300),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: AppColors.primaryColorLight),
@@ -185,7 +184,6 @@ class AppTheme extends ChangeNotifier {
       unselectedIconTheme: IconThemeData(
         color: AppColors.darkBackgroundColor,
       ),
-
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
@@ -195,12 +193,9 @@ class AppTheme extends ChangeNotifier {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         shape: const StadiumBorder(),
-        fixedSize:const Size(150,48),
-
+        fixedSize: const Size(150, 48),
         foregroundColor: AppColors.primaryColorLight,
-        textStyle: GoogleFonts.montserrat(
-            fontWeight: FontWeight.w700
-        ),
+        textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
@@ -208,12 +203,10 @@ class AppTheme extends ChangeNotifier {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(1),
         ),
-        fixedSize:const Size(250,48),
+        fixedSize: const Size(250, 48),
         foregroundColor: AppColors.bodyColorDark,
         backgroundColor: AppColors.primaryButtonColor,
-        textStyle: GoogleFonts.montserrat(
-          fontWeight: FontWeight.w700
-        ),
+        textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
       ),
     ),
     scaffoldBackgroundColor: AppColors.backgroundColor,

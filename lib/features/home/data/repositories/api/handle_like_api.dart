@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:bondly_app/src/api_calls_handler.dart';
 import 'package:logger/logger.dart';
 
@@ -23,7 +21,6 @@ class HandleLikeAPI {
         path: "accountFeeds/feeds/$feedId/likes",
       );
       log.i("Company Feeds Response: ${response.body}");
-      Map<String, dynamic> jsonMap = json.decode(response.body);
 
       return true;
     } catch (exception) {

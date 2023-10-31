@@ -24,6 +24,7 @@ import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
+import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
@@ -89,5 +90,9 @@ class ViewModelProvider {
         getIt<GetUserActivityUseCase>(),
         getIt<UserUseCase>(),
         getIt<LogoutUseCase>()));
+
+    getIt.registerFactory<MyRewardsViewModel>(
+      () => MyRewardsViewModel(),
+    );
   }
 }

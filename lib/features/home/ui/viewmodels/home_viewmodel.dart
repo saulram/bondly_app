@@ -266,7 +266,7 @@ class HomeViewModel extends NavigationModel {
     final Result<Badges, Exception> result =
         await _getCategoryBadgesUseCase.invoke(selectedCategory!);
     result.when((badges) {
-      log.i("HomeViewModel### Badges: ${badges.badges?.length}");
+      log.i("HomeViewModel### Badges: ${badges.badges.length}");
       this.badges = badges;
       loadingBadges = false;
     }, (error) {
