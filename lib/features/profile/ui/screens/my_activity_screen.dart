@@ -248,52 +248,61 @@ class _MyActivityScreenState extends State<MyActivityScreen> {
           borderRadius: const BorderRadius.all(Radius.circular(16.0)),
           border: Border.all(color: theme.cardColor),
         ),
-        child: Stack(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+        child: Material(
+          color: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: InkWell(
+            splashColor: AppColors.primaryColor,
+            child: Stack(
               children: [
-                Icon(
-                  icon,
-                  color: theme.unselectedWidgetColor,
-                  size: 36.0,
-                ),
-                const SizedBox(width: 8.0),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: theme.textTheme.headlineSmall!
-                            .copyWith(fontSize: 18.0),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
+                      color: theme.unselectedWidgetColor,
+                      size: 36.0,
+                    ),
+                    const SizedBox(width: 8.0),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: theme.textTheme.headlineSmall!
+                                .copyWith(fontSize: 18.0),
+                          ),
+                          const SizedBox(height: 8.0),
+                          PostMentionsWidget(
+                            text: description,
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                          const SizedBox(height: 24.0),
+                          Text(parsedDate),
+                        ],
                       ),
-                      const SizedBox(height: 8.0),
-                      PostMentionsWidget(
-                        text: description,
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: 24.0),
-                      Text(parsedDate),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(
+                      width: 24.0,
+                    )
+                  ],
                 ),
-                const SizedBox(
-                  width: 24.0,
-                )
+                !read
+                    ? const Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Icon(
+                          IconsaxBold.notification_status,
+                          color: AppColors.secondaryColor,
+                        ),
+                      )
+                    : Container()
               ],
             ),
-            !read
-                ? const Positioned(
-                    top: 0,
-                    right: 0,
-                    child: Icon(
-                      IconsaxBold.notification_status,
-                      color: AppColors.secondaryColor,
-                    ),
-                  )
-                : Container()
-          ],
+          ),
         ));
   }
 

@@ -56,14 +56,12 @@ class ProfileScreenState extends State<ProfileScreen> {
       child: ModelBuilder<ProfileViewModel>(
         builder: (context, model, child) => Scaffold(
           backgroundColor: AppColors.secondaryColor,
-          body: SafeArea(
-            child: Column(
-              children: [
-                _buildTopBar(theme),
-                _buildHeader(theme, model),
-                _buildBodyCard(theme, model)
-              ],
-            ),
+          body: Column(
+            children: [
+              _buildTopBar(theme),
+              _buildHeader(theme, model),
+              _buildBodyCard(theme, model)
+            ],
           ),
         ),
       ),
@@ -86,32 +84,34 @@ class ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildTopBar(ThemeData theme) {
-    return Container(
-      color: Colors.transparent,
-      width: double.infinity,
-      height: 56.0,
-      child: Row(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    IconsaxOutline.arrow_left,
-                    color: Colors.white,
+    return SafeArea(
+      child: Container(
+        color: Colors.transparent,
+        width: double.infinity,
+        height: 56.0,
+        child: Row(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      IconsaxOutline.arrow_left,
+                      color: Colors.white,
+                    ),
+                    onPressed: () => context.pop(),
                   ),
-                  onPressed: () => context.pop(),
-                ),
-                Center(
-                  child: Text(
-                    StringsProfile.profileTitle,
-                    style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+                  Center(
+                    child: Text(
+                      StringsProfile.profileTitle,
+                      style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              )
             )
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -289,7 +289,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             Positioned(
-              bottom: 32.0,
+              bottom: 48.0,
               left: 0,
               right: 0,
               child: Center(
