@@ -25,11 +25,9 @@ class BondlyAppBar extends StatelessWidget implements PreferredSizeWidget {
     var theme = Theme.of(context);
     return AppBar(
       backgroundColor: theme.scaffoldBackgroundColor,
-      title: Center(
-        child: Image.asset(
-          context.isDarkMode ? _logoDarkImagePath : _logoImagePath,
-          width: 100,
-        ),
+      title: Image.asset(
+        context.isDarkMode ? _logoDarkImagePath : _logoImagePath,
+        width: 100,
       ),
       leading: Container(
         margin: const EdgeInsets.all(8),
