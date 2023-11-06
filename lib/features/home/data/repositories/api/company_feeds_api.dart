@@ -30,4 +30,16 @@ class CompanyFeedsAPI {
       rethrow;
     }
   }
+
+  Future<FeedData> getFeedById(String feedId) async {
+    try {
+      var response = await _callsHandler.get(path: "accountFeeds/feeds/$feedId");
+      Map<String, dynamic> jsonMap = json.decode(response.body);
+
+      return FeedData.fromJson(jsonMap["data"]);
+    } catch (exception) {
+      log.e("Company Feeds Exception: ${exception.toString()}");
+      rethrow;
+    }
+  }
 }

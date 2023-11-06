@@ -7,6 +7,7 @@ class StringsProfile {
   static const String closeSession = "Cerrar sesión";
   static const String myActivity = "Mi actividad";
   static const String monthlyReport = "Estado de cuenta";
+  static const String myData = "Mis datos";
   static const String rewards = "Recompensas";
   static const String fromGallery = "Abrir Galería";
   static const String fromCamera = "Abrir Cámara";

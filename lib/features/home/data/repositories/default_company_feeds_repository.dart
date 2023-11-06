@@ -20,7 +20,7 @@ import 'package:multiple_result/multiple_result.dart';
 /// This class implements the [BannersRepository] abstract class.
 /// It uses the [_bannersAPI] instance to fetch the banners from the server.
 /// If an exception occurs during the API call, it returns a [Result] object with an [NoConnectionException] error.
-class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
+class DefaultCompanyFeedsRepository extends CompanyFeedsRepository {
   final CompanyFeedsAPI _feedsAPI;
   final CreateCommentAPI _createCommentAPI;
   final HandleLikeAPI _handleLikeAPI;
@@ -31,7 +31,7 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
   final AnnouncementsAPI _announcementsAPI;
   final AmbassadorsAPI _ambassadorsAPI;
 
-  DefaultCompanyFeedsRespository(
+  DefaultCompanyFeedsRepository(
       this._feedsAPI,
       this._createCommentAPI,
       this._handleLikeAPI,
@@ -40,7 +40,9 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
       this._companyCollaboratorsAPI,
       this._createAcknowledgmentAPI,
       this._announcementsAPI,
-      this._ambassadorsAPI);
+      this._ambassadorsAPI
+  );
+
   @override
   Future<Result<CompanyFeed, Exception>> getCompanyFeeds() async {
     try {
@@ -51,6 +53,22 @@ class DefaultCompanyFeedsRespository extends CompanyFeedsRepository {
       }
 
       return Result.error(NoConnectionException());
+    }
+  }
+
+  @override
+  Future<Result<FeedData, Exception>> getCompanyFeedById(String feedId) async {
+    try {
+      return Result.success(await _feedsAPI.getFeedById(feedId));
+    } catch (exception) {
+      return Result.error(
+        exception is TokenNotFoundException
+            ? exception
+            : (exception is FeedNotFoundException
+                ? exception
+                : NoConnectionException()
+        )
+      );
     }
   }
 

@@ -11,7 +11,9 @@ class UserActivityResponseMapper {
         read: e.read,
         createdAt: e.createdAt,
         updatedAt: e.updatedAt,
+        feedId: e.feedId,
         type: e.type,
+        id: e.id,
       )
     ).toList();
 

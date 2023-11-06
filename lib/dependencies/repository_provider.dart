@@ -40,7 +40,7 @@ class RepositoryProvider {
         DefaultBannersRepository(getIt<BannersAPI>()));
 
     getIt.registerSingleton<CompanyFeedsRepository>(
-      DefaultCompanyFeedsRespository(
+      DefaultCompanyFeedsRepository(
         getIt<CompanyFeedsAPI>(),
         getIt<CreateCommentAPI>(),
         getIt<HandleLikeAPI>(),

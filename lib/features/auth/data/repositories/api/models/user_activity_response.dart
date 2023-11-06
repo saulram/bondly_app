@@ -38,7 +38,9 @@ class PaginatedUserActivityResponse {
 }
 
 class UserActivityResponse {
+  late String id;
   late String userId;
+  late String feedId;
   late String title;
   late String content;
   late bool read;
@@ -47,7 +49,9 @@ class UserActivityResponse {
   late String type;
 
   UserActivityResponse({
+    required this.id,
     required this.userId,
+    required this.feedId,
     required this.title,
     required this.content,
     required this.read,
@@ -57,7 +61,9 @@ class UserActivityResponse {
   });
 
   UserActivityResponse.fromJson(Map<String, dynamic> json) {
+    id = json['_id'] ?? "";
     userId = json['user_id'] ?? "";
+    feedId = json['feed_id'] ?? "";
     title = json['title'] ?? "";
     content = json['content'] ?? "";
     read = json['read'] ?? false;
@@ -68,7 +74,9 @@ class UserActivityResponse {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
     data['user_id'] = userId;
+    data['feed_id'] = feedId;
     data['title'] = title;
     data['content'] = content;
     data['read'] = read;

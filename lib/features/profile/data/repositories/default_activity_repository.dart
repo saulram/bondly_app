@@ -10,7 +10,7 @@ class DefaultActivityRepository extends ActivityRepository {
   DefaultActivityRepository(this._api);
 
   @override
-  Future<Result<UserActivityHolder, Exception>> getActivity(
+  Future<Result<UserActivityHolder, Exception>> getActivityList(
       String userId,
       int limit,
       int page
@@ -22,6 +22,4 @@ class DefaultActivityRepository extends ActivityRepository {
       return Result.error(exception as Exception);
     }
   }
-
-
 }

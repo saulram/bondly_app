@@ -13,16 +13,20 @@ class UserActivityHolder {
 }
 
 class UserActivityItem {
+  final String id;
   final String userId;
+  final String feedId;
   final String title;
   final String content;
-  final bool read;
+  late bool read;
   final String createdAt;
   final String updatedAt;
   final String type;
 
   UserActivityItem({
+    required this.id,
     required this.userId,
+    required this.feedId,
     required this.title,
     required this.content,
     required this.read,

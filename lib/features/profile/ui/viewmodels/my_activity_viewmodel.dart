@@ -85,4 +85,8 @@ class MyActivityViewModel extends NavigationModel {
       notifyListeners();
     });
   }
+
+  Future<void> updateReadStatus(String id) async {
+
+  }
 }
