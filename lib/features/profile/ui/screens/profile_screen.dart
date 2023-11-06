@@ -31,7 +31,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   final String defaultAvatar =
       "https://www.gauchercommunity.org/wp-content/uploads/2020/09/avatar-placeholder.png";
 
-  double headerHeight = 200;
+  double headerHeight = 190;
   File? _image;
   final picker = ImagePicker();
 
@@ -58,8 +58,14 @@ class ProfileScreenState extends State<ProfileScreen> {
           backgroundColor: AppColors.secondaryColor,
           body: Column(
             children: [
-              _buildTopBar(theme),
-              _buildHeader(theme, model),
+              SafeArea(
+                child: Column(
+                  children: [
+                    _buildTopBar(theme),
+                    _buildHeader(theme, model),
+                  ],
+                )
+              ),
               _buildBodyCard(theme, model)
             ],
           ),
@@ -72,7 +78,7 @@ class ProfileScreenState extends State<ProfileScreen> {
     return Container(
       width: double.infinity,
       height: headerHeight,
-      margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       child: model.busy ? const Center(child: CircularProgressIndicator()) : Column(
         children: [
           _buildGreetingAndAvatar(theme, model),
@@ -84,34 +90,32 @@ class ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildTopBar(ThemeData theme) {
-    return SafeArea(
-      child: Container(
-        color: Colors.transparent,
-        width: double.infinity,
-        height: 56.0,
-        child: Row(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      IconsaxOutline.arrow_left,
-                      color: Colors.white,
-                    ),
-                    onPressed: () => context.pop(),
+    return Container(
+      color: Colors.transparent,
+      width: double.infinity,
+      height: 48.0,
+      child: Row(
+        children: [
+          Expanded(
+            child: Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    IconsaxOutline.arrow_left,
+                    color: Colors.white,
                   ),
-                  Center(
-                    child: Text(
-                      StringsProfile.profileTitle,
-                      style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
-                    ),
+                  onPressed: () => context.pop(),
+                ),
+                Center(
+                  child: Text(
+                    StringsProfile.profileTitle,
+                    style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
                   ),
-                ],
-              )
+                ),
+              ],
             )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }
@@ -262,30 +266,39 @@ class ProfileScreenState extends State<ProfileScreen> {
                   vertical: 36.0,
                 horizontal: 24.0
               ),
-              child: Column(
-                children: [
-                  SelectableMenuOption(
-                      title: StringsProfile.myActivity,
-                      icon: IconsaxOutline.notification_bing,
-                      onTap: () {
-                        context.push(MyActivityScreen.route);
-                      }
-                  ),
-                  SelectableMenuOption(
-                      title: StringsProfile.rewards,
-                      icon: IconsaxOutline.cup,
-                      onTap: () {
-                        context.push(MyRewardsScreen.route);
-                      }
-                  ),
-                  SelectableMenuOption(
-                      title: StringsProfile.monthlyReport,
-                      icon: IconsaxOutline.money,
-                      onTap: () {
-                        context.push(MonthlyBalanceScreen.route);
-                      }
-                  ),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SelectableMenuOption(
+                        title: StringsProfile.myData,
+                        icon: IconsaxOutline.menu_board,
+                        onTap: () {
+                          context.push(MonthlyBalanceScreen.route);
+                        }
+                    ),
+                    SelectableMenuOption(
+                        title: StringsProfile.myActivity,
+                        icon: IconsaxOutline.notification_bing,
+                        onTap: () {
+                          context.push(MyActivityScreen.route);
+                        }
+                    ),
+                    SelectableMenuOption(
+                        title: StringsProfile.rewards,
+                        icon: IconsaxOutline.cup,
+                        onTap: () {
+                          context.push(MyRewardsScreen.route);
+                        }
+                    ),
+                    SelectableMenuOption(
+                        title: StringsProfile.monthlyReport,
+                        icon: IconsaxOutline.money,
+                        onTap: () {
+                          context.push(MonthlyBalanceScreen.route);
+                        }
+                    ),
+                  ],
+                ),
               ),
             ),
             Positioned(

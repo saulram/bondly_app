@@ -106,14 +106,23 @@ class UseCaseProvider {
         ]);
 
     getIt.registerSingleton<GetUserActivityUseCase>(
-        GetUserActivityUseCase(getIt<ActivityRepository>()));
+        GetUserActivityUseCase(
+          getIt<ActivityRepository>(),
+          getIt<CompanyFeedsRepository>()
+        )
+    );
 
     getIt.registerSingleton<CreateAcknowledgmentUseCase>(
-        CreateAcknowledgmentUseCase(getIt<CompanyFeedsRepository>()));
+        CreateAcknowledgmentUseCase(getIt<CompanyFeedsRepository>())
+    );
+
     getIt.registerSingleton<GetCompanyAnnouncementsUseCase>(
-        GetCompanyAnnouncementsUseCase(getIt<CompanyFeedsRepository>()));
+        GetCompanyAnnouncementsUseCase(getIt<CompanyFeedsRepository>())
+    );
+
     getIt.registerSingleton<GetUserEmbassysUseCase>(
-        GetUserEmbassysUseCase(getIt<CompanyFeedsRepository>()));
+        GetUserEmbassysUseCase(getIt<CompanyFeedsRepository>())
+    );
 
     getIt.registerSingleton<GetShoppingItemsUseCase>(
         GetShoppingItemsUseCase(getIt<CartRepository>()));
@@ -134,6 +143,7 @@ class UseCaseProvider {
         ClearShoppingCartUseCase(getIt<CartRepository>()));
 
     getIt.registerSingleton<CheckOutCartUseCase>(
-        CheckOutCartUseCase(getIt<CartRepository>()));
+        CheckOutCartUseCase(getIt<CartRepository>())
+    );
   }
 }

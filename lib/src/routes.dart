@@ -1,5 +1,6 @@
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
+import 'package:bondly_app/features/profile/ui/screens/activity_detail_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/monthly_balance_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_activity_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_rewards_screen.dart';
@@ -29,7 +30,8 @@ class AppRouter {
           builder: (context, state) => ProfileScreen()),
       GoRoute(
           path: MyActivityScreen.route,
-          builder: (context, state) => MyActivityScreen()),
+          builder: (context, state) => const MyActivityScreen()
+      ),
       GoRoute(
         path: MyRewardsScreen.route,
         builder: (context, state) => const MyRewardsScreen(),
@@ -39,7 +41,14 @@ class AppRouter {
           builder: (context, state) => const MyCartScreen()),
       GoRoute(
           path: MonthlyBalanceScreen.route,
-          builder: (context, state) => const MonthlyBalanceScreen())
+          builder: (context, state) => const MonthlyBalanceScreen()
+      ),
+      GoRoute(
+          path: ActivityDetailScreen.route,
+          builder: (context, state) => ActivityDetailScreen(
+              activityId: (state.extra as Map<String, String>)[ActivityDetailScreen.idParam] ?? ""
+          )
+      )
     ],
   );
 }

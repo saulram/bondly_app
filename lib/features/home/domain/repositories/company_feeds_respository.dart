@@ -13,6 +13,10 @@ abstract class CompanyFeedsRepository {
   /// Returns a [Result] object that contains either a [CompanyFeed] object or an [Exception].
   Future<Result<CompanyFeed, Exception>> getCompanyFeeds();
 
+  /// This method retrieves a single company feed using an id.
+  /// Returns a [Result] object that contains either a [FeedData] object or an [Exception].
+  Future<Result<FeedData, Exception>> getCompanyFeedById(String feedId);
+
   /// This method creates a comment for a specific feed.
   /// Takes in a [feedId] and a [message] as parameters.
   /// Returns a [Result] object that contains either a [FeedData] object or an [Exception].
@@ -54,3 +58,6 @@ class DefaultCompanyException implements Exception {}
 
 /// Exception thrown when the authentication token is not found.
 class TokenNotFoundException implements Exception {}
+
+/// Exception thrown when the feed is not found.
+class FeedNotFoundException implements Exception {}
