@@ -22,6 +22,7 @@ import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
@@ -103,6 +104,7 @@ class ViewModelProvider {
         getIt<GetUserShoppingCartUseCase>(),
         getIt<PushCartItemUseCase>(),
         getIt<PullCartItemUseCase>(),
+        getIt<CheckOutCartUseCase>(),
       ),
     );
   }

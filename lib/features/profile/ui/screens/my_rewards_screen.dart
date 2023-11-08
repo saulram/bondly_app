@@ -6,6 +6,7 @@ import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
 import 'package:bondly_app/features/profile/ui/screens/shopping_cart_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +22,7 @@ class MyRewardsScreen extends StatefulWidget {
 
 class _MyRewardsScreenState extends State<MyRewardsScreen> {
   late MyRewardsViewModel model;
+  bool isLoading = false;
   @override
   void initState() {
     model = getIt<MyRewardsViewModel>();
@@ -39,14 +41,20 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
             floatingActionButton: FloatingActionButton(
               isExtended: true,
               onPressed: () async {
-                if (rewardsModel.cartItems.isEmpty) {
+                if (rewardsModel.cartEdited == false) {
                   context.push(MyCartScreen.route);
                   return;
-                } else {
-                  rewardsModel.sendItemsToCart().then((cartUpdated) {
-                    context.push(MyCartScreen.route);
-                  });
                 }
+                setState(() {
+                  isLoading = true;
+                });
+
+                rewardsModel.sendItemsToCart().then((cartUpdated) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  context.push(MyCartScreen.route);
+                });
               },
               tooltip: "Carrito",
               child: Row(
@@ -56,9 +64,15 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                   const SizedBox(
                     width: 5,
                   ),
-                  Text(
-                    "${rewardsModel.cartItems.length}",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  SizedBox(
+                    width: 15,
+                    height: 15,
+                    child: isLoading
+                        ? const CircularProgressIndicator.adaptive()
+                        : Text(
+                            "${rewardsModel.cartItems.length}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                   ),
                 ],
               ),
@@ -172,7 +186,7 @@ class RewardCardTitleSection extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          reward.name!,
+          " ${reward.name} ",
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(
@@ -224,7 +238,9 @@ class RewardCardImage extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               image: DecorationImage(
-                image: NetworkImage(reward.imageUrl!),
+                image: CachedNetworkImageProvider(
+                  reward.imageUrl!,
+                ),
                 fit: BoxFit.cover,
               ),
             ),
@@ -260,31 +276,34 @@ class RewardCardHeader extends StatelessWidget {
         SizedBox(width: size.width * .4),
         //To be fixed, if item exist in cart, show the quantity and a + and - button to add or remove.
         //If not, show a button to add to cart.
-        rewardsModel.getItemCount(reward.id!) == 0
+        rewardsModel.getItemCount(reward.id) == 0
             ? OutlinedButton(
                 onPressed: () {
-                  rewardsModel.addToCart(reward.id!);
+                  rewardsModel.cartEdited = true;
+                  rewardsModel.addToCart(reward.id);
                 },
-                child: Text("Seleccionar"),
+                child: const Text("Seleccionar"),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   IconButton(
                     onPressed: () {
-                      rewardsModel.removeFromCart(reward.id!);
+                      rewardsModel.cartEdited = true;
+                      rewardsModel.removeFromCart(reward.id);
                     },
                     icon: const Icon(IconsaxOutline.minus),
                   ),
                   Text(
-                    '${rewardsModel.getItemCount(reward.id!)}',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    '${rewardsModel.getItemCount(reward.id)}',
+                    style: Theme.of(context).textTheme.labelLarge,
                   ),
                   IconButton(
                     onPressed: () {
-                      rewardsModel.addToCart(reward.id!);
+                      rewardsModel.cartEdited = true;
+                      rewardsModel.addToCart(reward.id);
                     },
-                    icon: Icon(IconsaxOutline.add),
+                    icon: const Icon(IconsaxOutline.add),
                   ),
                 ],
               )
