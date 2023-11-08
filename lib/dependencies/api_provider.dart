@@ -12,6 +12,7 @@ import 'package:bondly_app/features/home/data/repositories/api/company_collabora
 import 'package:bondly_app/features/home/data/repositories/api/company_feeds_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/create_comment_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/handle_like_api.dart';
+import 'package:bondly_app/features/profile/data/api/cart_api.dart';
 import 'package:bondly_app/src/api_calls_handler.dart';
 
 class APIProvider {
@@ -60,6 +61,11 @@ class APIProvider {
     );
     getIt.registerSingleton<AmbassadorsAPI>(
       AmbassadorsAPI(getIt<ApiCallsHandler>()),
+    );
+    getIt.registerSingleton<CartAPI>(
+      CartAPI(
+        getIt<ApiCallsHandler>(),
+      ),
     );
   }
 }

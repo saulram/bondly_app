@@ -21,7 +21,15 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart'
 import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/profile/domain/repositories/activity_repository.dart';
+import 'package:bondly_app/features/profile/domain/repositories/cart_repository.dart';
+import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/clear_shopping_cart_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/pull_cart_item.usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/push_cart_item.usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
@@ -106,5 +114,26 @@ class UseCaseProvider {
         GetCompanyAnnouncementsUseCase(getIt<CompanyFeedsRepository>()));
     getIt.registerSingleton<GetUserEmbassysUseCase>(
         GetUserEmbassysUseCase(getIt<CompanyFeedsRepository>()));
+
+    getIt.registerSingleton<GetShoppingItemsUseCase>(
+        GetShoppingItemsUseCase(getIt<CartRepository>()));
+
+    getIt.registerSingleton<GetUserShoppingCartUseCase>(
+        GetUserShoppingCartUseCase(getIt<CartRepository>()));
+
+    getIt.registerSingleton<BulkAddCartItemsUseCase>(
+        BulkAddCartItemsUseCase(getIt<CartRepository>()));
+
+    getIt.registerSingleton<PushCartItemUseCase>(
+        PushCartItemUseCase(getIt<CartRepository>()));
+
+    getIt.registerSingleton<PullCartItemUseCase>(
+        PullCartItemUseCase(getIt<CartRepository>()));
+
+    getIt.registerSingleton<ClearShoppingCartUseCase>(
+        ClearShoppingCartUseCase(getIt<CartRepository>()));
+
+    getIt.registerSingleton<CheckOutCartUseCase>(
+        CheckOutCartUseCase(getIt<CartRepository>()));
   }
 }

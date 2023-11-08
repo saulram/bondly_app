@@ -116,10 +116,12 @@ class AppTheme extends ChangeNotifier {
     primaryColor: AppColors.primaryColor,
     primaryColorLight: AppColors.primaryColorLight,
     cardColor: AppColors.tertiaryColorLight,
+    secondaryHeaderColor: AppColors.secondaryColor,
     dividerColor: AppColors.dividerColor,
     unselectedWidgetColor: AppColors.darkBackgroundColor,
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.secondaryColor),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.secondaryColor,
+        extendedTextStyle: TextStyle(color: AppColors.bodyColorDark)),
     textTheme: TextTheme(
       titleLarge: GoogleFonts.montserrat(
         color: AppColors.bodyColor,

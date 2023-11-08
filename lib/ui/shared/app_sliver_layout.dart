@@ -70,7 +70,11 @@ class _BondlySliverLayoutState extends State<BondlySliverLayout> {
                 )),
           ];
         },
-        body: widget.child,
+        body: MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: widget.child,
+        ),
       ),
     );
   }
