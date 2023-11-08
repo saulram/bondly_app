@@ -2,11 +2,13 @@ import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
 import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart';
-import 'package:bondly_app/features/profile/domain/models/rewards_list_model.dart';
+import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
+import 'package:bondly_app/features/profile/ui/screens/shopping_cart_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MyRewardsScreen extends StatefulWidget {
   static const String route = "/myRewardsScreen";
@@ -36,7 +38,16 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
             title: "Recompensas",
             floatingActionButton: FloatingActionButton(
               isExtended: true,
-              onPressed: () {},
+              onPressed: () async {
+                if (rewardsModel.cartItems.isEmpty) {
+                  context.push(MyCartScreen.route);
+                  return;
+                } else {
+                  rewardsModel.sendItemsToCart().then((cartUpdated) {
+                    context.push(MyCartScreen.route);
+                  });
+                }
+              },
               tooltip: "Carrito",
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -46,46 +57,49 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                     width: 5,
                   ),
                   Text(
-                    "${rewardsModel.itemQuantities.length}",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    "${rewardsModel.cartItems.length}",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListView.builder(
-                  itemCount: rewardsModel.rewardList.rewards?.length,
-                  itemBuilder: (context, index) {
-                    Reward reward = rewardsModel.rewardList.rewards![index];
-
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      child: GoldBorderedContainer(
-                        child: Column(
-                          children: [
-                            RewardCardHeader(
-                              reward: reward,
-                              size: size,
-                              rewardsModel: rewardsModel,
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: rewardsModel.rewardList.rewards!.isEmpty
+                  ? const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    )
+                  : ListView.builder(
+                      itemCount: rewardsModel.rewardList.rewards?.length,
+                      itemBuilder: (context, index) {
+                        Reward reward = rewardsModel.rewardList.rewards![index];
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          child: GoldBorderedContainer(
+                            child: Column(
+                              children: [
+                                RewardCardHeader(
+                                  reward: reward,
+                                  size: size,
+                                  rewardsModel: rewardsModel,
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                RewardCardImage(reward: reward),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                RewardCardTitleSection(reward: reward),
+                                const Divider(),
+                                RewardDescriptionCardSection(reward: reward),
+                                const Divider(),
+                                RewardFooterCardSection(reward: reward),
+                              ],
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            RewardCardImage(reward: reward),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            RewardCardTitleSection(reward: reward),
-                            const Divider(),
-                            RewardDescriptionCardSection(reward: reward),
-                            const Divider(),
-                            RewardFooterCardSection(reward: reward),
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
+                          ),
+                        );
+                      }),
             ));
       }),
     );
@@ -210,7 +224,7 @@ class RewardCardImage extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               image: DecorationImage(
-                image: NetworkImage(reward.image!),
+                image: NetworkImage(reward.imageUrl!),
                 fit: BoxFit.cover,
               ),
             ),
@@ -260,7 +274,7 @@ class RewardCardHeader extends StatelessWidget {
                     onPressed: () {
                       rewardsModel.removeFromCart(reward.id!);
                     },
-                    icon: Icon(IconsaxOutline.minus),
+                    icon: const Icon(IconsaxOutline.minus),
                   ),
                   Text(
                     '${rewardsModel.getItemCount(reward.id!)}',

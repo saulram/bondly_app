@@ -21,7 +21,12 @@ import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart'
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
+import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/pull_cart_item.usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/push_cart_item.usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
@@ -92,7 +97,13 @@ class ViewModelProvider {
         getIt<LogoutUseCase>()));
 
     getIt.registerFactory<MyRewardsViewModel>(
-      () => MyRewardsViewModel(),
+      () => MyRewardsViewModel(
+        getIt<GetShoppingItemsUseCase>(),
+        getIt<BulkAddCartItemsUseCase>(),
+        getIt<GetUserShoppingCartUseCase>(),
+        getIt<PushCartItemUseCase>(),
+        getIt<PullCartItemUseCase>(),
+      ),
     );
   }
 }
