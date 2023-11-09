@@ -1,11 +1,6 @@
 class StringsCart {
   static const String importantTitle = 'IMPORTANTE';
 
-  static String confirmationMessageBody(String itemCount, String total) {
-    return '''Acabas de seleccionar $itemCount producto(s) para canjear tus puntos.
-Al dar click al botón CONFIRMAR se generará un canje que restará $total puntos de tu estado de cuenta, lo cual es irreversible. ¿Estás seguro de los premios que quieres canjear?''';
-  }
-
   static const String cancel = 'Cancelar';
   static const String confirm = 'Confirmar';
   static const String hhrr =

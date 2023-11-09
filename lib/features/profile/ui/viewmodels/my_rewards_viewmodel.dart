@@ -1,4 +1,5 @@
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
 import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
 import 'package:bondly_app/features/profile/domain/models/rewards_list_model.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
@@ -7,6 +8,8 @@ import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_us
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/pull_cart_item.usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/push_cart_item.usecase.dart';
+import 'package:bondly_app/src/app_services.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:multiple_result/multiple_result.dart';
 
@@ -21,13 +24,17 @@ class MyRewardsViewModel extends NavigationModel {
   final PullCartItemUseCase _pullCartItemUseCase;
   final CheckOutCartUseCase _checkOutCartUseCase;
 
+  final GlobalKey<ScaffoldState> cartScaffoldKey = GlobalKey<ScaffoldState>();
+  final AppServices snackBarService;
+
   MyRewardsViewModel(
       this._getShoppingItemsUseCase,
       this._bulkAddCartItemsUseCase,
       this._getUserShoppingCartUseCase,
       this._pushCartItemUseCase,
       this._pullCartItemUseCase,
-      this._checkOutCartUseCase) {
+      this._checkOutCartUseCase,
+      this.snackBarService) {
     log.i("MyRewardsViewModel Created");
     init();
   }
@@ -197,11 +204,19 @@ class MyRewardsViewModel extends NavigationModel {
   }
 
   Future<bool> checkOutCart() async {
+    navigation.pop();
+    busy = true;
     Result result = await _checkOutCartUseCase.invoke(_userCart.id);
+    busy = false;
     result.when((success) {
+      navigation.go(HomeScreen.route);
+      handleShowSnackBar(
+          "¡Felicidades! Has canjeado tus puntos exitosamente! 🎉 El departamento de RR.HH. Se pondrá en contacto contigo.");
       return true;
     }, (error) {
       log.e(error);
+      handleShowSnackBar(
+          "¡Lo sentimos! No se pudo procesar tu solicitud. Por favor intenta de nuevo.");
       return false;
     });
     return true;
@@ -211,6 +226,10 @@ class MyRewardsViewModel extends NavigationModel {
     _cartItems = [];
     _userCart = UserCart(rewards: []);
     notifyListeners();
+  }
+
+  void handleShowSnackBar(String message) {
+    snackBarService.showSnackbar(cartScaffoldKey, message);
   }
 
   @override

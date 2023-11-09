@@ -20,7 +20,6 @@ class MyCartScreen extends StatefulWidget {
 
 class _MyCartScreenState extends State<MyCartScreen> {
   late MyRewardsViewModel model;
-  bool busy = false;
 
   @override
   void initState() {
@@ -29,66 +28,130 @@ class _MyCartScreenState extends State<MyCartScreen> {
   }
 
   Future<void> showConfirmationModal(
-      BuildContext context, int itemCount, MyRewardsViewModel model) async {
-    final result = await showAdaptiveDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog.adaptive(
-        title: const Text(StringsCart.importantTitle),
-        content: Text(
-          StringsCart.confirmationMessageBody(
-            itemCount.toString(),
-            model.userCart.total.toString(),
+    BuildContext context,
+    int itemCount,
+    MyRewardsViewModel model,
+  ) async {
+    Dialog alertDialog = Dialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0)), //this right here
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton.filled(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(IconsaxOutline.close_circle)),
+            ],
           ),
-        ),
-        actions: <Widget>[
+          const SizedBox(
+            height: 15,
+          ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FilledButton(
-              style: Theme.of(context).filledButtonTheme.style?.copyWith(
-                    backgroundColor: MaterialStateProperty.all(
-                      Theme.of(context).disabledColor,
-                    ),
-                  ),
-              onPressed: () => Navigator.pop(context, 'Cancel'),
-              child: const Text('Cancel'),
+            padding: const EdgeInsets.all(15.0),
+            child: Text(
+              StringsCart.importantTitle,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FilledButton(
-              style: Theme.of(context).filledButtonTheme.style?.copyWith(
-                    backgroundColor: MaterialStateProperty.all(
-                      Theme.of(context).secondaryHeaderColor,
+          Container(
+            padding: const EdgeInsets.all(15.0),
+            child: confirmationMessageBody(
+                itemCount.toString(), model.userCart.total.toString(), context),
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                width: 110,
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(StringsCart.cancel),
+                ),
+              ),
+              SizedBox(
+                width: 110,
+                child: OutlinedButton(
+                  onPressed: () async {
+                    await model.checkOutCart();
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        Theme.of(context).secondaryHeaderColor),
+                    textStyle: MaterialStateProperty.all<TextStyle>(
+                      Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: Theme.of(context).secondaryHeaderColor,
+                          ),
                     ),
                   ),
-              onPressed: () async {
-                final result = await model.checkOutCart();
-                if (result) {
-                  model.cartEdited = false;
-                  model.handleResetAll();
-                  context.go("/homeScreen");
+                  child: Text(
+                    StringsCart.confirm,
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 15,
+          )
+        ],
+      ),
+    );
+    showDialog(
+        context: context, builder: (BuildContext context) => alertDialog);
+  }
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(StringsCart.hhrr),
-                    ),
-                  );
-                } else {
-                  Navigator.pop(context, StringsCart.cancel);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(StringsCart.notEnoughPoints),
-                    ),
-                  );
-                }
-              },
-              child: busy
-                  ? CircularProgressIndicator.adaptive()
-                  : const Text(StringsCart.confirm),
-            ),
+  static Text confirmationMessageBody(
+      String itemCount, String total, BuildContext context) {
+    final TextStyle boldStyle =
+        Theme.of(context).textTheme.bodyMedium!.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            );
+
+    return Text.rich(
+      TextSpan(
+        text: 'Acabas de seleccionar ',
+        style: Theme.of(context).textTheme.bodyMedium!.copyWith(),
+        children: <TextSpan>[
+          TextSpan(
+            text: '$itemCount producto(s)',
+            style: boldStyle,
+          ),
+          TextSpan(
+              text: ' para canjear tus puntos.\n\n',
+              style: Theme.of(context).textTheme.bodyMedium),
+          TextSpan(
+            text:
+                'Al dar click al botón CONFIRMAR se generará un canje que restará \n',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          TextSpan(
+            text: '$total punto(s) \n',
+            style: boldStyle,
+          ),
+          TextSpan(
+            text:
+                'de tu estado de cuenta, lo cual es irreversible. ¿Estás seguro de los premios que quieres canjear?',
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],
       ),
+      textAlign: TextAlign.center,
     );
   }
 
@@ -100,6 +163,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
       child: ModelBuilder<MyRewardsViewModel>(
         builder: (context, rewardsModel, child) {
           return BondlySliverLayout(
+            key: rewardsModel.cartScaffoldKey,
             title: "Cart",
             floatingActionButton: FloatingActionButton.extended(
               isExtended: true,
@@ -114,94 +178,122 @@ class _MyCartScreenState extends State<MyCartScreen> {
             child: Container(
               padding: const EdgeInsets.all(10),
               height: size.height * .6,
-              child: rewardsModel.userCart.rewards.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(StringsCart.emptyCartMessage),
-                          TextButton(
-                            child: const Text(StringsCart.goToRewards),
-                            onPressed: () => context.pop(),
-                          ),
-                        ],
-                      ),
+              child: rewardsModel.busy
+                  ? const Center(
+                      child: CircularProgressIndicator.adaptive(),
                     )
-                  : ListView.builder(
-                      itemCount: rewardsModel.userCart.rewards.length,
-                      itemBuilder: (context, index) {
-                        if (index == 0) {
-                          return Column(
+                  : rewardsModel.userCart.rewards.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text("Thumbnail"),
-                                    const Text("Nombre"),
-                                    SizedBox(
-                                      width: 100,
-                                      child: const Text("Cantidad"),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              CartItemTile(
-                                item: rewardsModel.userCart.rewards[index],
-                                model: rewardsModel,
+                              const Text(StringsCart.emptyCartMessage),
+                              TextButton(
+                                child: const Text(StringsCart.goToRewards),
+                                onPressed: () => context.pop(),
                               ),
                             ],
-                          );
-                        } else if (index ==
-                            rewardsModel.userCart.rewards.length - 1) {
-                          return Column(
-                            children: [
-                              const SizedBox(height: 10),
-                              CartItemTile(
-                                item: rewardsModel.userCart.rewards[index],
-                                model: rewardsModel,
-                              ),
-                              const SizedBox(height: 10),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text("Total"),
-                                    Text("${rewardsModel.userCart.total} pts"),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                        return CartItemTile(
-                          item: rewardsModel.userCart.rewards[index],
-                          model: rewardsModel,
-                        );
-                      },
-                    ),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: rewardsModel.userCart.rewards.length,
+                          itemBuilder: (context, index) {
+                            if (index == 0) {
+                              return Column(
+                                children: [
+                                  const CartListHeader(),
+                                  const SizedBox(height: 10),
+                                  CartItemTile(
+                                    item: rewardsModel.userCart.rewards[index],
+                                    model: rewardsModel,
+                                  ),
+                                ],
+                              );
+                            } else if (index ==
+                                rewardsModel.userCart.rewards.length - 2) {
+                              return Column(
+                                children: [
+                                  const SizedBox(height: 10),
+                                  CartItemTile(
+                                    item: rewardsModel.userCart.rewards[index],
+                                    model: rewardsModel,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  CartListFooter(
+                                    total: rewardsModel.userCart.total,
+                                  ),
+                                ],
+                              );
+                            }
+                            return CartItemTile(
+                              item: rewardsModel.userCart.rewards[index],
+                              model: rewardsModel,
+                            );
+                          },
+                        ),
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class CartListFooter extends StatelessWidget {
+  final int total;
+  const CartListFooter({
+    super.key,
+    required this.total,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(50),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text("Total"),
+          Text("$total pts"),
+        ],
+      ),
+    );
+  }
+}
+
+class CartListHeader extends StatelessWidget {
+  const CartListHeader({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(50),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text("Img"),
+          Text("Nombre"),
+          SizedBox(
+            width: 100,
+            child: Text("Cantidad"),
+          ),
+        ],
       ),
     );
   }
@@ -236,7 +328,7 @@ class CartItemTile extends StatelessWidget {
         style: Theme.of(context).textTheme.bodySmall,
       ),
       subtitle: Text(
-        " ${item.reward.points} points",
+        " ${item.reward.points} puntos",
         style: Theme.of(context).textTheme.bodySmall,
       ),
       trailing: SizedBox(
@@ -251,7 +343,7 @@ class CartItemTile extends StatelessWidget {
             ),
             const SizedBox(width: 15, height: 15),
             Text(
-              "${item.quantity}",
+              item.quantity.toString(),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall,
             ),

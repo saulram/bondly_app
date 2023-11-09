@@ -1,4 +1,3 @@
-import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_home.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
@@ -12,13 +11,13 @@ class ScaffoldLayout extends StatelessWidget {
   final String? avatar;
   final VoidCallback? afterProfileCall;
 
-  const ScaffoldLayout({
-    Key? key,
-    required this.body,
-    this.enableBottomNavBar = false,
-    this.avatar,
-    this.afterProfileCall
-  }) : super(key: key);
+  const ScaffoldLayout(
+      {Key? key,
+      required this.body,
+      this.enableBottomNavBar = false,
+      this.avatar,
+      this.afterProfileCall})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +30,10 @@ class ScaffoldLayout extends StatelessWidget {
         }
       },
       child: Scaffold(
-        appBar: BondlyAppBar(avatar, onExitProfileCallback: afterProfileCall,),
+        appBar: BondlyAppBar(
+          avatar,
+          onExitProfileCallback: afterProfileCall,
+        ),
         resizeToAvoidBottomInset: true,
         //TBD add endDrawer With the different routes.
         body: body,

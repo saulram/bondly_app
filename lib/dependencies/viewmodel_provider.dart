@@ -34,6 +34,7 @@ import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.d
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
+import 'package:bondly_app/src/app_services.dart';
 import 'package:bondly_app/src/routes.dart';
 import 'package:get_it/get_it.dart';
 
@@ -105,6 +106,7 @@ class ViewModelProvider {
         getIt<PushCartItemUseCase>(),
         getIt<PullCartItemUseCase>(),
         getIt<CheckOutCartUseCase>(),
+        getIt<AppServices>(),
       ),
     );
   }

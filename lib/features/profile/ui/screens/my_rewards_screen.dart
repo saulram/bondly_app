@@ -41,7 +41,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
             floatingActionButton: FloatingActionButton(
               isExtended: true,
               onPressed: () async {
-                if (rewardsModel.cartEdited == false) {
+                if (!rewardsModel.cartEdited) {
                   context.push(MyCartScreen.route);
                   return;
                 }
