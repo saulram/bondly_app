@@ -1,11 +1,15 @@
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
 import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
 import 'package:bondly_app/features/profile/domain/models/rewards_list_model.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/pull_cart_item.usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/push_cart_item.usecase.dart';
+import 'package:bondly_app/src/app_services.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:multiple_result/multiple_result.dart';
 
@@ -18,13 +22,19 @@ class MyRewardsViewModel extends NavigationModel {
   final GetUserShoppingCartUseCase _getUserShoppingCartUseCase;
   final PushCartItemUseCase _pushCartItemUseCase;
   final PullCartItemUseCase _pullCartItemUseCase;
+  final CheckOutCartUseCase _checkOutCartUseCase;
+
+  final GlobalKey<ScaffoldState> cartScaffoldKey = GlobalKey<ScaffoldState>();
+  final AppServices snackBarService;
 
   MyRewardsViewModel(
       this._getShoppingItemsUseCase,
       this._bulkAddCartItemsUseCase,
       this._getUserShoppingCartUseCase,
       this._pushCartItemUseCase,
-      this._pullCartItemUseCase) {
+      this._pullCartItemUseCase,
+      this._checkOutCartUseCase,
+      this.snackBarService) {
     log.i("MyRewardsViewModel Created");
     init();
   }
@@ -49,7 +59,19 @@ class MyRewardsViewModel extends NavigationModel {
 
   List<Map<String, dynamic>?> get cartItems => _cartItems;
 
-  void addToCart(String itemId) {
+  set cartIems(List<Map<String, dynamic>?> items) {
+    _cartItems = items;
+    notifyListeners();
+  }
+
+  bool _cartEdited = false;
+  bool get cartEdited => _cartEdited;
+  set cartEdited(bool state) {
+    _cartEdited = state;
+    notifyListeners();
+  }
+
+  void addToCart(String itemId, {int? quantity}) {
     // Busca si el elemento ya está en el carrito
     final existingItem = _cartItems.firstWhere(
       (item) => item!['id'] == itemId,
@@ -61,7 +83,8 @@ class MyRewardsViewModel extends NavigationModel {
       existingItem['quantity'] = (existingItem['quantity'] ?? 0) + 1;
     } else {
       // Agrega un nuevo elemento al carrito
-      _cartItems.add({'id': itemId, 'quantity': 1});
+      log.i("Adding Item: $itemId");
+      _cartItems.add({'id': itemId, 'quantity': quantity ?? 1});
     }
 
     notifyListeners();
@@ -120,8 +143,15 @@ class MyRewardsViewModel extends NavigationModel {
   Future<UserCart> handleGetUserCart() async {
     Result result = await _getUserShoppingCartUseCase.invoke();
     result.when((cart) {
-      log.i("User Cart: ${userCart.id.toString()}");
-      userCart = cart;
+      UserCart myCart = cart;
+
+      for (var originalElement in myCart.rewards) {
+        log.i("Cart Item: ${originalElement.quantity.toString()}");
+        addToCart(originalElement.reward.id,
+            quantity: originalElement.quantity);
+      }
+      log.i("User Cart: ${cart.id.toString()}");
+      userCart = myCart;
     }, (error) {
       log.e(error);
     });
@@ -171,6 +201,35 @@ class MyRewardsViewModel extends NavigationModel {
     });
     updatingCart = false;
     return userCart;
+  }
+
+  Future<bool> checkOutCart() async {
+    navigation.pop();
+    busy = true;
+    Result result = await _checkOutCartUseCase.invoke(_userCart.id);
+    busy = false;
+    result.when((success) {
+      navigation.go(HomeScreen.route);
+      handleShowSnackBar(
+          "¡Felicidades! Has canjeado tus puntos exitosamente! 🎉 El departamento de RR.HH. Se pondrá en contacto contigo.");
+      return true;
+    }, (error) {
+      log.e(error);
+      handleShowSnackBar(
+          "¡Lo sentimos! No se pudo procesar tu solicitud. Por favor intenta de nuevo.");
+      return false;
+    });
+    return true;
+  }
+
+  void handleResetAll() {
+    _cartItems = [];
+    _userCart = UserCart(rewards: []);
+    notifyListeners();
+  }
+
+  void handleShowSnackBar(String message) {
+    snackBarService.showSnackbar(cartScaffoldKey, message);
   }
 
   @override

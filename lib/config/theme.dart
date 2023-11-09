@@ -119,6 +119,11 @@ class AppTheme extends ChangeNotifier {
     secondaryHeaderColor: AppColors.secondaryColor,
     dividerColor: AppColors.dividerColor,
     unselectedWidgetColor: AppColors.darkBackgroundColor,
+    progressIndicatorTheme: const ProgressIndicatorThemeData(
+      circularTrackColor: AppColors.tertiaryColorLight,
+      linearTrackColor: AppColors.tertiaryColorLight,
+      color: AppColors.bodyColor,
+    ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.secondaryColor,
         extendedTextStyle: TextStyle(color: AppColors.bodyColorDark)),
@@ -203,7 +208,7 @@ class AppTheme extends ChangeNotifier {
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(1),
+          borderRadius: BorderRadius.circular(10),
         ),
         fixedSize: const Size(250, 48),
         foregroundColor: AppColors.bodyColorDark,

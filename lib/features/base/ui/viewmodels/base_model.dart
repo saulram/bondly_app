@@ -1,10 +1,11 @@
-
 import 'dart:async';
+
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/src/routes.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
 /// Full screen view models should extend this class to incorporate navigation
 /// features.
 ///
@@ -18,15 +19,17 @@ import 'package:provider/provider.dart';
 class NavigationModel extends ContextModel {
   final GoRouter _navigation = getIt<AppRouter>().router;
   GoRouter get navigation => _navigation;
-  bool busy = false;
-
+  bool _busy = false;
+  bool get busy => _busy;
+  set busy(bool value) {
+    _busy = value;
+    notifyListeners();
+  }
 }
-
 
 class DebouncedChangeNotifier extends ChangeNotifier {
   int _currentTaskVersion = 0;
   int _taskVersion = 0;
-
 
   /// Handle multiple changes by versioning the microTask.
   @override
@@ -37,7 +40,6 @@ class DebouncedChangeNotifier extends ChangeNotifier {
         _currentTaskVersion++;
         _taskVersion = _currentTaskVersion;
 
-
         if (!hasListeners) return;
         super.notifyListeners();
       });
@@ -45,19 +47,15 @@ class DebouncedChangeNotifier extends ChangeNotifier {
   }
 }
 
-
 class ContextModel extends DebouncedChangeNotifier {
   BuildContext? context;
 }
 
-
 class ModelProvider<T extends ContextModel> extends ChangeNotifierProvider<T> {
   final T model;
 
-
   ModelProvider({Key? key, required this.model, required Widget child})
       : super.value(key: key, value: model, child: child);
-
 
   @override
   Widget build(BuildContext context) {
@@ -65,35 +63,30 @@ class ModelProvider<T extends ContextModel> extends ChangeNotifierProvider<T> {
     return super.build(context);
   }
 
-
   static M of<M extends ContextModel>(
-      BuildContext context, {
-        bool listen = false,
-      }) {
+    BuildContext context, {
+    bool listen = false,
+  }) {
     M model = Provider.of<M>(context, listen: listen);
     model.context = context;
     return model;
   }
-
-
 }
 
-
-class ModelBuilder<T extends ContextModel>
-    extends Consumer<T> {
+class ModelBuilder<T extends ContextModel> extends Consumer<T> {
   final bool listen;
 
-
-  ModelBuilder({Key? key,
-    required Widget Function(BuildContext context, T value, Widget? child) builder,
+  ModelBuilder({
+    Key? key,
+    required Widget Function(BuildContext context, T value, Widget? child)
+        builder,
     Widget? child,
     this.listen = true,
-  }) : super(key: key,
-    builder: builder,
-    child: child,
-  );
-
-
+  }) : super(
+          key: key,
+          builder: builder,
+          child: child,
+        );
 
   @override
   Widget buildWithChild(BuildContext context, Widget? child) {
@@ -106,4 +99,3 @@ class ModelBuilder<T extends ContextModel>
     );
   }
 }
-

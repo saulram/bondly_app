@@ -7,10 +7,15 @@ import 'package:go_router/go_router.dart';
 class BondlySliverLayout extends StatefulWidget {
   final Widget child;
   final String? title;
+  final Key? scaffoldKey;
   final FloatingActionButton? floatingActionButton;
 
   const BondlySliverLayout(
-      {super.key, required this.child, this.title, this.floatingActionButton});
+      {super.key,
+      required this.child,
+      this.title,
+      this.floatingActionButton,
+      this.scaffoldKey});
 
   @override
   State<BondlySliverLayout> createState() => _BondlySliverLayoutState();
@@ -26,6 +31,7 @@ class _BondlySliverLayoutState extends State<BondlySliverLayout> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
+      key: widget.scaffoldKey,
       floatingActionButton: widget.floatingActionButton,
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
