@@ -8,11 +8,17 @@ import 'package:flutter/material.dart';
 class ActivityDetailScreen extends StatefulWidget {
   static const String route = "/activityDetailScreen";
   static const String idParam = "activityId";
+  static const String readParam = "activityStatus";
 
   final ActivityDetailViewModel model = getIt<ActivityDetailViewModel>();
   final String activityId;
+  final bool isRead;
 
-  ActivityDetailScreen({super.key, required this.activityId});
+  ActivityDetailScreen({
+    super.key,
+    required this.activityId,
+    required this.isRead,
+  });
 
   @override
   State<ActivityDetailScreen> createState() => _ActivityDetailScreenState();
@@ -23,7 +29,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
   @override
   void initState() {
     super.initState();
-    widget.model.load(widget.activityId);
+    widget.model.load(widget.activityId, widget.isRead);
   }
 
   @override

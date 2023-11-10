@@ -8,4 +8,6 @@ abstract class ActivityRepository {
   Future<Result<UserActivityHolder, Exception>> getActivityList(
       String userId, int limit, int page
   );
+
+  Future<Result<bool, Exception>> updateActivityStatus(String activityId);
 }

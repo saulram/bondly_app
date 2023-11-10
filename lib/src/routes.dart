@@ -45,9 +45,13 @@ class AppRouter {
       ),
       GoRoute(
           path: ActivityDetailScreen.route,
-          builder: (context, state) => ActivityDetailScreen(
-              activityId: (state.extra as Map<String, String>)[ActivityDetailScreen.idParam] ?? ""
-          )
+          builder: (context, state) {
+            var params = state.extra as Map<String, dynamic>;
+            return ActivityDetailScreen(
+              activityId: params[ActivityDetailScreen.idParam] ?? "",
+              isRead: params[ActivityDetailScreen.readParam] ?? false
+            );
+          }
       )
     ],
   );

@@ -69,4 +69,17 @@ class UsersAPI {
       throw NoConnectionException();
     }
   }
+
+  Future<bool> updateActivity(String activityId) async {
+    try {
+      await _callsHandler.put(
+        path: "activity/$activityId",
+        data: {"read": true}
+      );
+      return true;
+    } catch (exception) {
+      Logger().e(exception.toString());
+      throw NoConnectionException();
+    }
+  }
 }

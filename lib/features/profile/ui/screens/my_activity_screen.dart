@@ -2,6 +2,7 @@ import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/profile/domain/models/user_activity.dart';
 import 'package:bondly_app/features/profile/ui/screens/activity_detail_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/user_activity_item.dart';
@@ -127,46 +128,12 @@ class _MyActivityScreenState
                               return Column(
                                 children: [
                                   _buildHeaderCard(theme),
-                                  UserActivityItem(
-                                      key: Key(item.id),
-                                      id: item.feedId,
-                                      type: item.type,
-                                      title: item.title,
-                                      description: item.content,
-                                      date: item.createdAt,
-                                      read: item.read,
-                                      onTap: (string) {
-                                        context.push(
-                                          ActivityDetailScreen.route,
-                                          extra: {ActivityDetailScreen.idParam: string}
-                                        );
-                                      }
-                                  )
+                                  _buildActivityItem(item)
                                 ],
                               );
                             }
 
-                            return UserActivityItem(
-                                key: Key(item.id),
-                                id: item.feedId,
-                                type: item.type,
-                                title: item.title,
-                                description: item.content,
-                                date: item.createdAt,
-                                read: item.read,
-                                onTap: (string) {
-                                  context.push(
-                                    ActivityDetailScreen.route,
-                                    extra: {ActivityDetailScreen.idParam: string}
-                                  );
-
-                                  if (!item.read) {
-                                    item.read = true;
-                                    setState(() {});
-                                    model.updateReadStatus(item.id);
-                                  }
-                                }
-                            );
+                            return _buildActivityItem(item);
                           }
 
                           return Container(
@@ -277,6 +244,32 @@ class _MyActivityScreenState
           },
         ).toList(),
       ),
+    );
+  }
+
+  UserActivityItemWidget _buildActivityItem(UserActivityItem item) {
+    return UserActivityItemWidget(
+        key: Key(item.id),
+        id: item.feedId,
+        type: item.type,
+        title: item.title,
+        description: item.content,
+        date: item.createdAt,
+        read: item.read,
+        onTap: () {
+          context.push(
+              ActivityDetailScreen.route,
+              extra: {
+                ActivityDetailScreen.idParam: item.id,
+                ActivityDetailScreen.readParam: item.read
+              }
+          );
+
+          if (!item.read) {
+            item.read = true;
+            setState(() {});
+          }
+        }
     );
   }
 }
