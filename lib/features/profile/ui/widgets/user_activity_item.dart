@@ -3,17 +3,17 @@ import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 
-class UserActivityItem extends StatelessWidget {
+class UserActivityItemWidget extends StatelessWidget {
   final String id;
   final String type;
   final String title;
   final String description;
   final String date;
   final bool read;
-  final Function(String activityId) onTap;
+  final VoidCallback onTap;
 
 
-  const UserActivityItem({
+  const UserActivityItemWidget({
     super.key,
     required this.id,
     required this.type,
@@ -45,9 +45,7 @@ class UserActivityItem extends StatelessWidget {
         parsedDate.replaceRange(parsedDate.length - 13, parsedDate.length, "").trim();
 
     return GestureDetector(
-      onTap: () {
-        onTap.call(id);
-      },
+      onTap: onTap,
       child: Container(
           margin: const EdgeInsets.only(top: 16.0, left: 12.0, right: 12.0),
           width: double.infinity,

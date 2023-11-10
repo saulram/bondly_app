@@ -28,6 +28,7 @@ import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_u
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/pull_cart_item.usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/push_cart_item.usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/update_user_activity_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/activity_detail_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
@@ -114,7 +115,8 @@ class ViewModelProvider {
 
     getIt.registerFactory<ActivityDetailViewModel>(() =>
         ActivityDetailViewModel(
-          getIt<GetUserActivityUseCase>()
+          getIt<GetUserActivityUseCase>(),
+          getIt<UpdateUserActivityUseCase>()
         )
     );
   }

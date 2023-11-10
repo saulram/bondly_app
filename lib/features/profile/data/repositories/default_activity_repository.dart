@@ -22,4 +22,13 @@ class DefaultActivityRepository extends ActivityRepository {
       return Result.error(exception as Exception);
     }
   }
+
+  @override
+  Future<Result<bool, Exception>> updateActivityStatus(String activityId) async {
+    try {
+      return Result.success(await _api.updateActivity(activityId));
+    } catch (exception) {
+      return Result.error(exception as Exception);
+    }
+  }
 }

@@ -30,6 +30,7 @@ import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_u
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/pull_cart_item.usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/push_cart_item.usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/update_user_activity_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
@@ -144,6 +145,10 @@ class UseCaseProvider {
 
     getIt.registerSingleton<CheckOutCartUseCase>(
         CheckOutCartUseCase(getIt<CartRepository>())
+    );
+
+    getIt.registerSingleton<UpdateUserActivityUseCase>(
+        UpdateUserActivityUseCase(getIt<ActivityRepository>())
     );
   }
 }
