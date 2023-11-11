@@ -49,6 +49,7 @@ class AppRouter {
             var params = state.extra as Map<String, dynamic>;
             return ActivityDetailScreen(
               activityId: params[ActivityDetailScreen.idParam] ?? "",
+              feedId: params[ActivityDetailScreen.feedIdParam] ?? "",
               isRead: params[ActivityDetailScreen.readParam] ?? false
             );
           }

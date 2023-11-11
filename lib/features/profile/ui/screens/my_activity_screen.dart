@@ -261,6 +261,7 @@ class _MyActivityScreenState
               ActivityDetailScreen.route,
               extra: {
                 ActivityDetailScreen.idParam: item.id,
+                ActivityDetailScreen.feedIdParam: item.feedId,
                 ActivityDetailScreen.readParam: item.read
               }
           );
