@@ -17,7 +17,7 @@ class StringsProfile {
       "- Tus puntos recibidos a través de insignias\n"
       "- Los \"me gusta\" de tus compañeros\n"
       "- Las recompensas que has canjeado";
-  static const String myActivityLoadError = "No pudimos cargar tu actividad reciente";
+  static const String myActivityLoadError = "No pudimos cargar los datos, por favor reintente más tarde.";
   static const String myActivityLoadComplete = "No hay más contenido para mostrar";
 
   static String welcomeGreeting(String name) {

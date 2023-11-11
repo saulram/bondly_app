@@ -1,3 +1,4 @@
+import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/single_post_widget.dart';
@@ -99,7 +100,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
             child: Text(
-              "No pudimos cargar los datos, por favor reintente más tarde",
+              StringsProfile.myActivityLoadError,
               style: Theme.of(context).textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
