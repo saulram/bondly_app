@@ -12,17 +12,17 @@ class ActivityDetailViewModel extends NavigationModel {
 
   FeedData? post;
 
-  Future<void> load(String id, bool isRead) async {
+  Future<void> load(String feedId, String id, bool isRead) async {
     busy = true;
     notifyListeners();
     try {
-      var response = await _useCase.invokeSingle(id);
+      var response = await _useCase.invokeSingle(feedId);
       response.when(
           (success) {
             post = success;
             notifyListeners();
 
-            setPostAsRead(post!.id!, isRead);
+            _setPostAsRead(id, isRead);
           },
           (error) => {
 
@@ -34,7 +34,7 @@ class ActivityDetailViewModel extends NavigationModel {
     }
   }
 
-  void setPostAsRead(String postId, bool isRead) {
+  void _setPostAsRead(String postId, bool isRead) {
     _updateActivityUseCase.invoke(postId, isRead);
   }
 }
