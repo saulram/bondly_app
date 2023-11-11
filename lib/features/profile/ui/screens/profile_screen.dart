@@ -8,6 +8,7 @@ import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
 import 'package:bondly_app/features/profile/ui/screens/monthly_balance_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_activity_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_badges_screen.dart';
+import 'package:bondly_app/features/profile/ui/screens/my_data_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_rewards_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/selectable_menu_option.dart';
@@ -18,7 +19,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
-  static String route = "/profileScreen";
+  static const String route = "/profileScreen";
 
   final ProfileViewModel model = getIt<ProfileViewModel>();
 
@@ -269,12 +270,13 @@ class ProfileScreenState extends State<ProfileScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // SelectableMenuOption(
-                    //     title: StringsProfile.myData,
-                    //     icon: IconsaxOutline.menu_board,
-                    //     onTap: () {
-                    //       context.push(MonthlyBalanceScreen.route);
-                    //     }),
+                    SelectableMenuOption(
+                        title: StringsProfile.myData,
+                        icon: IconsaxOutline.menu_board,
+                        onTap: () {
+                          context.push(MyDataScreen.route);
+                        }
+                    ),
                     SelectableMenuOption(
                         title: StringsProfile.myActivity,
                         icon: IconsaxOutline.notification_bing,
