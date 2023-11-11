@@ -5,8 +5,8 @@ class SingleActivityResponse {
   late final String content;
   late final bool read;
   late final String feedId;
-  late final String createdAt;
-  late final String updatedAt;
+  late final DateTime createdAt;
+  late final DateTime updatedAt;
 
   SingleActivityResponse({
     required this.id,
