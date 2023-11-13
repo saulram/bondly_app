@@ -18,7 +18,7 @@ class UserActivityItem {
   final String feedId;
   final String title;
   final String content;
-  late bool read;
+  bool read = false;
   final String createdAt;
   final String updatedAt;
   final String type;

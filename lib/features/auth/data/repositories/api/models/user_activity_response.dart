@@ -1,9 +1,9 @@
 class PaginatedUserActivityResponse {
-  late bool success;
-  late int count;
-  late int nextPage;
-  late int prevPage;
-  late List<UserActivityResponse> data;
+  final bool success;
+  final int count;
+  final int nextPage;
+  final int prevPage;
+  final List<UserActivityResponse> data;
 
   PaginatedUserActivityResponse({
     required this.success,
@@ -13,17 +13,24 @@ class PaginatedUserActivityResponse {
     required this.data
   });
 
-  PaginatedUserActivityResponse.fromJson(Map<String, dynamic> json) {
-    success = json['success'] ?? false;
-    count = json['count'] ?? 0;
-    nextPage = json['next'] ?? -1;
-    prevPage = json['prev'] ?? -1;
-    data = <UserActivityResponse>[];
+  factory PaginatedUserActivityResponse.fromJson(Map<String, dynamic> json) {
+    var success = json['success'] ?? false;
+    var count = json['count'] ?? 0;
+    var nextPage = json['next'] ?? -1;
+    var prevPage = json['prev'] ?? -1;
+    var data = <UserActivityResponse>[];
     if (json['data'] != null) {
       json['data'].forEach((v) {
         data.add(UserActivityResponse.fromJson(v));
       });
     }
+    return PaginatedUserActivityResponse(
+        success: success,
+        count: count,
+        nextPage: nextPage,
+        prevPage: prevPage,
+        data: data
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -38,15 +45,15 @@ class PaginatedUserActivityResponse {
 }
 
 class UserActivityResponse {
-  late String id;
-  late String userId;
-  late String feedId;
-  late String title;
-  late String content;
-  late bool read;
-  late String createdAt;
-  late String updatedAt;
-  late String type;
+  final String id;
+  final String userId;
+  final String feedId;
+  final String title;
+  final String content;
+  final bool read;
+  final String createdAt;
+  final String updatedAt;
+  final String type;
 
   UserActivityResponse({
     required this.id,
@@ -60,16 +67,18 @@ class UserActivityResponse {
     required this.type,
   });
 
-  UserActivityResponse.fromJson(Map<String, dynamic> json) {
-    id = json['_id'] ?? "";
-    userId = json['user_id'] ?? "";
-    feedId = json['feed_id'] ?? "";
-    title = json['title'] ?? "";
-    content = json['content'] ?? "";
-    read = json['read'] ?? false;
-    createdAt = json['createdAt'] ?? "";
-    updatedAt = json['updatedAt'] ?? "";
-    type = json['type'] ?? "";
+  factory UserActivityResponse.fromJson(Map<String, dynamic> json) {
+    return UserActivityResponse(
+      id: json['_id'] ?? "",
+      userId: json['user_id'] ?? "",
+      feedId: json['feed_id'] ?? "",
+      title: json['title'] ?? "",
+      content: json['content'] ?? "",
+      read: json['read'] ?? false,
+      createdAt: json['createdAt'] ?? "",
+      updatedAt: json['updatedAt'] ?? "",
+      type: json['type'] ?? ""
+    );
   }
 
   Map<String, dynamic> toJson() {
