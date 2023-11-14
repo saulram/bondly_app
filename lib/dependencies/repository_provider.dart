@@ -21,10 +21,13 @@ import 'package:bondly_app/features/home/data/repositories/default_banners_repos
 import 'package:bondly_app/features/home/data/repositories/default_company_feeds_repository.dart';
 import 'package:bondly_app/features/home/domain/repositories/banners_repository.dart';
 import 'package:bondly_app/features/home/domain/repositories/company_feeds_respository.dart';
+import 'package:bondly_app/features/profile/data/api/bondly_badges_api.dart';
 import 'package:bondly_app/features/profile/data/api/cart_api.dart';
 import 'package:bondly_app/features/profile/data/repositories/default_activity_repository.dart';
+import 'package:bondly_app/features/profile/data/repositories/default_bondly_badges_repository.dart';
 import 'package:bondly_app/features/profile/data/repositories/default_cart_repository.dart';
 import 'package:bondly_app/features/profile/domain/repositories/activity_repository.dart';
+import 'package:bondly_app/features/profile/domain/repositories/bondly_badges_repository.dart';
 import 'package:bondly_app/features/profile/domain/repositories/cart_repository.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
@@ -71,6 +74,11 @@ class RepositoryProvider {
     getIt.registerSingleton<CartRepository>(
       DefaultCartRepository(
         getIt<CartAPI>(),
+      ),
+    );
+    getIt.registerSingleton<BondlyBadgesRepository>(
+      DefaultBondlyBadgesRepository(
+        getIt<BondlyBadgesAPI>(),
       ),
     );
   }

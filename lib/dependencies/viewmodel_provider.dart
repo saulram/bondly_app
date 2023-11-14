@@ -23,6 +23,7 @@ import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_bondly_badges_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
@@ -31,6 +32,7 @@ import 'package:bondly_app/features/profile/domain/usecases/push_cart_item.useca
 import 'package:bondly_app/features/profile/domain/usecases/update_user_activity_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/activity_detail_viewmodel.dart';
+import 'package:bondly_app/features/profile/ui/viewmodels/bondly_badges_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
@@ -98,8 +100,7 @@ class ViewModelProvider {
     getIt.registerFactory<MyActivityViewModel>(() => MyActivityViewModel(
         getIt<GetUserActivityUseCase>(),
         getIt<UserUseCase>(),
-        getIt<LogoutUseCase>())
-    );
+        getIt<LogoutUseCase>()));
 
     getIt.registerFactory<MyRewardsViewModel>(
       () => MyRewardsViewModel(
@@ -114,10 +115,10 @@ class ViewModelProvider {
     );
 
     getIt.registerFactory<ActivityDetailViewModel>(() =>
-        ActivityDetailViewModel(
-          getIt<GetUserActivityUseCase>(),
-          getIt<UpdateUserActivityUseCase>()
-        )
-    );
+        ActivityDetailViewModel(getIt<GetUserActivityUseCase>(),
+            getIt<UpdateUserActivityUseCase>()));
+    getIt.registerFactory<BondlyBadgesViewModel>(() => BondlyBadgesViewModel(
+          getIt<GetBondlyBadgesUseCase>(),
+        ));
   }
 }

@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:bondly_app/features/home/domain/models/badge_model.dart';
+
 Categories categoriesFromJson(String str) =>
     Categories.fromJson(json.decode(str));
 
@@ -45,6 +47,7 @@ class Category {
   String? imageUrl;
   String? type;
   bool? visible;
+  List<Badge>? categoryBadges;
 
   Category({
     this.id,
@@ -54,6 +57,7 @@ class Category {
     this.imageUrl,
     this.type,
     this.visible,
+    this.categoryBadges = const [],
   });
 
   Category copyWith({
@@ -83,6 +87,10 @@ class Category {
         imageUrl: json["imageUrl"],
         type: json["type"],
         visible: json["visible"],
+        categoryBadges: json["categoryBadges"] == null
+            ? []
+            : List<Badge>.from(
+                json["categoryBadges"].map((x) => Badge.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
