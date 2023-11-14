@@ -13,6 +13,14 @@ class StringsProfile {
   static const String fromCamera = "Abrir Cámara";
   static const String myBadges = "Mis insignias";
 
+  static const String fullName = "Nombre";
+  static const String phone = "Teléfono";
+  static const String email = "Correo electrónico";
+  static const String dob = "Fecha de nacimiento";
+  static const String location = "Ciudad";
+  static const String jobTitle = "Puesto";
+  static const String saveMyData = "Guardar cambios";
+
   static const String myActivityHeader = "Tus interacciones en Bondly";
   static const String myActivitySubHeader = "En el listado encontrarás:\n"
       "- Tus puntos recibidos a través de insignias\n"
