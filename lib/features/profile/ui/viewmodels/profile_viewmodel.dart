@@ -64,4 +64,15 @@ class ProfileViewModel extends NavigationModel {
       notifyListeners();
     }
   }
+
+  Future<void> saveMyData({
+    String? name,
+    String? email,
+    String? phone,
+    String? city,
+    String? dob,
+    String? job
+  }) async {
+    navigation.pop();
+  }
 }
