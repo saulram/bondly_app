@@ -7,6 +7,7 @@ import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
 import 'package:bondly_app/features/profile/ui/screens/monthly_balance_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_activity_screen.dart';
+import 'package:bondly_app/features/profile/ui/screens/my_badges_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_rewards_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/selectable_menu_option.dart';
@@ -59,13 +60,12 @@ class ProfileScreenState extends State<ProfileScreen> {
           body: Column(
             children: [
               SafeArea(
-                child: Column(
-                  children: [
-                    _buildTopBar(theme),
-                    _buildHeader(theme, model),
-                  ],
-                )
-              ),
+                  child: Column(
+                children: [
+                  _buildTopBar(theme),
+                  _buildHeader(theme, model),
+                ],
+              )),
               _buildBodyCard(theme, model)
             ],
           ),
@@ -79,13 +79,17 @@ class ProfileScreenState extends State<ProfileScreen> {
       width: double.infinity,
       height: headerHeight,
       margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-      child: model.busy ? const Center(child: CircularProgressIndicator()) : Column(
-        children: [
-          _buildGreetingAndAvatar(theme, model),
-          const SizedBox(height: 24,),
-          _buildPoints(theme, model)
-        ],
-      ),
+      child: model.busy
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              children: [
+                _buildGreetingAndAvatar(theme, model),
+                const SizedBox(
+                  height: 24,
+                ),
+                _buildPoints(theme, model)
+              ],
+            ),
     );
   }
 
@@ -97,24 +101,24 @@ class ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         children: [
           Expanded(
-            child: Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    IconsaxOutline.arrow_left,
-                    color: Colors.white,
-                  ),
-                  onPressed: () => context.pop(),
+              child: Stack(
+            children: [
+              IconButton(
+                icon: const Icon(
+                  IconsaxOutline.arrow_left,
+                  color: Colors.white,
                 ),
-                Center(
-                  child: Text(
-                    StringsProfile.profileTitle,
-                    style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
-                  ),
+                onPressed: () => context.pop(),
+              ),
+              Center(
+                child: Text(
+                  StringsProfile.profileTitle,
+                  style:
+                      theme.textTheme.titleLarge!.copyWith(color: Colors.white),
                 ),
-              ],
-            )
-          )
+              ),
+            ],
+          ))
         ],
       ),
     );
@@ -125,44 +129,40 @@ class ProfileScreenState extends State<ProfileScreen> {
       children: [
         Expanded(
           child: Text(
-            StringsProfile.welcomeGreeting(model.user?.completeName
-                ?? StringsProfile.defaultUser
-            ),
+            StringsProfile.welcomeGreeting(
+                model.user?.completeName ?? StringsProfile.defaultUser),
             style: theme.textTheme.headlineSmall!.copyWith(color: Colors.white),
           ),
         ),
         Stack(
           children: [
-            _image == null ?
-            GestureDetector(
-              onTap: () {
-                displayAvatar(
-                  image: model.user?.avatar ?? defaultAvatar
-                );
-              },
-              child: Hero(
-                tag: "AvatarWidget",
-                child: CircleAvatar(
-                  key: const Key("AvatarWidget"),
-                  backgroundColor: theme.primaryColor,
-                  maxRadius: 50,
-                  backgroundImage: NetworkImage(
-                      model.user?.avatar ?? defaultAvatar
+            _image == null
+                ? GestureDetector(
+                    onTap: () {
+                      displayAvatar(image: model.user?.avatar ?? defaultAvatar);
+                    },
+                    child: Hero(
+                      tag: "AvatarWidget",
+                      child: CircleAvatar(
+                        key: const Key("AvatarWidget"),
+                        backgroundColor: theme.primaryColor,
+                        maxRadius: 50,
+                        backgroundImage:
+                            NetworkImage(model.user?.avatar ?? defaultAvatar),
+                      ),
+                    ),
+                  )
+                : GestureDetector(
+                    onTap: () {
+                      displayAvatar(image: "");
+                    },
+                    child: CircleAvatar(
+                      key: const Key("AvatarWidget"),
+                      backgroundColor: theme.primaryColor,
+                      maxRadius: 50,
+                      backgroundImage: FileImage(_image!),
+                    ),
                   ),
-                ),
-              ),
-            ) :
-            GestureDetector(
-              onTap: () {
-                displayAvatar(image: "");
-              },
-              child: CircleAvatar(
-                key: const Key("AvatarWidget"),
-                backgroundColor: theme.primaryColor,
-                maxRadius: 50,
-                backgroundImage: FileImage(_image!),
-              ),
-            ),
             Positioned(
               bottom: 0,
               right: 0,
@@ -172,8 +172,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                 height: 40.0,
                 decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(24))
-                ),
+                    borderRadius: BorderRadius.all(Radius.circular(24))),
                 child: IconButton(
                     key: const Key("EditButton"),
                     onPressed: () {
@@ -183,8 +182,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                       Icons.edit,
                       size: 24.0,
                       color: AppColors.secondaryColor,
-                    )
-                ),
+                    )),
               ),
             )
           ],
@@ -204,7 +202,9 @@ class ProfileScreenState extends State<ProfileScreen> {
               model.user?.pointsReceived.toString() ?? "0",
               style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
             ),
-            const SizedBox(height: 8,),
+            const SizedBox(
+              height: 8,
+            ),
             Text(
               StringsProfile.receivedPoints,
               style: theme.textTheme.bodyLarge!.copyWith(color: Colors.white),
@@ -220,7 +220,9 @@ class ProfileScreenState extends State<ProfileScreen> {
               model.user?.monthlyPoints.toString() ?? "0",
               style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
             ),
-            const SizedBox(height: 8,),
+            const SizedBox(
+              height: 8,
+            ),
             Text(
               StringsProfile.monthlyPoints,
               style: theme.textTheme.bodyLarge!.copyWith(color: Colors.white),
@@ -236,7 +238,9 @@ class ProfileScreenState extends State<ProfileScreen> {
               model.user?.giftedPoints.toString() ?? "0",
               style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
             ),
-            const SizedBox(height: 8,),
+            const SizedBox(
+              height: 8,
+            ),
             Text(
               StringsProfile.givenPoints,
               style: theme.textTheme.bodyLarge!.copyWith(color: Colors.white),
@@ -256,16 +260,12 @@ class ProfileScreenState extends State<ProfileScreen> {
             color: theme.scaffoldBackgroundColor,
             borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(32.0),
-                topRight: Radius.circular(32.0)
-            )
-        ),
+                topRight: Radius.circular(32.0))),
         child: Stack(
           children: [
             Container(
-              margin: const EdgeInsets.symmetric(
-                  vertical: 36.0,
-                horizontal: 24.0
-              ),
+              margin:
+                  const EdgeInsets.symmetric(vertical: 36.0, horizontal: 24.0),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -274,29 +274,31 @@ class ProfileScreenState extends State<ProfileScreen> {
                         icon: IconsaxOutline.menu_board,
                         onTap: () {
                           context.push(MonthlyBalanceScreen.route);
-                        }
-                    ),
+                        }),
                     SelectableMenuOption(
                         title: StringsProfile.myActivity,
                         icon: IconsaxOutline.notification_bing,
                         onTap: () {
                           context.push(MyActivityScreen.route);
-                        }
-                    ),
+                        }),
+                    SelectableMenuOption(
+                        title: StringsProfile.myBadges,
+                        icon: IconsaxOutline.award,
+                        onTap: () {
+                          context.push(MyBadgesScreen.route);
+                        }),
                     SelectableMenuOption(
                         title: StringsProfile.rewards,
                         icon: IconsaxOutline.cup,
                         onTap: () {
                           context.push(MyRewardsScreen.route);
-                        }
-                    ),
+                        }),
                     SelectableMenuOption(
                         title: StringsProfile.monthlyReport,
                         icon: IconsaxOutline.money,
                         onTap: () {
                           context.push(MonthlyBalanceScreen.route);
-                        }
-                    ),
+                        }),
                   ],
                 ),
               ),
@@ -323,11 +325,10 @@ class ProfileScreenState extends State<ProfileScreen> {
   // Image Picker function to get image from gallery
   Future<void> getImageFromGallery() async {
     final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 40,
-      maxWidth: 1000,
-      maxHeight: 1000
-    );
+        source: ImageSource.gallery,
+        imageQuality: 40,
+        maxWidth: 1000,
+        maxHeight: 1000);
 
     setState(() {
       if (pickedFile != null) {
@@ -340,11 +341,10 @@ class ProfileScreenState extends State<ProfileScreen> {
   //Image Picker function to get image from camera
   Future<void> getImageFromCamera() async {
     final pickedFile = await picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 40,
-      maxWidth: 1000,
-      maxHeight: 1000
-    );
+        source: ImageSource.camera,
+        imageQuality: 40,
+        maxWidth: 1000,
+        maxHeight: 1000);
 
     setState(() {
       if (pickedFile != null) {
@@ -378,13 +378,11 @@ class ProfileScreenState extends State<ProfileScreen> {
           Container(
             color: AppColors.secondaryColor,
             child: CupertinoActionSheetAction(
-              child: Text(
-                  StringsProfile.fromCamera,
+              child: Text(StringsProfile.fromCamera,
                   style: Theme.of(context)
                       .textTheme
                       .titleLarge!
-                      .copyWith(color: Colors.white)
-              ),
+                      .copyWith(color: Colors.white)),
               onPressed: () {
                 Navigator.of(context).pop();
                 getImageFromCamera();

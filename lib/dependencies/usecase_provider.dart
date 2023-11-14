@@ -21,10 +21,12 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart'
 import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/profile/domain/repositories/activity_repository.dart';
+import 'package:bondly_app/features/profile/domain/repositories/bondly_badges_repository.dart';
 import 'package:bondly_app/features/profile/domain/repositories/cart_repository.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/clear_shopping_cart_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_bondly_badges_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
@@ -106,24 +108,17 @@ class UseCaseProvider {
               instanceName: RemoteUsersRepository.name)
         ]);
 
-    getIt.registerSingleton<GetUserActivityUseCase>(
-        GetUserActivityUseCase(
-          getIt<ActivityRepository>(),
-          getIt<CompanyFeedsRepository>()
-        )
-    );
+    getIt.registerSingleton<GetUserActivityUseCase>(GetUserActivityUseCase(
+        getIt<ActivityRepository>(), getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingleton<CreateAcknowledgmentUseCase>(
-        CreateAcknowledgmentUseCase(getIt<CompanyFeedsRepository>())
-    );
+        CreateAcknowledgmentUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingleton<GetCompanyAnnouncementsUseCase>(
-        GetCompanyAnnouncementsUseCase(getIt<CompanyFeedsRepository>())
-    );
+        GetCompanyAnnouncementsUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingleton<GetUserEmbassysUseCase>(
-        GetUserEmbassysUseCase(getIt<CompanyFeedsRepository>())
-    );
+        GetUserEmbassysUseCase(getIt<CompanyFeedsRepository>()));
 
     getIt.registerSingleton<GetShoppingItemsUseCase>(
         GetShoppingItemsUseCase(getIt<CartRepository>()));
@@ -144,11 +139,12 @@ class UseCaseProvider {
         ClearShoppingCartUseCase(getIt<CartRepository>()));
 
     getIt.registerSingleton<CheckOutCartUseCase>(
-        CheckOutCartUseCase(getIt<CartRepository>())
-    );
+        CheckOutCartUseCase(getIt<CartRepository>()));
 
     getIt.registerSingleton<UpdateUserActivityUseCase>(
-        UpdateUserActivityUseCase(getIt<ActivityRepository>())
-    );
+        UpdateUserActivityUseCase(getIt<ActivityRepository>()));
+
+    getIt.registerSingleton<GetBondlyBadgesUseCase>(
+        GetBondlyBadgesUseCase(getIt<BondlyBadgesRepository>()));
   }
 }
