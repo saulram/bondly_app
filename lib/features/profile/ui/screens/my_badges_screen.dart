@@ -1,6 +1,8 @@
+import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/bondly_badges_viewmodel.dart';
+import 'package:bondly_app/features/profile/ui/widgets/badges_grid.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
 import 'package:flutter/material.dart';
 
@@ -31,156 +33,98 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
         builder: (context, viewModel, child) {
           return BondlySliverLayout(
             title: "Mis Insignias",
-            child: SingleChildScrollView(
-              child: viewModel.busy
-                  ? const Center(
-                      child: CircularProgressIndicator.adaptive(),
-                    )
-                  : Column(
+            child: Column(
+              children: [
+                SizedBox(
+                    height: 20,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          height: size.height * .3,
-                          child: GridView.builder(
-                            itemCount: viewModel.bondlyBadges.embassys.count,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
+                        GestureDetector(
+                          onTap: () => viewModel.scrollController.animateToPage(
+                            0,
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.ease,
+                          ),
+                          child: Container(
+                            width: 100,
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: AppColors.tertiaryColor,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            itemBuilder: (context, index) {
-                              final embassy = viewModel
-                                  .bondlyBadges.embassys.embassys[index];
-                              return Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.network(
-                                      embassy.badgeId.image,
-                                      height: 50,
-                                      width: 50,
-                                    ),
-                                    Text(
-                                      embassy.badgeId.name,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text("${embassy.quantity}"),
-                                  ],
-                                ),
-                              );
-                            },
+                            child: Text(
+                              "Embajadas",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          height: size.height * .3,
-                          child: GridView.builder(
-                            itemCount: viewModel.bondlyBadges.myBadges.count,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
+                        GestureDetector(
+                          onTap: () => viewModel.scrollController.animateToPage(
+                            1,
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.ease,
+                          ),
+                          child: Container(
+                            width: 100,
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: AppColors.tertiaryColor,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            itemBuilder: (context, index) {
-                              final myBadge = viewModel
-                                  .bondlyBadges.myBadges.myBadges[index];
-                              return Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.network(
-                                      myBadge.badgeId.image,
-                                      height: 50,
-                                      width: 50,
-                                    ),
-                                    Text(
-                                      myBadge.badgeId.name,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text("${myBadge.quantity}"),
-                                  ],
-                                ),
-                              );
-                            },
+                            child: Text(
+                              "Mis Insignias",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          height: size.height * .3,
-                          width: size.width,
-                          child: ListView.builder(
-                              itemCount:
-                                  viewModel.bondlyBadges.categories.length,
-                              itemBuilder: (context, i) {
-                                return Column(
-                                  children: [
-                                    Text(viewModel
-                                        .bondlyBadges.categories[i].name),
-                                    SizedBox(
-                                      height: 100,
-                                      child: GridView.builder(
-                                        itemCount: viewModel
-                                            .bondlyBadges.myBadges.count,
-                                        gridDelegate:
-                                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
-                                          crossAxisSpacing: 10,
-                                          mainAxisSpacing: 10,
-                                        ),
-                                        itemBuilder: (context, index) {
-                                          final myBadge = viewModel.bondlyBadges
-                                              .myBadges.myBadges[index];
-                                          return Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: Colors.white,
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Image.network(
-                                                  myBadge.badgeId.image,
-                                                  height: 50,
-                                                  width: 50,
-                                                ),
-                                                Text(
-                                                  myBadge.badgeId.name,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                Text("${myBadge.quantity}"),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              }),
+                        GestureDetector(
+                          onTap: () => viewModel.scrollController.animateToPage(
+                            2,
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.ease,
+                          ),
+                          child: Container(
+                            width: 100,
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: AppColors.tertiaryColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              "Insignias Bondly",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
                         ),
                       ],
-                    ),
+                    )),
+                Expanded(
+                  flex: 1,
+                  child: PageView(
+                    controller: viewModel.scrollController,
+                    children: [
+                      BadgesGrid(
+                          size: size,
+                          embassys: viewModel.bondlyBadges.embassys,
+                          type: BadgeType.embassys),
+                      BadgesGrid(
+                        size: size,
+                        myBadges: viewModel.bondlyBadges.myBadges,
+                        type: BadgeType.myBadges,
+                      ),
+                      BadgesGrid(
+                        size: size,
+                        categories: viewModel.bondlyBadges.categories,
+                        type: BadgeType.categories,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           );
         },

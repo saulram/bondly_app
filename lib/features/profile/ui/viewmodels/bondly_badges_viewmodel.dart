@@ -1,10 +1,12 @@
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/domain/models/bondly_badges_model.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_bondly_badges_usecase.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 class BondlyBadgesViewModel extends NavigationModel {
   final GetBondlyBadgesUseCase _getBondlyBadgesUseCase;
+  final PageController scrollController = PageController();
   final Logger logger = Logger(
     printer: PrettyPrinter(),
   );
