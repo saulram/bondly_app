@@ -269,12 +269,12 @@ class ProfileScreenState extends State<ProfileScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    SelectableMenuOption(
-                        title: StringsProfile.myData,
-                        icon: IconsaxOutline.menu_board,
-                        onTap: () {
-                          context.push(MonthlyBalanceScreen.route);
-                        }),
+                    // SelectableMenuOption(
+                    //     title: StringsProfile.myData,
+                    //     icon: IconsaxOutline.menu_board,
+                    //     onTap: () {
+                    //       context.push(MonthlyBalanceScreen.route);
+                    //     }),
                     SelectableMenuOption(
                         title: StringsProfile.myActivity,
                         icon: IconsaxOutline.notification_bing,

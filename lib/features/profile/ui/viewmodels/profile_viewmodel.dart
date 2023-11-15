@@ -18,33 +18,29 @@ class ProfileViewModel extends NavigationModel {
   User? user;
   bool showUserUpdateError = false;
 
-  ProfileViewModel({
-    required this.userUseCase,
-    required this.logoutUseCase,
-    required this.updateUserUseCase
-  });
+  ProfileViewModel(
+      {required this.userUseCase,
+      required this.logoutUseCase,
+      required this.updateUserUseCase});
 
   void load({bool remote = true}) async {
     busy = true;
     notifyListeners();
 
     Result<User, Exception> result = await userUseCase.invoke(remote: remote);
-    result.when(
-      (user) {
-        this.user = user;
-        busy = false;
-        notifyListeners();
-      },
-      (error) {
-        busy = false;
-        notifyListeners();
-        if (error is UserUnavailableException) {
-          closeSession();
-        }
-        load(remote: false);
-        Logger().e(error);
+    result.when((user) {
+      this.user = user;
+      busy = false;
+      notifyListeners();
+    }, (error) {
+      busy = false;
+      notifyListeners();
+      if (error is UserUnavailableException) {
+        closeSession();
       }
-    );
+      load(remote: false);
+      Logger().e(error);
+    });
   }
 
   Future<void> closeSession() async {
@@ -57,10 +53,7 @@ class ProfileViewModel extends NavigationModel {
     notifyListeners();
 
     try {
-      await updateUserUseCase.invoke(
-        user?.id ?? "",
-        file
-      );
+      await updateUserUseCase.invoke(user?.id ?? "", file);
       load(remote: true);
     } catch (exception) {
       if (exception is UserUpdateException) {
