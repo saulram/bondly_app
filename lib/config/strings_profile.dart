@@ -22,6 +22,10 @@ class StringsProfile {
       "No pudimos cargar los datos, por favor reintente más tarde.";
   static const String myActivityLoadComplete =
       "No hay más contenido para mostrar";
+  static const String bondlyBadgesSubHeader = "En el listado encontrarás:\n"
+      "- Insignias en las que eres embajador\n"
+      "- Las \"Insignias Bondly\" que has recibido\n"
+      "- El Listado completo de insignias";
 
   static String welcomeGreeting(String name) {
     return "Hola,\n$name";
