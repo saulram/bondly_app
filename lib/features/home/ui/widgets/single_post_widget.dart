@@ -6,6 +6,7 @@ import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_coments_widget.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,7 +14,6 @@ import 'package:logger/logger.dart';
 import 'package:moment_dart/moment_dart.dart';
 
 class SinglePostWidget extends StatefulWidget {
-
   final FeedData post;
   final int index;
   const SinglePostWidget({super.key, required this.post, required this.index});
@@ -36,9 +36,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
     var theme = Theme.of(context);
     return Container(
         width: size.width,
-        margin: const EdgeInsets.symmetric(
-          vertical: 10
-        ),
+        margin: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
             border: Border.all(color: theme.cardColor),
             color: theme.dividerColor,
@@ -102,19 +100,16 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
               : "https://api.minimalavatars.com/avatar/avatar/png"),
         ),
         const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.post.sender.completeName.trim(),
-              style: Theme.of(context).textTheme.labelLarge,
-            ),
-            Text(
-              postDate.format('DD/MM/YYYY hh:mm'),
-              style: context.themeData.textTheme.labelSmall,
-            ),
-          ]
-        ),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(
+            widget.post.sender.completeName.trim(),
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
+          Text(
+            postDate.format('DD/MM/YYYY hh:mm'),
+            style: context.themeData.textTheme.labelSmall,
+          ),
+        ]),
         const Expanded(
           child: SizedBox(),
         ),
@@ -148,33 +143,35 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(50),
-          child: Image.network(
-              "https://api.bondly.mx/${widget.post.badge?.image}",
+          child: CachedNetworkImage(
+              imageUrl: "https://api.bondly.mx/${widget.post.badge?.image}",
               width: 50,
-              height: 50, loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return const SizedBox(
               height: 50,
-              width: 50,
-              child: Center(child: CircularProgressIndicator()),
-            );
-          }, errorBuilder: (context, error, stackTrace) {
-            Logger().e(error, stackTrace.toString());
-            return const SizedBox(
-              height: 50,
-              width: 50,
-              child: Center(child: Text('Error loading badge image')),
-            );
-          }, fit: BoxFit.contain),
+              progressIndicatorBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return Container();
+                return const SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              },
+              errorWidget: (context, error, stackTrace) {
+                Logger().e(error, stackTrace.toString());
+                return const SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: Center(child: Text('Error loading badge image')),
+                );
+              },
+              fit: BoxFit.contain),
         ),
         const SizedBox(height: 5),
         Text(
           widget.post.badge?.name ?? 'Badge Name',
-          style: context.themeData.textTheme.titleSmall
-              ?.copyWith(color: context.isDarkMode
-              ? AppColors.tertiaryColorLight
-              : AppColors.tertiaryColor
-          ),
+          style: context.themeData.textTheme.titleSmall?.copyWith(
+              color: context.isDarkMode
+                  ? AppColors.tertiaryColorLight
+                  : AppColors.tertiaryColor),
         ),
       ],
     );
@@ -197,15 +194,17 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
                 ),
               );
             },
-            child: Image.network("https://api.bondly.mx/${widget.post.image}",
-                errorBuilder: (context, error, stackTrace) {
-              Logger().e(error, stackTrace.toString());
-              return const SizedBox(
-                height: 50,
-                width: 50,
-                child: Center(child: Text('Error loading badge image')),
-              );
-            }, fit: BoxFit.cover),
+            child: CachedNetworkImage(
+                imageUrl: "https://api.bondly.mx/${widget.post.image}",
+                errorWidget: (context, error, stackTrace) {
+                  Logger().e(error, stackTrace.toString());
+                  return const SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: Center(child: Text('Error loading badge image')),
+                  );
+                },
+                fit: BoxFit.cover),
           ),
         ));
   }
@@ -234,13 +233,11 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
                 : IconsaxOutline.heart,
             color: widget.post.isLiked == true
                 ? (context.isDarkMode
-                      ? AppColors.secondaryColorLight
-                      : AppColors.secondaryColor
-                  )
+                    ? AppColors.secondaryColorLight
+                    : AppColors.secondaryColor)
                 : (context.isDarkMode
-                      ? AppColors.greyBackGroundColor
-                      : AppColors.primaryColor
-                  ),
+                    ? AppColors.greyBackGroundColor
+                    : AppColors.primaryColor),
           ),
           const SizedBox(width: 5),
           Text(
@@ -250,8 +247,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
                 fontWeight: FontWeight.w400,
                 color: context.isDarkMode
                     ? AppColors.secondaryColorLight
-                    : AppColors.secondaryColor
-            ),
+                    : AppColors.secondaryColor),
           ),
         ],
       ),
@@ -278,22 +274,19 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
       },
       child: Row(
         children: [
-          Icon(
-            IconsaxOutline.message,
-            color: context.isDarkMode
-                ? AppColors.tertiaryColorLight
-                : AppColors.tertiaryColor
-          ),
+          Icon(IconsaxOutline.message,
+              color: context.isDarkMode
+                  ? AppColors.tertiaryColorLight
+                  : AppColors.tertiaryColor),
           const SizedBox(width: 5),
           Text(
             widget.post.comments.length.toString(),
             style: GoogleFonts.montserrat(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color:  context.isDarkMode
+                color: context.isDarkMode
                     ? AppColors.tertiaryColorLight
-                    : AppColors.tertiaryColor
-            ),
+                    : AppColors.tertiaryColor),
           ),
         ],
       ),

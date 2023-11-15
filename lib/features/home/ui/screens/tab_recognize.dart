@@ -3,6 +3,7 @@ import 'package:bondly_app/config/strings_home.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -176,8 +177,9 @@ class _RecognizetabState extends State<Recognizetab> {
                 SizedBox(
                   height: 50,
                   width: 50,
-                  child: Image.network(
-                    "https://api.bondly.mx/${model.selectedBadge?.image}",
+                  child: CachedNetworkImage(
+                    imageUrl:
+                        "https://api.bondly.mx/${model.selectedBadge?.image}",
                   ),
                 ),
                 Text(
@@ -304,8 +306,9 @@ class _RecognizetabState extends State<Recognizetab> {
                         SizedBox(
                           height: 50,
                           width: 50,
-                          child: Image.network(
-                            "https://api.bondly.mx/${model.badges.badges[index].image}",
+                          child: CachedNetworkImage(
+                            imageUrl:
+                                "https://api.bondly.mx/${model.badges.badges[index].image}",
                           ),
                         ),
                         Text(
@@ -364,8 +367,9 @@ class _RecognizetabState extends State<Recognizetab> {
                     SizedBox(
                       height: 50,
                       width: 50,
-                      child: Image.network(
-                        "https://api.bondly.mx/${model.categories.categories?[index].imageUrl}",
+                      child: CachedNetworkImage(
+                        imageUrl:
+                            "https://api.bondly.mx/${model.categories.categories?[index].imageUrl}",
                       ),
                     ),
                     Text(
