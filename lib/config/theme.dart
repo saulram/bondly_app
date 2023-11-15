@@ -15,6 +15,7 @@ class AppTheme extends ChangeNotifier {
     primaryColorLight: AppColors.primaryColorLight,
     cardColor: AppColors.tertiaryColor,
     dividerColor: AppColors.darkDividerColor,
+    chipTheme: ChipThemeData(backgroundColor: AppColors.secondaryColorLight),
     unselectedWidgetColor: AppColors.backgroundColor,
     textTheme: TextTheme(
       titleLarge: GoogleFonts.montserrat(
@@ -117,6 +118,7 @@ class AppTheme extends ChangeNotifier {
     primaryColorLight: AppColors.primaryColorLight,
     cardColor: AppColors.tertiaryColorLight,
     secondaryHeaderColor: AppColors.secondaryColor,
+    chipTheme: ChipThemeData(backgroundColor: AppColors.secondaryColor),
     dividerColor: AppColors.dividerColor,
     unselectedWidgetColor: AppColors.darkBackgroundColor,
     progressIndicatorTheme: const ProgressIndicatorThemeData(
