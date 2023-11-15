@@ -20,6 +20,7 @@ class StringsProfile {
   static const String location = "Ciudad";
   static const String jobTitle = "Puesto";
   static const String saveMyData = "Guardar cambios";
+  static const String myDataSubtitle = "Escribe o actualiza tus datos";
 
   static const String myActivityHeader = "Tus interacciones en Bondly";
   static const String myActivitySubHeader = "En el listado encontrarás:\n"

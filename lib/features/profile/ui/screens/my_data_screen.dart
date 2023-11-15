@@ -26,6 +26,12 @@ class _MyDataScreenState extends State<MyDataScreen> {
   final jobTextFieldController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _model.loadUserData();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
 
@@ -79,6 +85,13 @@ class _MyDataScreenState extends State<MyDataScreen> {
   }
 
   Widget _buildBodyCard(ThemeData theme, ProfileViewModel model) {
+    nameTextFieldController.text = model.user?.completeName ?? "";
+    emailTextFieldController.text = model.user?.email ?? "";
+    phoneTextFieldController.text = model.user?.employeeNumber.toString() ?? "";
+    cityTextFieldController.text = model.user?.companyName ?? "";
+    dobTextFieldController.text = "";
+    jobTextFieldController.text = model.user?.role ?? "";
+
     return Expanded(
       child: Container(
         key: const Key("BackgroundCardWidget"),
@@ -90,52 +103,57 @@ class _MyDataScreenState extends State<MyDataScreen> {
             )
         ),
         width: double.infinity,
-        child: Stack(
-          children: [
-            Container(
-              margin: const EdgeInsets.symmetric(
-                  vertical: 36.0,
-                  horizontal: 32.0
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 36.0),
-                    _getNameTextField(theme),
-                    const SizedBox(height: 36.0),
-                    _getEmailTextField(theme),
-                    const SizedBox(height: 36.0),
-                    _getPhoneTextField(theme),
-                    const SizedBox(height: 36.0),
-                    _getDOBTextField(theme),
-                    const SizedBox(height: 36.0),
-                    _getCityTextField(theme),
-                    const SizedBox(height: 36.0),
-                    _getJobTitleTextField(theme),
-                    const SizedBox(height: 36.0),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: () {
-                          model.saveMyData(
-                              name: nameTextFieldController.text,
-                              email: emailTextFieldController.text,
-                              phone: phoneTextFieldController.text,
-                              city: cityTextFieldController.text,
-                              dob: dobTextFieldController.text,
-                              job: jobTextFieldController.text
-                          );
-                        },
-                        child: const Text(
-                          StringsProfile.saveMyData,
-                        ),
-                      ),
-                    ),
-                  ],
+        child: model.busy ? CircularProgressIndicator.adaptive(
+          backgroundColor: theme.unselectedWidgetColor,
+        )
+            : Container(
+          margin: const EdgeInsets.symmetric(
+              vertical: 36.0,
+              horizontal: 32.0
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                  StringsProfile.myDataSubtitle,
+                  style: theme.textTheme.titleMedium!.copyWith(
+                      fontSize: 18.0
+                  ),
                 ),
-              ),
+                const SizedBox(height: 64.0),
+                _getNameTextField(theme),
+                const SizedBox(height: 32.0),
+                _getEmailTextField(theme),
+                const SizedBox(height: 32.0),
+                _getPhoneTextField(theme),
+                const SizedBox(height: 32.0),
+                _getDOBTextField(theme),
+                const SizedBox(height: 32.0),
+                _getCityTextField(theme),
+                const SizedBox(height: 32.0),
+                _getJobTitleTextField(theme),
+                const SizedBox(height: 64.0),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () {
+                      model.saveMyData(
+                          name: nameTextFieldController.text,
+                          email: emailTextFieldController.text,
+                          phone: phoneTextFieldController.text,
+                          city: cityTextFieldController.text,
+                          dob: dobTextFieldController.text,
+                          job: jobTextFieldController.text
+                      );
+                    },
+                    child: const Text(
+                      StringsProfile.saveMyData,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

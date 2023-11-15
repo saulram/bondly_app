@@ -7,6 +7,7 @@ import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/user_profile_use_case.dart';
 import 'package:logger/logger.dart';
 import 'package:multiple_result/multiple_result.dart';
 
@@ -14,16 +15,19 @@ class ProfileViewModel extends NavigationModel {
   final UserUseCase userUseCase;
   final LogoutUseCase logoutUseCase;
   final UpdateUserAvatarUseCase updateUserUseCase;
+  final UserProfileUseCase profileUseCase;
 
   User? user;
   bool showUserUpdateError = false;
 
-  ProfileViewModel(
-      {required this.userUseCase,
-      required this.logoutUseCase,
-      required this.updateUserUseCase});
+  ProfileViewModel({
+    required this.userUseCase,
+    required this.logoutUseCase,
+    required this.updateUserUseCase,
+    required this.profileUseCase
+  });
 
-  void load({bool remote = true}) async {
+  Future<void> load({bool remote = true}) async {
     busy = true;
     notifyListeners();
 
@@ -74,5 +78,14 @@ class ProfileViewModel extends NavigationModel {
     String? job
   }) async {
     navigation.pop();
+  }
+
+  Future<void> loadUserData() async {
+    await load(remote: false);
+    busy = true;
+    notifyListeners();
+    await Future.delayed(Duration(milliseconds: 3000));
+    busy = false;
+    notifyListeners();
   }
 }
