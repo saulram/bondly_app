@@ -33,6 +33,7 @@ import 'package:bondly_app/features/profile/domain/usecases/push_cart_item.useca
 import 'package:bondly_app/features/profile/domain/usecases/update_user_activity_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/account_statement_viewmodel.dart';
+import 'package:bondly_app/features/profile/domain/usecases/user_profile_use_case.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/activity_detail_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/bondly_badges_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
@@ -57,6 +58,7 @@ class ViewModelProvider {
               userUseCase: getIt<UserUseCase>(),
               logoutUseCase: getIt<LogoutUseCase>(),
               updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
+              profileUseCase: getIt<UserProfileUseCase>(),
             ),
         dependsOn: [
           AppDatabase,

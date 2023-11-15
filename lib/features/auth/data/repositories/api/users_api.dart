@@ -6,6 +6,7 @@ import 'package:bondly_app/features/auth/data/repositories/api/models/user_activ
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bondly_app/features/profile/domain/models/user_activity.dart';
+import 'package:bondly_app/features/profile/domain/models/user_profile.dart';
 import 'package:bondly_app/src/api_calls_handler.dart';
 import 'package:logger/logger.dart';
 
@@ -77,6 +78,34 @@ class UsersAPI {
         data: {"read": true}
       );
       return true;
+    } catch (exception) {
+      Logger().e(exception.toString());
+      throw NoConnectionException();
+    }
+  }
+
+  Future<UserProfile> getFullProfile(String userId) async {
+    try {
+      var response = await _callsHandler.get(path: "userProfile/user/$userId");
+      Map<String, dynamic> data = json.decode(response.body)["data"];
+      Map<String, dynamic> userMap = {"data": data["user_id"]};
+      return UserProfile(
+          User.fromJson(userMap),
+          data["companyName"],
+          data["jobPosition"],
+          data["location"],
+          data["bDay"],
+          data["phone"]
+      );
+    } catch (exception) {
+      Logger().e(exception.toString());
+      throw NoConnectionException();
+    }
+  }
+
+  Future<void> updateUserProfile(Map<String, String> data) async {
+    try {
+      await _callsHandler.put(path: "userProfile/user/${data["id"]}");
     } catch (exception) {
       Logger().e(exception.toString());
       throw NoConnectionException();

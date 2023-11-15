@@ -2,6 +2,7 @@ import 'package:bondly_app/features/auth/data/repositories/api/users_api.dart';
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bondly_app/features/auth/domain/repositories/users_repository.dart';
+import 'package:bondly_app/features/profile/domain/models/user_profile.dart';
 import 'package:multiple_result/multiple_result.dart';
 
 class RemoteUsersRepository extends UsersRepository {
@@ -39,6 +40,21 @@ class RemoteUsersRepository extends UsersRepository {
       await _usersApi.updateAvatar(params.first, params.last);
     } catch(exception) {
       rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateProfile(Map<String, String> data) async {
+    await _usersApi.updateUserProfile(data);
+  }
+
+  @override
+  Future<Result<UserProfile, Exception>> getFullProfile(String userId) async {
+    try {
+      final userDetails = await _usersApi.getFullProfile(userId);
+      return Result.success(userDetails);
+    } catch (exception) {
+      return Result.error(InvalidLoginException());
     }
   }
 }
