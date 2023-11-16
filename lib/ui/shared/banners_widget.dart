@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
@@ -68,9 +69,10 @@ class _BannersCarouselState extends State<BannersCarousel> {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(15),
-                          child: Image.network(
-                            "https://api.bondly.mx/${widget.imageUris![index]}",
-                            fit: BoxFit.cover,
+                          child: CachedNetworkImage(
+                            imageUrl:
+                                "https://api.bondly.mx/${widget.imageUris![index]}",
+                            fit: BoxFit.fill,
                             alignment: Alignment.topLeft,
                           ),
                         ));

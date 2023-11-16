@@ -23,6 +23,7 @@ import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_account_statement_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_bondly_badges_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
@@ -31,6 +32,7 @@ import 'package:bondly_app/features/profile/domain/usecases/pull_cart_item.useca
 import 'package:bondly_app/features/profile/domain/usecases/push_cart_item.usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_activity_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
+import 'package:bondly_app/features/profile/ui/viewmodels/account_statement_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/activity_detail_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/bondly_badges_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
@@ -81,21 +83,15 @@ class ViewModelProvider {
             ),
         dependsOn: [UserUseCase]);
 
-    getIt.registerSingletonWithDependencies<LoginViewModel>(
-        () => LoginViewModel(
-              getIt<LoginUseCase>(),
-              getIt<GetCompaniesUseCase>(),
-              getIt<GetLoginStateUseCase>(),
-              getIt<UserUseCase>(),
-              getIt<SessionTokenHandler>(),
-            ),
-        dependsOn: [
-          AppDatabase,
-          UsersDao,
-          UserUseCase,
-          InitDependency(UsersRepository,
-              instanceName: DefaultUsersRepository.name),
-        ]);
+    getIt.registerFactory<LoginViewModel>(() {
+      return LoginViewModel(
+        getIt<LoginUseCase>(),
+        getIt<GetCompaniesUseCase>(),
+        getIt<GetLoginStateUseCase>(),
+        getIt<UserUseCase>(),
+        getIt<SessionTokenHandler>(),
+      );
+    });
 
     getIt.registerFactory<MyActivityViewModel>(() => MyActivityViewModel(
         getIt<GetUserActivityUseCase>(),
@@ -120,5 +116,7 @@ class ViewModelProvider {
     getIt.registerFactory<BondlyBadgesViewModel>(() => BondlyBadgesViewModel(
           getIt<GetBondlyBadgesUseCase>(),
         ));
+    getIt.registerFactory<AccountStatementViewModel>(
+        () => AccountStatementViewModel(getIt<GetAccountStatementUseCase>()));
   }
 }

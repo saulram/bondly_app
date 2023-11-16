@@ -1,5 +1,6 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/features/profile/domain/models/bondly_badges_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 enum BadgeType { embassys, myBadges, categories }
@@ -87,8 +88,8 @@ class _BadgesGridState extends State<BadgesGrid> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Image.network(
-          "${badge?.image}",
+        CachedNetworkImage(
+          imageUrl: "${badge?.image}",
           height: 50,
           width: 50,
         ),

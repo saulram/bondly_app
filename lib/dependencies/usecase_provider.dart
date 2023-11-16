@@ -20,12 +20,14 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_collaborato
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
+import 'package:bondly_app/features/profile/domain/repositories/account_statement_repository.dart';
 import 'package:bondly_app/features/profile/domain/repositories/activity_repository.dart';
 import 'package:bondly_app/features/profile/domain/repositories/bondly_badges_repository.dart';
 import 'package:bondly_app/features/profile/domain/repositories/cart_repository.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/clear_shopping_cart_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_account_statement_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_bondly_badges_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
@@ -146,5 +148,7 @@ class UseCaseProvider {
 
     getIt.registerSingleton<GetBondlyBadgesUseCase>(
         GetBondlyBadgesUseCase(getIt<BondlyBadgesRepository>()));
+    getIt.registerSingleton<GetAccountStatementUseCase>(
+        GetAccountStatementUseCase(getIt<AccountStatementRepository>()));
   }
 }
