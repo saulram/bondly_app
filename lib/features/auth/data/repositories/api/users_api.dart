@@ -91,21 +91,21 @@ class UsersAPI {
       Map<String, dynamic> userMap = {"data": data["user_id"]};
       return UserProfile(
           User.fromJson(userMap),
-          data["companyName"],
-          data["jobPosition"],
-          data["location"],
-          data["bDay"],
-          data["phone"]
+          data["companyName"] ?? "",
+          data["jobPosition"] ?? "",
+          data["location"] ?? "",
+          DateTime.parse(data["bDay"]),
+          data["_id"] ?? ""
       );
     } catch (exception) {
       Logger().e(exception.toString());
-      throw NoConnectionException();
+      rethrow;
     }
   }
 
-  Future<void> updateUserProfile(Map<String, String> data) async {
+  Future<void> updateUserProfile(String userId, Map<String, String> data) async {
     try {
-      await _callsHandler.put(path: "userProfile/user/${data["id"]}");
+      await _callsHandler.put(path: "userProfile/$userId", data: data);
     } catch (exception) {
       Logger().e(exception.toString());
       throw NoConnectionException();

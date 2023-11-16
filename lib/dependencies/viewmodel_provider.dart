@@ -53,20 +53,14 @@ class ViewModelProvider {
 
     getIt.registerSingleton<AppModel>(AppModel());
 
-    getIt.registerSingletonWithDependencies<ProfileViewModel>(
+    getIt.registerFactory<ProfileViewModel>(
         () => ProfileViewModel(
               userUseCase: getIt<UserUseCase>(),
               logoutUseCase: getIt<LogoutUseCase>(),
               updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
               profileUseCase: getIt<UserProfileUseCase>(),
             ),
-        dependsOn: [
-          AppDatabase,
-          UsersDao,
-          LogoutUseCase,
-          InitDependency(UsersRepository,
-              instanceName: DefaultUsersRepository.name),
-        ]);
+    );
 
     getIt.registerSingletonWithDependencies<HomeViewModel>(
         () => HomeViewModel(
