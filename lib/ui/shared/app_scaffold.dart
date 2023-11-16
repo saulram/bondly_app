@@ -1,112 +1,69 @@
-import 'package:bondly_app/ui/shared/responsive.dart';
+import 'package:bondly_app/config/strings_home.dart';
+import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
+import 'package:bondly_app/ui/shared/app_app_bar.dart';
+import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 
-class AppScaffold extends StatelessWidget {
-  final bool isBusy;
-  final Widget? child;
-  final Widget? bottomNavigationBar;
-  final Widget? floatingActionButton;
-  final FloatingActionButtonLocation? floatingActionButtonLocation;
-  final FloatingActionButtonAnimator? floatingActionButtonAnimator;
-  final Widget? drawer;
-  final Widget? endDrawer;
-  final Widget? bottomSheet;
-  final Color? backgroundColor;
-  final bool? resizeToAvoidBottomInset;
-  final PreferredSizeWidget? appBar;
+class ScaffoldLayout extends StatelessWidget {
+  final Widget body;
+  final bool enableBottomNavBar;
+  final String? avatar;
+  final VoidCallback? afterProfileCall;
 
-  const AppScaffold(
-      {super.key, required this.isBusy,
-      this.child,
-      this.bottomNavigationBar,
-      this.floatingActionButton,
-      this.floatingActionButtonLocation,
-      this.floatingActionButtonAnimator,
-      this.drawer,
-      this.endDrawer,
-      this.bottomSheet,
-      this.backgroundColor,
-      this.resizeToAvoidBottomInset,
-      this.appBar});
-
-  Widget _desktopLayout() {
-    return Scaffold(
-      appBar: appBar,
-      body: child,
-      bottomNavigationBar: bottomNavigationBar,
-      floatingActionButton: floatingActionButton,
-      floatingActionButtonLocation: floatingActionButtonLocation,
-      floatingActionButtonAnimator: floatingActionButtonAnimator,
-      drawer: drawer,
-      endDrawer: endDrawer,
-      bottomSheet: bottomSheet,
-      backgroundColor: backgroundColor,
-      resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-    );
-  }
+  const ScaffoldLayout(
+      {Key? key,
+      required this.body,
+      this.enableBottomNavBar = false,
+      this.avatar,
+      this.afterProfileCall})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return _desktopLayout();
-    throw UnimplementedError();
-  }
+    return GestureDetector(
+      onTap: () {
+        var f = FocusScope.of(context);
 
-  static Widget tabletLayout({
-    bool isBusy = false,
-    Widget? child,
-    Widget? bottomNavigationBar,
-    Widget? floatingActionButton,
-    FloatingActionButtonLocation? floatingActionButtonLocation,
-    FloatingActionButtonAnimator? floatingActionButtonAnimator,
-    Widget? drawer,
-    Widget? endDrawer,
-    Widget? bottomSheet,
-    Color? backgroundColor,
-    bool? resizeToAvoidBottomInset,
-    PreferredSizeWidget? appBar,
-  }) {
-    return Scaffold(
-      appBar: appBar,
-      body: child,
-      bottomNavigationBar: bottomNavigationBar,
-      floatingActionButton: floatingActionButton,
-      floatingActionButtonLocation: floatingActionButtonLocation,
-      floatingActionButtonAnimator: floatingActionButtonAnimator,
-      drawer: drawer,
-      endDrawer: endDrawer,
-      bottomSheet: bottomSheet,
-      backgroundColor: backgroundColor,
-      resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+        if (!f.hasPrimaryFocus) {
+          f.unfocus();
+        }
+      },
+      child: Scaffold(
+        appBar: BondlyAppBar(
+          avatar,
+          onExitProfileCallback: afterProfileCall,
+        ),
+        resizeToAvoidBottomInset: true,
+        //TBD add endDrawer With the different routes.
+        body: body,
+        bottomNavigationBar: enableBottomNavBar
+            ? _buildBottomNavBar(getIt<HomeViewModel>())
+            : null,
+      ),
     );
   }
 
-  static Widget mobileLayout({
-    bool isBusy = false,
-    Widget? child,
-    Widget? bottomNavigationBar,
-    Widget? floatingActionButton,
-    FloatingActionButtonLocation? floatingActionButtonLocation,
-    FloatingActionButtonAnimator? floatingActionButtonAnimator,
-    Widget? drawer,
-    Widget? endDrawer,
-    Widget? bottomSheet,
-    Color? backgroundColor,
-    bool? resizeToAvoidBottomInset,
-    PreferredSizeWidget? appBar,
-  }) {
-    return Scaffold(
-      appBar: appBar,
-      body: child,
-      bottomNavigationBar: bottomNavigationBar,
-      floatingActionButton: floatingActionButton,
-      floatingActionButtonLocation: floatingActionButtonLocation,
-      floatingActionButtonAnimator: floatingActionButtonAnimator,
-      drawer: drawer,
-      endDrawer: endDrawer,
-      bottomSheet: bottomSheet,
-      backgroundColor: backgroundColor,
-      resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+  Widget _buildBottomNavBar(HomeViewModel homeViewModel) {
+    return BottomNavigationBar(
+      currentIndex: homeViewModel.currentIndex,
+      onTap: (index) {
+        homeViewModel.onTabTapped(index);
+      },
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(IconsaxOutline.archive_book),
+          label: StringsHome.tabFeed,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(IconsaxOutline.add_square),
+          label: StringsHome.tabRecognize,
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(IconsaxOutline.medal),
+          label: StringsHome.tabBadges,
+        ),
+      ],
     );
   }
 }

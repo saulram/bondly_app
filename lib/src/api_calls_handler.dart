@@ -2,9 +2,10 @@
 
 import "dart:async";
 import "dart:convert";
-import 'dart:io' show SocketException, IOException;
+import 'dart:io';
 
 import 'package:bondly_app/config/environment.dart';
+import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:flutter/foundation.dart';
 import "package:http/http.dart" as http;
 import 'package:logger/logger.dart';
@@ -104,10 +105,13 @@ abstract class CallsHandler {
 
 class ApiCallsHandler extends CallsHandler {
 
-  ApiCallsHandler(
-    String appVersion,
-    String buildNumber,
-  ) : super(appVersion, buildNumber);
+  final SessionTokenHandler sessionTokenHandler;
+
+  ApiCallsHandler({
+    required String appVersion,
+    required String buildNumber,
+    required this.sessionTokenHandler
+  }) : super(appVersion, buildNumber);
 
   final http.Client _baseClient = http.Client();
   http.Client get _client {
@@ -126,12 +130,26 @@ class ApiCallsHandler extends CallsHandler {
     return _enqueueCall(path, Methods.POST, params: data, extraHeaders: extraHeaders);
   }
 
+  Future<http.Response> put({
+    required String path,
+    Map<String, dynamic>? data,
+    Map<String, String>? extraHeaders
+  }) async {
+    return _enqueueCall(path, Methods.PUT, params: data, extraHeaders: extraHeaders);
+  }
+
   Future<http.Response> get({
       required String path,
-      Map<String, dynamic>? params,
+      Map<String, String>? params,
       Map<String, String>? extraHeaders
   }) async {
-   return _enqueueCall(path, Methods.GET, params: params, extraHeaders: extraHeaders);
+   return _enqueueCall(
+       path,
+       Methods.GET,
+       params: params,
+       extraHeaders: extraHeaders,
+       queryParams: params
+   );
   }
 
   Future<http.Response> delete({
@@ -140,6 +158,39 @@ class ApiCallsHandler extends CallsHandler {
       Map<String, String>? extraHeaders}
   ) async {
     return _enqueueCall(path, Methods.DELETE, params: params, extraHeaders: extraHeaders,);
+  }
+
+  Future<void> sendMultipart({
+    required String method,
+    required String path,
+    required File file,
+    String? name,
+    Map<String, String>? extraHeader
+  }) async {
+    var request = http.MultipartRequest(method, _bondlyUri(path));
+    final httpFile = http.MultipartFile.fromBytes(
+      name ?? 'image',
+      file.readAsBytesSync(),
+      filename: "image"
+    );
+
+    request.headers.addAll({
+      "Authorization": sessionTokenHandler.get()!
+    });
+    request.files.add(httpFile);
+
+    Logger().i(
+      "Sending ${request.method} multipart to: "
+          "$path with ${request.files.length} files: ${request.files.first.length}"
+    );
+
+    final response = await request.send();
+    if (response.statusCode != 200) {
+      throw Exception("Failure: ${response.reasonPhrase}");
+    }
+    response.stream.transform(utf8.decoder).listen((value) {
+      Logger().i(value.length);
+    });
   }
 
   Uri _bondlyUri(String path, {Map<String, dynamic>? params}) {
@@ -155,9 +206,10 @@ class ApiCallsHandler extends CallsHandler {
       String path,
       Methods method,
       {Map<String, dynamic>? params,
-      Map<String, String>? extraHeaders}
+      Map<String, String>? extraHeaders,
+      Map<String, String>? queryParams}
   ) async {
-    Uri uri = _bondlyUri(path);
+    Uri uri = _bondlyUri(path, params: queryParams);
 
     String payload = "";
     if (params != null) {
@@ -168,6 +220,12 @@ class ApiCallsHandler extends CallsHandler {
       extraHeaders.addAll(baseHeaders);
     } else {
       extraHeaders = baseHeaders;
+    }
+
+    if (sessionTokenHandler.get() != null) {
+      extraHeaders.addAll({
+        "Authorization": sessionTokenHandler.get()!
+      });
     }
 
     try {

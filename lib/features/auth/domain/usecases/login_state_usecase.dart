@@ -2,8 +2,8 @@ import 'package:multiple_result/multiple_result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GetLoginStateUseCase {
-  final SharedPreferences _sharedPreferences;
   static const String _loginStateKey = "LoginState";
+  final SharedPreferences _sharedPreferences;
 
   GetLoginStateUseCase(this._sharedPreferences);
 
@@ -16,7 +16,7 @@ class GetLoginStateUseCase {
     }
   }
 
-  void update(bool value) {
-    _sharedPreferences.setBool(_loginStateKey, value);
+  void update(String? token) {
+    _sharedPreferences.setBool(_loginStateKey, token != null);
   }
 }

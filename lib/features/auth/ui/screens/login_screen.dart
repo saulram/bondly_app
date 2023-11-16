@@ -1,22 +1,20 @@
-import 'package:bondly_app/config/colors.dart';
-import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
+import 'package:bondly_app/config/constants.dart';
+import 'package:bondly_app/config/strings_login.dart';
 import 'package:bondly_app/config/theme.dart';
+import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/extensions/device_scale.dart';
-import 'package:bondly_app/config/constants.dart';
-import 'package:bondly_app/config/strings_login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 
 class LoginScreen extends StatefulWidget {
-  static const String companiesParamFlag = "companiesParamFlag";
+  static const String route = "/loginScreen";
 
-  final LoginViewModel model;
-
-  const LoginScreen(this.model, {Key? key}) : super(key: key);
+  LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -25,6 +23,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final String _logoImagePath = "assets/img_logo.png";
   final String _logoDarkImagePath = "assets/img_logo_dark.png";
+  final Logger l = Logger();
+
+  final LoginViewModel model = getIt<LoginViewModel>();
 
   final userTextFieldController = TextEditingController();
   final passwordTextFieldController = TextEditingController();
@@ -34,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    widget.model.load();
+    model.load();
   }
 
   @override
@@ -45,32 +46,34 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    l.i("LoginScreen build");
+
     return Scaffold(
-      body: ModelProvider<LoginViewModel>(
-        model: widget.model,
-        child: ModelBuilder<LoginViewModel>(
-          builder: (context, model, child) {
-            var screenWidth =
+        body: ModelProvider<LoginViewModel>(
+      model: model,
+      child: ModelBuilder<LoginViewModel>(builder: (context, viewModel, child) {
+        l.i("LoginScreen ModelBuilder");
+        var screenWidth =
             MediaQuery.of(context).size.width > Constants.mobileBreakpoint
                 ? Constants.boxedCenteredContentWidth
                 : MediaQuery.of(context).size.width;
-            switch (model.state) {
-              case LoadingLogin _:
-                return const Center(child: CupertinoActivityIndicator());
-              case SuccessLogin _:
-                return Container();
-              case FailedLogin error:
-                return _buildLoginView(screenWidth, errorType: error.errorType);
-              default:
-                return _buildLoginView(screenWidth);
-            }
-          }
-        ),
-      )
-    );
+        l.i("state ${viewModel.state.toString()}");
+        switch (viewModel.state) {
+          case LoadingLogin _:
+            return const Center(child: CupertinoActivityIndicator());
+          case SuccessLogin _:
+            return Container();
+          case FailedLogin error:
+            return _buildLoginView(screenWidth, errorType: error.errorType);
+          default:
+            return _buildLoginView(screenWidth);
+        }
+      }),
+    ));
   }
 
   Widget _buildLoginView(double screenWidth, {LoginErrorType? errorType}) {
+    l.i("LoginScreen _buildLoginView");
     return Container(
       height: MediaQuery.of(context).size.height,
       alignment: Alignment.center,
@@ -90,12 +93,13 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-}
+  }
 
   Widget _buildLogo() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 36.dp),
-      child: Image.asset(context.isDarkMode ? _logoDarkImagePath :_logoImagePath),
+      child:
+          Image.asset(context.isDarkMode ? _logoDarkImagePath : _logoImagePath),
     );
   }
 
@@ -167,10 +171,10 @@ class _LoginScreenState extends State<LoginScreen> {
             maxLength: Constants.passwordMaxLength,
           ),
           if (showInputError)
-              const SizedBox(
-                width: double.infinity,
-                child: Text(LoginStrings.required),
-              )
+            const SizedBox(
+              width: double.infinity,
+              child: Text(LoginStrings.required),
+            )
           else if (errorDescription.isNotEmpty)
             Container(
               margin: EdgeInsets.only(top: 8.dp),
@@ -181,18 +185,14 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           SizedBox(height: 8.dp),
           DropdownButtonFormField(
-            value: LoginStrings.selectYourCompany,
-            dropdownColor: AppColors.tertiaryColor,
-            items: widget.model.companies.map((e) {
-              return DropdownMenuItem(
-                  value: e,
-                  child: Text(e)
-              );
-            }).toList(),
-            onChanged: (item) {
-              _selectedCompany = item as String;
-            }
-          ),
+              value: LoginStrings.selectYourCompany,
+              dropdownColor: Theme.of(context).cardColor,
+              items: model.companies.map((e) {
+                return DropdownMenuItem(value: e, child: Text(e));
+              }).toList(),
+              onChanged: (item) {
+                _selectedCompany = item as String;
+              }),
         ],
       ),
     );
@@ -206,11 +206,8 @@ class _LoginScreenState extends State<LoginScreen> {
           margin: EdgeInsets.symmetric(horizontal: 48.dp),
           child: FilledButton(
             onPressed: () {
-              widget.model.onLoginAction(
-                userTextFieldController.text,
-                passwordTextFieldController.text,
-                _selectedCompany
-              );
+              model.onLoginAction(userTextFieldController.text,
+                  passwordTextFieldController.text, _selectedCompany);
             },
             child: const Text(
               LoginStrings.enter,

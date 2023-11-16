@@ -1,17 +1,22 @@
 import 'package:bondly_app/config/strings_login.dart';
+import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
+import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bondly_app/features/auth/domain/usecases/get_login_companies_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_state_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
-import 'package:bondly_app/src/routes.dart';
+import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
 import 'package:multiple_result/multiple_result.dart';
 
 class LoginViewModel extends NavigationModel {
   final LoginUseCase _useCase;
   final GetCompaniesUseCase _companiesUseCase;
   final GetLoginStateUseCase _loginStateUseCase;
+  final UserUseCase _userUseCase;
+  final SessionTokenHandler _tokenHandler;
 
   LoginUIState? state;
   List<String> companies = [];
@@ -19,25 +24,36 @@ class LoginViewModel extends NavigationModel {
   LoginViewModel(
     this._useCase,
     this._companiesUseCase,
-    this._loginStateUseCase
+    this._loginStateUseCase,
+    this._userUseCase,
+    this._tokenHandler
   );
 
   Future<void> onLoginAction(
-      String user,
+      String username,
       String password,
       String company
   ) async {
     state = LoadingLogin();
     notifyListeners();
 
-    final Result result = await _useCase.invoke(user, password, company);
+    final Result<User, Exception> result = await _useCase.invoke(username, password, company);
     result.when(
-      (success) {
+      (user) {
+        if (user.token == null) {
+          state = FailedLogin(LoginErrorType.authError);
+          notifyListeners();
+          return;
+        }
+
+        _loginStateUseCase.update(user.token);
+        _userUseCase.update(user);
+        _tokenHandler.save(user.token!);
+
         state = SuccessLogin();
         notifyListeners();
-        _loginStateUseCase.update(true);
 
-        navigation.pushReplacement(AppRouter.homeScreenRoute);
+        navigation.go(HomeScreen.route);
       },
       (error) {
         var errorType = LoginErrorType.authError;
@@ -48,7 +64,7 @@ class LoginViewModel extends NavigationModel {
           case NoConnectionException _: errorType = LoginErrorType.connectionError;
           case DefaultCompanyException _: errorType = LoginErrorType.defaultCompanyError;
         }
-        _loginStateUseCase.update(false);
+        _loginStateUseCase.update(null);
         state = FailedLogin(errorType);
         notifyListeners();
       }
