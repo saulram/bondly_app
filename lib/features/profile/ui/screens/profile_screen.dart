@@ -21,15 +21,14 @@ import 'package:image_picker/image_picker.dart';
 class ProfileScreen extends StatefulWidget {
   static const String route = "/profileScreen";
 
-  final ProfileViewModel model = getIt<ProfileViewModel>();
-
-  ProfileScreen({super.key});
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => ProfileScreenState();
 }
 
 class ProfileScreenState extends State<ProfileScreen> {
+  final ProfileViewModel _model = getIt<ProfileViewModel>();
   final String defaultAvatar =
       "https://www.gauchercommunity.org/wp-content/uploads/2020/09/avatar-placeholder.png";
 
@@ -40,7 +39,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    widget.model.load();
+    _model.load();
   }
 
   @override
@@ -54,7 +53,7 @@ class ProfileScreenState extends State<ProfileScreen> {
     var theme = Theme.of(context);
 
     return ModelProvider<ProfileViewModel>(
-      model: widget.model,
+      model: _model,
       child: ModelBuilder<ProfileViewModel>(
         builder: (context, model, child) => Scaffold(
           backgroundColor: AppColors.secondaryColor,
@@ -335,7 +334,7 @@ class ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        widget.model.updateAvatar(_image!);
+        _model.updateAvatar(_image!);
       }
     });
   }
@@ -351,7 +350,7 @@ class ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        widget.model.updateAvatar(_image!);
+        _model.updateAvatar(_image!);
       }
     });
   }

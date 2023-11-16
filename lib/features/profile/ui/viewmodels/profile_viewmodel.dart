@@ -6,6 +6,7 @@ import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/profile/domain/models/user_profile.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/user_profile_use_case.dart';
 import 'package:logger/logger.dart';
@@ -18,6 +19,7 @@ class ProfileViewModel extends NavigationModel {
   final UserProfileUseCase profileUseCase;
 
   User? user;
+  UserProfile? userProfile;
   bool showUserUpdateError = false;
 
   ProfileViewModel({
@@ -32,19 +34,18 @@ class ProfileViewModel extends NavigationModel {
     notifyListeners();
 
     Result<User, Exception> result = await userUseCase.invoke(remote: remote);
-    result.when((user) {
-      this.user = user;
-      busy = false;
-      notifyListeners();
-    }, (error) {
-      busy = false;
-      notifyListeners();
-      if (error is UserUnavailableException) {
-        closeSession();
+    result.when(
+      (user) {
+        this.user = user;
+        busy = false;
+        notifyListeners();
+      },
+      (error) {
+        busy = false;
+        notifyListeners();
+        handleError(error);
       }
-      load(remote: false);
-      Logger().e(error);
-    });
+    );
   }
 
   Future<void> closeSession() async {
@@ -70,22 +71,51 @@ class ProfileViewModel extends NavigationModel {
   }
 
   Future<void> saveMyData({
-    String? name,
-    String? email,
-    String? phone,
-    String? city,
-    String? dob,
-    String? job
+    required String email,
+    required String location,
+    required String dob,
+    required String job
   }) async {
-    navigation.pop();
+    try {
+      await profileUseCase.update(
+        userProfile?.id ?? "",
+        UpdateProfileParams(
+            email: email,
+            location: location,
+            jobTitle: job,
+            dob: dob
+        )
+      );
+    } finally {
+      busy = false;
+      notifyListeners();
+      navigation.pop();
+    }
   }
 
   Future<void> loadUserData() async {
     await load(remote: false);
+
     busy = true;
     notifyListeners();
-    await Future.delayed(Duration(milliseconds: 3000));
-    busy = false;
-    notifyListeners();
+
+    try {
+      final result = await profileUseCase.invoke(user?.id ?? "");
+      result.when(
+          (profile) => userProfile = profile,
+          (error) => handleError(error)
+      );
+    } finally {
+      busy = false;
+      notifyListeners();
+    }
+  }
+
+  void handleError(Exception error) {
+    if (error is UserUnavailableException) {
+      closeSession();
+    }
+    load(remote: false);
+    Logger().e(error);
   }
 }

@@ -6,7 +6,7 @@ class UserProfile {
   final String jobPosition;
   final String location;
   final DateTime dob;
-  final String phone;
+  final String id;
 
   UserProfile(
     this.user,
@@ -14,6 +14,6 @@ class UserProfile {
     this.jobPosition,
     this.location,
     this.dob,
-    this.phone,
+    this.id,
   );
 }

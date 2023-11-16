@@ -4,6 +4,7 @@ import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:ficonsax/ficonsax.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -20,15 +21,23 @@ class _MyDataScreenState extends State<MyDataScreen> {
   final ProfileViewModel _model = getIt<ProfileViewModel>();
   final nameTextFieldController = TextEditingController();
   final emailTextFieldController = TextEditingController();
-  final phoneTextFieldController = TextEditingController();
   final dobTextFieldController = TextEditingController();
   final cityTextFieldController = TextEditingController();
   final jobTextFieldController = TextEditingController();
+
+  DateTime selectedDate = DateTime(2000);
+  bool updatedDate = false;
 
   @override
   void initState() {
     super.initState();
     _model.loadUserData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _model.dispose();
   }
 
   @override
@@ -85,12 +94,16 @@ class _MyDataScreenState extends State<MyDataScreen> {
   }
 
   Widget _buildBodyCard(ThemeData theme, ProfileViewModel model) {
-    nameTextFieldController.text = model.user?.completeName ?? "";
-    emailTextFieldController.text = model.user?.email ?? "";
-    phoneTextFieldController.text = model.user?.employeeNumber.toString() ?? "";
-    cityTextFieldController.text = model.user?.companyName ?? "";
-    dobTextFieldController.text = "";
-    jobTextFieldController.text = model.user?.role ?? "";
+    var stringDate = model.userProfile?.dob.toString();
+    nameTextFieldController.text = model.userProfile?.user.completeName ?? "";
+    emailTextFieldController.text = model.userProfile?.user.email ?? "";
+    cityTextFieldController.text = model.userProfile?.location ?? "";
+    dobTextFieldController.text = updatedDate
+        ? "${selectedDate.year}-"
+        "${selectedDate.month.toString().padLeft(2, '0')}-"
+        "${selectedDate.day.toString().padLeft(2, '0')}"
+        : stringDate?.substring(0, stringDate.indexOf(" ")) ?? "";
+    jobTextFieldController.text = model.userProfile?.jobPosition ?? "";
 
     return Expanded(
       child: Container(
@@ -125,23 +138,19 @@ class _MyDataScreenState extends State<MyDataScreen> {
                 const SizedBox(height: 32.0),
                 _getEmailTextField(theme),
                 const SizedBox(height: 32.0),
-                _getPhoneTextField(theme),
-                const SizedBox(height: 32.0),
-                _getDOBTextField(theme),
-                const SizedBox(height: 32.0),
                 _getCityTextField(theme),
                 const SizedBox(height: 32.0),
                 _getJobTitleTextField(theme),
+                const SizedBox(height: 32.0),
+                _getDOBTextField(theme),
                 const SizedBox(height: 64.0),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: () {
                       model.saveMyData(
-                          name: nameTextFieldController.text,
                           email: emailTextFieldController.text,
-                          phone: phoneTextFieldController.text,
-                          city: cityTextFieldController.text,
+                          location: cityTextFieldController.text,
                           dob: dobTextFieldController.text,
                           job: jobTextFieldController.text
                       );
@@ -161,6 +170,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
 
   Widget _getNameTextField(ThemeData theme) {
     return TextFormField(
+      readOnly: true,
       controller: nameTextFieldController,
       decoration: InputDecoration(
         label: Text(
@@ -198,21 +208,10 @@ class _MyDataScreenState extends State<MyDataScreen> {
     );
   }
 
-  Widget _getPhoneTextField(ThemeData theme) {
-    return TextFormField(
-      controller: phoneTextFieldController,
-      decoration: InputDecoration(
-        label: Text(
-          StringsProfile.phone,
-          style: theme.textTheme.bodyMedium,
-        ),
-        prefixIcon: const Icon(IconsaxBold.call),
-      ),
-    );
-  }
-
   Widget _getDOBTextField(ThemeData theme) {
     return TextFormField(
+      readOnly: true,
+      onTap: _showDialog,
       controller: dobTextFieldController,
       decoration: InputDecoration(
         label: Text(
@@ -220,7 +219,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
           style: theme.textTheme.bodyMedium,
         ),
         prefixIcon: const Icon(IconsaxBold.cake),
-      ),
+      )
     );
   }
 
@@ -233,6 +232,41 @@ class _MyDataScreenState extends State<MyDataScreen> {
           style: theme.textTheme.bodyMedium,
         ),
         prefixIcon: const Icon(IconsaxBold.briefcase),
+      ),
+    );
+  }
+
+  Future<void> _showDialog() async {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 216,
+        padding: const EdgeInsets.only(top: 6.0),
+        // The Bottom margin is provided to align the popup above the system
+        // navigation bar.
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        // Provide a background color for the popup.
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        // Use a SafeArea widget to avoid system overlaps.
+        child: SafeArea(
+          top: false,
+          child: CupertinoDatePicker(
+            initialDateTime: selectedDate,
+            mode: CupertinoDatePickerMode.date,
+            use24hFormat: true,
+            // This shows day of week alongside day of month
+            showDayOfWeek: true,
+            // This is called when the user changes the date.
+            onDateTimeChanged: (DateTime newDate) {
+              setState(() {
+                updatedDate = true;
+                selectedDate = newDate;
+              });
+            },
+          ),
+        ),
       ),
     );
   }

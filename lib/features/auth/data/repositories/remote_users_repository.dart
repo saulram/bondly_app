@@ -45,7 +45,9 @@ class RemoteUsersRepository extends UsersRepository {
 
   @override
   Future<void> updateProfile(Map<String, String> data) async {
-    await _usersApi.updateUserProfile(data);
+    var id = data["id"]!;
+    data.remove("id");
+    await _usersApi.updateUserProfile(id, data);
   }
 
   @override
@@ -54,7 +56,7 @@ class RemoteUsersRepository extends UsersRepository {
       final userDetails = await _usersApi.getFullProfile(userId);
       return Result.success(userDetails);
     } catch (exception) {
-      return Result.error(InvalidLoginException());
+      return Result.error(exception as Exception);
     }
   }
 }

@@ -8,26 +8,40 @@ class UserProfileUseCase {
   UserProfileUseCase(this.repository);
 
   Future<Result<UserProfile, Exception>> invoke(String userId) async {
+    if (userId.isEmpty) {
+      return Result.error(UserUnavailableException());
+    }
+
     return repository.getFullProfile(userId);
   }
 
-  Future<void> update(UpdateProfileParams params) async {
+  Future<Result<bool, Exception>> update(String userId, UpdateProfileParams params) async {
+    if (userId.isEmpty) {
+      return Result.error(UserUnavailableException());
+    }
 
+    await repository.updateProfile(
+      {
+        "id": userId,
+        "email": params.email,
+        "location": params.location,
+        "bDay": params.dob,
+        "jobPosition": params.jobTitle,
+      }
+    );
+
+    return Result.success(userId.isNotEmpty);
   }
 }
 
 class UpdateProfileParams {
-  final String name;
   final String email;
-  final String phone;
   final String location;
   final String jobTitle;
   final String dob;
 
   UpdateProfileParams({
-    required this.name,
     required this.email,
-    required this.phone,
     required this.location,
     required this.jobTitle,
     required this.dob
