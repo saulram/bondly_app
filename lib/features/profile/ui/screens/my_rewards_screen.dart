@@ -85,37 +85,95 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                   ? const Center(
                       child: CircularProgressIndicator.adaptive(),
                     )
-                  : ListView.builder(
-                      itemCount: rewardsModel.rewardList.rewards?.length,
-                      itemBuilder: (context, index) {
-                        Reward reward = rewardsModel.rewardList.rewards![index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          child: GoldBorderedContainer(
-                            child: Column(
-                              children: [
-                                RewardCardHeader(
-                                  reward: reward,
-                                  size: size,
-                                  rewardsModel: rewardsModel,
+                  : Column(
+                      children: [
+                        SizedBox(
+                          height: 50,
+                          child: rewardsModel.rewardList.rewards!.isEmpty
+                              ? const Center(
+                                  child: CircularProgressIndicator.adaptive(),
+                                )
+                              : ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount:
+                                      rewardsModel.rewardCategories.length,
+                                  itemBuilder: (context, index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          rewardsModel.filterByCategory(
+                                              rewardsModel
+                                                  .rewardCategories[index]);
+                                        },
+                                        child: Chip(
+                                          label: Text(
+                                              rewardsModel
+                                                  .rewardCategories[index],
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                      color: context.isDarkMode
+                                                          ? AppColors
+                                                              .tertiaryColor
+                                                          : AppColors
+                                                              .tertiaryColorLight)),
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                RewardCardImage(reward: reward),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                RewardCardTitleSection(reward: reward),
-                                const Divider(),
-                                RewardDescriptionCardSection(reward: reward),
-                                const Divider(),
-                                RewardFooterCardSection(reward: reward),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        rewardsModel.busy
+                            ? Center(
+                                child: CircularProgressIndicator.adaptive(),
+                              )
+                            : Expanded(
+                                child: ListView.builder(
+                                    itemCount:
+                                        rewardsModel.rewardList.rewards?.length,
+                                    itemBuilder: (context, index) {
+                                      Reward reward = rewardsModel
+                                          .rewardList.rewards![index];
+                                      return Container(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 10),
+                                        child: GoldBorderedContainer(
+                                          child: Column(
+                                            children: [
+                                              RewardCardHeader(
+                                                reward: reward,
+                                                size: size,
+                                                rewardsModel: rewardsModel,
+                                              ),
+                                              const SizedBox(
+                                                height: 10,
+                                              ),
+                                              RewardCardImage(reward: reward),
+                                              const SizedBox(
+                                                height: 10,
+                                              ),
+                                              RewardCardTitleSection(
+                                                  reward: reward),
+                                              const Divider(),
+                                              RewardDescriptionCardSection(
+                                                  reward: reward),
+                                              const Divider(),
+                                              RewardFooterCardSection(
+                                                  reward: reward),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                              ),
+                      ],
+                    ),
             ));
       }),
     );
@@ -194,15 +252,11 @@ class RewardCardTitleSection extends StatelessWidget {
         const SizedBox(
           width: 10,
         ),
-        Icon(
-          IconsaxOutline.heart,
-          color: Theme.of(context).iconTheme.color,
-        ),
         const SizedBox(
           width: 5,
         ),
         Text(
-          "${reward.likes!.length}",
+          "${reward.points} pts",
           style: Theme.of(context).textTheme.titleMedium,
         ),
       ],
@@ -226,14 +280,14 @@ class RewardCardImage extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => FullScreenImage(
-              image: reward.image!,
-              tag: reward.id!,
+              image: reward.image,
+              tag: reward.id,
             ),
           ),
         );
       },
       child: Hero(
-        tag: reward.id!,
+        tag: reward.id,
         child: AspectRatio(
           aspectRatio: 1,
           child: Container(
@@ -274,7 +328,9 @@ class RewardCardHeader extends StatelessWidget {
             reward.enable == false
                 ? IconsaxOutline.lock
                 : IconsaxOutline.unlock,
-            color: context.isDarkMode ? AppColors.tertiaryColorLight : AppColors.tertiaryColor),
+            color: context.isDarkMode
+                ? AppColors.tertiaryColorLight
+                : AppColors.tertiaryColor),
         SizedBox(width: size.width * .4),
         //To be fixed, if item exist in cart, show the quantity and a + and - button to add or remove.
         //If not, show a button to add to cart.
@@ -294,7 +350,10 @@ class RewardCardHeader extends StatelessWidget {
                       rewardsModel.cartEdited = true;
                       rewardsModel.removeFromCart(reward.id);
                     },
-                    icon:  Icon(IconsaxOutline.minus, color: context.themeData.textTheme.bodyMedium?.color,),
+                    icon: Icon(
+                      IconsaxOutline.minus,
+                      color: context.themeData.textTheme.bodyMedium?.color,
+                    ),
                   ),
                   Text(
                     '${rewardsModel.getItemCount(reward.id)}',
@@ -305,10 +364,10 @@ class RewardCardHeader extends StatelessWidget {
                       rewardsModel.cartEdited = true;
                       rewardsModel.addToCart(reward.id);
                     },
-                    icon:  Icon(IconsaxOutline.add,
+                    icon: Icon(
+                      IconsaxOutline.add,
                       color: context.themeData.textTheme.bodyMedium?.color,
-
-                      ),
+                    ),
                   ),
                 ],
               )
