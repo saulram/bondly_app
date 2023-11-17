@@ -64,6 +64,24 @@ class MyRewardsViewModel extends NavigationModel {
     notifyListeners();
   }
 
+  Future<void> filterByCategory(String category) async {
+    busy = true;
+    await handleGetRewards();
+    if (category == "Todos") {
+      rewardList = RewardList(rewards: _rewardList.rewards);
+    } else {
+      List<Reward> filteredList = [];
+      for (var reward in _rewardList.rewards ?? []) {
+        if (reward.category == category) {
+          filteredList.add(reward);
+        }
+      }
+      rewardList = RewardList(rewards: filteredList);
+      busy = false;
+    }
+    busy = false;
+  }
+
   bool _cartEdited = false;
   bool get cartEdited => _cartEdited;
   set cartEdited(bool state) {
@@ -189,6 +207,18 @@ class MyRewardsViewModel extends NavigationModel {
     });
     updatingCart = false;
     return userCart;
+  }
+
+  List<String> _rewardCategories = [
+    "Todos",
+    "Experiencias",
+    "Gift Cards",
+    "Incentivos"
+  ];
+  List<String> get rewardCategories => _rewardCategories;
+  set rewardCategories(List<String> categories) {
+    _rewardCategories = categories;
+    notifyListeners();
   }
 
   Future<UserCart> pullItem(String rewardId) async {
