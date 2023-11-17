@@ -1,3 +1,5 @@
+import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
@@ -272,7 +274,7 @@ class RewardCardHeader extends StatelessWidget {
             reward.enable == false
                 ? IconsaxOutline.lock
                 : IconsaxOutline.unlock,
-            color: Theme.of(context).iconTheme.color),
+            color: context.isDarkMode ? AppColors.tertiaryColorLight : AppColors.tertiaryColor),
         SizedBox(width: size.width * .4),
         //To be fixed, if item exist in cart, show the quantity and a + and - button to add or remove.
         //If not, show a button to add to cart.
@@ -292,7 +294,7 @@ class RewardCardHeader extends StatelessWidget {
                       rewardsModel.cartEdited = true;
                       rewardsModel.removeFromCart(reward.id);
                     },
-                    icon: const Icon(IconsaxOutline.minus),
+                    icon:  Icon(IconsaxOutline.minus, color: context.themeData.textTheme.bodyMedium?.color,),
                   ),
                   Text(
                     '${rewardsModel.getItemCount(reward.id)}',
@@ -303,7 +305,10 @@ class RewardCardHeader extends StatelessWidget {
                       rewardsModel.cartEdited = true;
                       rewardsModel.addToCart(reward.id);
                     },
-                    icon: const Icon(IconsaxOutline.add),
+                    icon:  Icon(IconsaxOutline.add,
+                      color: context.themeData.textTheme.bodyMedium?.color,
+
+                      ),
                   ),
                 ],
               )

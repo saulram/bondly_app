@@ -17,6 +17,9 @@ class AppTheme extends ChangeNotifier {
     dividerColor: AppColors.darkDividerColor,
     chipTheme: ChipThemeData(backgroundColor: AppColors.secondaryColorLight),
     unselectedWidgetColor: AppColors.backgroundColor,
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: AppColors.primaryColor,
+    ),
     textTheme: TextTheme(
       titleLarge: GoogleFonts.montserrat(
         color: AppColors.bodyColorDark,
@@ -63,6 +66,7 @@ class AppTheme extends ChangeNotifier {
       ),
       prefixIconColor: AppColors.bodyColorDark,
       iconColor: AppColors.bodyColorDark,
+
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: const BorderSide(color: AppColors.secondaryColor),
@@ -70,11 +74,11 @@ class AppTheme extends ChangeNotifier {
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: AppColors.primaryColor,
-      selectedItemColor: AppColors.secondaryColor,
+      selectedItemColor: AppColors.tertiaryColorLight,
       unselectedItemColor: AppColors.bodyColorDark,
       type: BottomNavigationBarType.fixed,
       selectedIconTheme: IconThemeData(
-        color: AppColors.secondaryColor,
+        color: AppColors.tertiaryColorLight,
       ),
       unselectedIconTheme: IconThemeData(
         color: AppColors.bodyColorDark,
@@ -94,8 +98,9 @@ class AppTheme extends ChangeNotifier {
       style: OutlinedButton.styleFrom(
         shape: const StadiumBorder(),
         fixedSize: const Size(150, 48),
-        foregroundColor: AppColors.primaryColor,
-        textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+        side: const BorderSide(color: AppColors.tertiaryColorLight),
+        foregroundColor: AppColors.tertiaryColorLight,
+        textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700, fontSize: 16,color: AppColors.tertiaryColorLight),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(

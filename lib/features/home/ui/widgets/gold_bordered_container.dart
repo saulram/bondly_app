@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/theme.dart';
 import 'package:flutter/material.dart';
 
 class GoldBorderedContainer extends StatefulWidget {
@@ -16,10 +17,14 @@ class _GoldBorderedContainerState extends State<GoldBorderedContainer> {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           border: Border.all(color: AppColors.tertiaryColorLight),
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: context.isDarkMode
+              ? AppColors.greyBackGroundColorDark
+              : AppColors.greyBackGroundColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: context.isDarkMode
+                  ? Colors.white.withOpacity(0.1) // Adjust the shadow color for dark mode
+                  : Colors.black.withOpacity(0.2),
               spreadRadius: 1,
               blurRadius: 5,
               offset: const Offset(0, 3),

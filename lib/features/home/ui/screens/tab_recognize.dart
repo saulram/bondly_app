@@ -1,5 +1,6 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_home.dart';
+import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart';
@@ -32,8 +33,9 @@ class _RecognizetabState extends State<Recognizetab> {
         child: Column(
           children: [
             _buildAnouncementsSection(),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
             _buildAcknowledgmentsSection(),
+            const SizedBox(height: 15),
           ],
         ),
       ),
@@ -167,7 +169,7 @@ class _RecognizetabState extends State<Recognizetab> {
     return Row(
       children: [
         Container(
-          height: 100,
+          height: 120,
           width: 90,
           margin: const EdgeInsets.symmetric(horizontal: 10),
           child: InkWell(
@@ -183,17 +185,15 @@ class _RecognizetabState extends State<Recognizetab> {
                   ),
                 ),
                 Text(
-                  "",
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.primaryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10),
+                  "${model.selectedBadge?.value ?? ''} pts",
+                  style: Theme.of(context).textTheme.bodySmall
+                  ,
                   textAlign: TextAlign.center,
                 ),
                 Text(
                   model.selectedBadge?.name ?? '',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.primaryColor,
+                      color: context.isDarkMode ?AppColors.tertiaryColorLight: AppColors.primaryColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 10),
                   textAlign: TextAlign.center,
@@ -215,19 +215,36 @@ class _RecognizetabState extends State<Recognizetab> {
                   model.pushCollaboratorId(mention['id']);
                 },
                 onSubmitted: (value) {},
-                decoration: const InputDecoration(
-                    hintText: StringsHome.acknowledgMentInputHint),
+                decoration:  InputDecoration(
+                  labelStyle: Theme.of(context).textTheme.bodyMedium,
+                    helperStyle: Theme.of(context).textTheme.bodyMedium,
+                    hintText: StringsHome.acknowledgMentInputHint,
+                  hintStyle: Theme.of(context).textTheme.bodyMedium,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(
+                      color: AppColors.secondaryColor,
+                    ),
+                  ),
+                ),
                 mentions: [
                   Mention(
                     trigger: '@',
-                    style: const TextStyle(
-                      color: AppColors.secondaryColor,
+                    style:  TextStyle(
+                      color: context.isDarkMode ? AppColors.tertiaryColorLight : AppColors.secondaryColor,
+                      fontWeight: FontWeight.bold,
                     ),
                     data: model.collaboratorsList,
                     matchAll: false,
                     suggestionBuilder: (data) {
                       return Container(
                         padding: const EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                          color: context.isDarkMode ? Colors.grey[800] : Colors.white,
+                        ),
                         width: 150,
                         child: Row(
                           children: <Widget>[
@@ -242,7 +259,9 @@ class _RecognizetabState extends State<Recognizetab> {
                             ),
                             Column(
                               children: <Widget>[
-                                Text("${data['display']}"),
+                                Text("${data['display']}",style: context.themeData.textTheme.bodyMedium?.copyWith(
+
+                                ),),
                               ],
                             )
                           ],
@@ -259,7 +278,13 @@ class _RecognizetabState extends State<Recognizetab> {
                       model
                           .mentionsKey.currentState!.controller!.text.isNotEmpty
                   ? OutlinedButton(
-                      style: Theme.of(context).outlinedButtonTheme.style,
+                      style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+                        side: MaterialStateProperty.all(
+                          BorderSide(
+                            color: context.isDarkMode ? AppColors.tertiaryColorLight : AppColors.tertiaryColor,
+                          ),
+                      )
+                      ),
                       onPressed: () async {
                         model.creatingAcknowledgment = true;
                         await model.handleSubmitAcknowledgment();
@@ -268,9 +293,13 @@ class _RecognizetabState extends State<Recognizetab> {
                       },
                       child: model.creatingAcknowledgment
                           ? const CircularProgressIndicator.adaptive()
-                          : const Text(
-                              StringsHome.acknowledgmentInputButtonText),
-                    )
+                          :  Text(
+                              StringsHome.acknowledgmentInputButtonText,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color:context.isDarkMode ? AppColors.tertiaryColorLight : AppColors.tertiaryColor
+
+                    ),),)
                   : const SizedBox()
             ],
           ),
@@ -317,7 +346,6 @@ class _RecognizetabState extends State<Recognizetab> {
                               .textTheme
                               .bodySmall
                               ?.copyWith(
-                                  color: AppColors.primaryColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 10),
                           textAlign: TextAlign.center,
@@ -328,7 +356,6 @@ class _RecognizetabState extends State<Recognizetab> {
                               .textTheme
                               .bodySmall
                               ?.copyWith(
-                                  color: AppColors.primaryColor,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 10),
                           textAlign: TextAlign.center,
@@ -375,7 +402,6 @@ class _RecognizetabState extends State<Recognizetab> {
                     Text(
                       model.categories.categories?[index].name ?? '',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.primaryColor,
                           fontWeight: FontWeight.bold),
                     ),
                   ],
