@@ -1,7 +1,7 @@
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class StartScreen extends StatelessWidget {
   final AppModel model = getIt<AppModel>();
@@ -14,11 +14,16 @@ class StartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     model.load();
 
-    return Center(
-      child: Image.asset(
-        context.isDarkMode
-          ? _logoDarkImagePath
-          : _logoImagePath
+    return Scaffold(
+      body: Center(
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.5,
+          child: Image.asset(
+            context.isDarkMode
+              ? _logoDarkImagePath
+              : _logoImagePath
+          ),
+        ),
       ),
     );
   }

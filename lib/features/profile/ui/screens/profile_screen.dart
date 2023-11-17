@@ -66,7 +66,8 @@ class ProfileScreenState extends State<ProfileScreen> {
                   _buildHeader(theme, model),
                 ],
               )),
-              _buildBodyCard(theme, model)
+              _buildBodyCard(theme, model),
+
             ],
           ),
         ),
@@ -117,6 +118,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                       theme.textTheme.titleLarge!.copyWith(color: Colors.white),
                 ),
               ),
+
             ],
           ))
         ],
@@ -305,7 +307,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             Positioned(
-              bottom: 48.0,
+              bottom: 68.0,
               left: 0,
               right: 0,
               child: Center(
@@ -317,6 +319,17 @@ class ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
+            Positioned(
+              bottom: 15,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Text(
+                  "${model.appName} v${model.version}b${model.buildNumber}",
+                  style: theme.textTheme.bodySmall!
+                ),
+              ),
+            )
           ],
         ),
       ),

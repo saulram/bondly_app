@@ -11,13 +11,13 @@ import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_u
 import 'package:bondly_app/features/profile/domain/usecases/user_profile_use_case.dart';
 import 'package:logger/logger.dart';
 import 'package:multiple_result/multiple_result.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class ProfileViewModel extends NavigationModel {
   final UserUseCase userUseCase;
   final LogoutUseCase logoutUseCase;
   final UpdateUserAvatarUseCase updateUserUseCase;
   final UserProfileUseCase profileUseCase;
-
   User? user;
   UserProfile? userProfile;
   bool showUserUpdateError = false;
