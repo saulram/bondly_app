@@ -1,11 +1,11 @@
 {
-    "name": "bondly_app",
-    "short_name": "bondly_app",
+    "name": "Bondly",
+    "short_name": "Bondly App",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "App de recompensas pra Recursos Humanos.",
+    "description": "App de recompensas para Recursos Humanos.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
