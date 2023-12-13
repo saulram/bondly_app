@@ -15,9 +15,9 @@ class AppTheme extends ChangeNotifier {
     primaryColorLight: AppColors.primaryColorLight,
     cardColor: AppColors.tertiaryColor,
     dividerColor: AppColors.darkDividerColor,
-    chipTheme: ChipThemeData(backgroundColor: AppColors.secondaryColorLight),
+    chipTheme: const ChipThemeData(backgroundColor: AppColors.secondaryColorLight),
     unselectedWidgetColor: AppColors.backgroundColor,
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: AppColors.primaryColor,
     ),
     textTheme: TextTheme(
@@ -123,7 +123,7 @@ class AppTheme extends ChangeNotifier {
     primaryColorLight: AppColors.primaryColorLight,
     cardColor: AppColors.tertiaryColorLight,
     secondaryHeaderColor: AppColors.secondaryColor,
-    chipTheme: ChipThemeData(backgroundColor: AppColors.secondaryColor),
+    chipTheme: const ChipThemeData(backgroundColor: AppColors.secondaryColor),
     dividerColor: AppColors.dividerColor,
     unselectedWidgetColor: AppColors.darkBackgroundColor,
     progressIndicatorTheme: const ProgressIndicatorThemeData(

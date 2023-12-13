@@ -23,13 +23,13 @@ class AppRouter {
         builder: (context, state) => StartScreen(),
       ),
       GoRoute(
-          path: LoginScreen.route, builder: (context, state) => LoginScreen()),
+          path: LoginScreen.route, builder: (context, state) => const LoginScreen()),
       GoRoute(
           path: HomeScreen.route,
           builder: (context, state) => const HomeScreen()),
       GoRoute(
           path: ProfileScreen.route,
-          builder: (context, state) => ProfileScreen()),
+          builder: (context, state) => const ProfileScreen()),
       GoRoute(
           path: MyActivityScreen.route,
           builder: (context, state) => const MyActivityScreen()),
