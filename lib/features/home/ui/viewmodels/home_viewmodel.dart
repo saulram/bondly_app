@@ -188,7 +188,7 @@ class HomeViewModel extends NavigationModel {
     final Result<FeedData, Exception> result =
         await _createFeedCommentUseCase.invoke(feedId, message);
     result.when((feedUpdated) {
-      log.i("HomeViewModel### Comment: ${feedUpdated}");
+      log.i("HomeViewModel### Comment: $feedUpdated");
       getCompanyFeeds();
     }, (error) {
       log.e(error.toString());

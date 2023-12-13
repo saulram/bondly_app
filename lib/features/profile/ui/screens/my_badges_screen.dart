@@ -39,7 +39,7 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
             child: Column(
               children: [
                 _buildHeaderCard(Theme.of(context)),
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 SizedBox(
@@ -48,17 +48,17 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
                   children: [
                     _tabSwitcher(
                         () => viewModel.scrollController.animateToPage(0,
-                            duration: Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 500),
                             curve: Curves.easeIn),
                         "Embajadas"),
                     _tabSwitcher(
                         () => viewModel.scrollController.animateToPage(1,
-                            duration: Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 500),
                             curve: Curves.easeIn),
                         "Mis Insignias"),
                     _tabSwitcher(
                         () => viewModel.scrollController.animateToPage(2,
-                            duration: Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 500),
                             curve: Curves.easeIn),
                         "Insignias"),
                   ],

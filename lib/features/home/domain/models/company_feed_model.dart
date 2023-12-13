@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:bondly_app/config/strings_main.dart';
 import 'package:bondly_app/features/home/domain/models/badge_model.dart';
+import 'package:flutter/foundation.dart';
 
 class CompanyFeed {
   final bool success;
@@ -19,7 +22,7 @@ class CompanyFeed {
 
 class FeedData {
   final String? id;
-  final int account;
+  final int? account;
   final String header;
   final String body;
   final String? footer;
@@ -30,7 +33,6 @@ class FeedData {
   final List<Like> likes;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final int v;
   final bool visible;
   final bool? isLiked;
   final String? image;
@@ -48,7 +50,6 @@ class FeedData {
       required this.likes,
       required this.createdAt,
       required this.updatedAt,
-      required this.v,
       required this.visible,
       this.image,
       this.isLiked});
@@ -83,7 +84,6 @@ class FeedData {
         updatedAt: json['updatedAt'] != null
             ? DateTime.parse(json['updatedAt'])
             : DateTime.now(),
-        v: json['__v'],
         visible: json['visible'],
         isLiked: json['userLike'] ?? false,
         image: json['image']);
@@ -100,13 +100,13 @@ class Sender {
   final int? accountHolder;
   final String email;
   final bool isActive;
-  final int seats;
+  final int? seats;
   final String? planType;
-  final int monthlyPoints;
+  final int? monthlyPoints;
   final String? accountType;
   final String? companyName;
-  final int giftedPoints;
-  final int pointsReceived;
+  final int? giftedPoints;
+  final int? pointsReceived;
   final bool visible;
   final String? avatar;
 
@@ -132,6 +132,10 @@ class Sender {
   });
 
   factory Sender.fromJson(Map<String, dynamic> json) {
+    if(json['seats'] == null){
+      debugPrint("Sender ## ${json['completeName']} ");
+      debugger();
+    }
     return Sender(
       id: json['_id'],
       completeName: json['completeName'],
@@ -142,7 +146,7 @@ class Sender {
       accountHolder: json['accountHolder'],
       email: json['email'],
       isActive: json['isActive'],
-      seats: json['seats'],
+      seats: json['seats'] ?? 0,
       planType: json['planType'],
       monthlyPoints: json['monthlyPoints'],
       accountType: json['accountType'],

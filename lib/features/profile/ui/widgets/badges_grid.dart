@@ -78,6 +78,7 @@ class _BadgesGridState extends State<BadgesGrid> {
                   return _buildBadge(
                       badge: myBadge?.badgeId, quantity: myBadge?.quantity);
                 }
+                return null;
               },
             ),
     );

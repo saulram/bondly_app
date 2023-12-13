@@ -12,7 +12,7 @@ class GetLoginStateUseCase {
       var loginState = _sharedPreferences.getBool(_loginStateKey);
       return Result.success(loginState ?? false);
     } catch (exception) {
-      return Result.success(false);
+      return const Result.success(false);
     }
   }
 

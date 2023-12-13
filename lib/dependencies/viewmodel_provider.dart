@@ -1,7 +1,5 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
-import 'package:bondly_app/features/auth/data/repositories/default_users_repository.dart';
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
-import 'package:bondly_app/features/auth/domain/repositories/users_repository.dart';
 import 'package:bondly_app/features/auth/domain/usecases/get_login_companies_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_state_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
@@ -39,11 +37,8 @@ import 'package:bondly_app/features/profile/ui/viewmodels/bondly_badges_viewmode
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
-import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
-import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
 import 'package:bondly_app/src/app_services.dart';
 import 'package:bondly_app/src/routes.dart';
-import 'package:get_it/get_it.dart';
 
 class ViewModelProvider {
   static provide() {

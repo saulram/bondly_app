@@ -14,7 +14,7 @@ import 'package:logger/logger.dart';
 class LoginScreen extends StatefulWidget {
   static const String route = "/loginScreen";
 
-  LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();

@@ -130,7 +130,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                           height: 10,
                         ),
                         rewardsModel.busy
-                            ? Center(
+                            ? const Center(
                                 child: CircularProgressIndicator.adaptive(),
                               )
                             : Expanded(
@@ -193,7 +193,7 @@ class RewardDescriptionCardSection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(
-        reward.description!,
+        reward.description,
         style: Theme.of(context).textTheme.bodyMedium,
       ),
     );
