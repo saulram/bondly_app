@@ -20,7 +20,7 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_collaborato
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
-import 'package:carousel_slider/carousel_controller.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:logger/logger.dart';
@@ -369,7 +369,7 @@ class HomeViewModel extends NavigationModel {
     }
   }
 
-  CarouselController carouselController = CarouselController();
+  CarouselSliderController carouselController = CarouselSliderController();
 
   List<Announcement> _announcements = [];
 
