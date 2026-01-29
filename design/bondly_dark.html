@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bondly - Login Screen Design</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Bondly Brand Colors */
+            --primary-purple: #6B5B95;
+            --primary-pink: #E91E63;
+            --gradient-start: #6B5B95;
+            --gradient-end: #E91E63;
+            
+            /* UI Colors */
+            --background: #0F0F1E;
+            --surface: rgba(255, 255, 255, 0.05);
+            --surface-hover: rgba(255, 255, 255, 0.08);
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-tertiary: rgba(255, 255, 255, 0.5);
+            --border: rgba(255, 255, 255, 0.1);
+            --error: #FF5252;
+            --success: #4CAF50;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--primary-purple);
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary-pink);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: 5s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(50px, -50px) scale(1.1);
+            }
+            66% {
+                transform: translate(-50px, 50px) scale(0.9);
+            }
+        }
+
+        /* Main Container */
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            padding: 20px;
+        }
+
+        /* Glass Card */
+        .login-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .login-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Logo */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            display: inline-block;
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px rgba(233, 30, 99, 0.3));
+            }
+            50% {
+                filter: drop-shadow(0 0 20px rgba(107, 91, 149, 0.5));
+            }
+        }
+
+        .logo-subtitle {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-top: 8px;
+            font-style: italic;
+            letter-spacing: 0.5px;
+        }
+
+        /* Welcome Message */
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #FFFFFF, rgba(255, 255, 255, 0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .form-input:focus, .form-select:focus {
+            background: var(--surface-hover);
+            border-color: var(--primary-pink);
+            box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+        }
+
+        .form-input:focus + .input-icon {
+            color: var(--primary-pink);
+        }
+
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 20px;
+        }
+
+        .form-select option {
+            background: #1a1a2e;
+            color: var(--text-primary);
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 13px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .character-count {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        /* Button */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border: none;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(233, 30, 99, 0.4);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-text {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-top: 16px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-text:hover {
+            color: var(--primary-pink);
+        }
+
+        /* Icons (using Unicode symbols) */
+        .icon-person::before { content: '👤'; }
+        .icon-lock::before { content: '🔒'; }
+        .icon-building::before { content: '🏢'; }
+        .icon-error::before { content: '⚠️'; }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 32px 24px;
+            }
+
+            .logo {
+                font-size: 40px;
+            }
+
+            .welcome-title {
+                font-size: 24px;
+            }
+        }
+
+        /* Loading State */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-primary.loading .loading-spinner {
+            display: block;
+        }
+
+        .btn-primary.loading span {
+            display: none;
+        }
+
+        /* Success Animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-card {
+            animation: slideIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background-animation">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Logo -->
+            <div class="logo-container">
+                <div class="logo">bondly</div>
+                <div class="logo-subtitle">reconociendo nuestros lazos</div>
+            </div>
+
+            <!-- Welcome Message -->
+            <div class="welcome-message">
+                <h1 class="welcome-title">Bienvenido de nuevo</h1>
+                <p class="welcome-subtitle">Ingresa tus credenciales para continuar</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label class="form-label" for="username">Usuario</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="username" 
+                            class="form-input" 
+                            placeholder="Ingresa tu usuario"
+                            maxlength="10"
+                            pattern="[0-9]*"
+                            inputmode="numeric"
+                        >
+                        <span class="input-icon icon-person"></span>
+                    </div>
+                    <div class="character-count">
+                        <span id="usernameCount">0</span>/10
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label class="form-label" for="password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            class="form-input" 
+                            placeholder="Ingresa tu contraseña"
+                            maxlength="20"
+                        >
+                        <span class="input-icon icon-lock"></span>
+                    </div>
+                    <div class="character-count">
+                        <span id="passwordCount">0</span>/20
+                    </div>
+                </div>
+
+                <!-- Company Dropdown -->
+                <div class="form-group">
+                    <label class="form-label" for="company">Empresa</label>
+                    <div class="input-wrapper">
+                        <select id="company" class="form-select">
+                            <option value="">Selecciona tu empresa</option>
+                            <option value="company1">Empresa Demo 1</option>
+                            <option value="company2">Empresa Demo 2</option>
+                            <option value="company3">Empresa Demo 3</option>
+                        </select>
+                        <span class="input-icon icon-building"></span>
+                    </div>
+                </div>
+
+                <!-- Error Message (Hidden by default) -->
+                <div id="errorMessage" class="error-message" style="display: none;">
+                    <span class="icon-error"></span>
+                    <span id="errorText"></span>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    <div class="loading-spinner"></div>
+                    <span>Ingresar</span>
+                </button>
+
+                <!-- Forgot Password Link -->
+                <a href="#" class="btn-text" id="forgotPassword">¿Olvidaste tu contraseña?</a>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Character counters
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const usernameCount = document.getElementById('usernameCount');
+        const passwordCount = document.getElementById('passwordCount');
+
+        usernameInput.addEventListener('input', (e) => {
+            usernameCount.textContent = e.target.value.length;
+        });
+
+        passwordInput.addEventListener('input', (e) => {
+            passwordCount.textContent = e.target.value.length;
+        });
+
+        // Form submission
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Hide previous errors
+            errorMessage.style.display = 'none';
+            
+            // Validate inputs
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            const company = document.getElementById('company').value;
+
+            if (!username || !password) {
+                errorText.textContent = 'Por favor completa todos los campos requeridos';
+                errorMessage.style.display = 'flex';
+                return;
+            }
+
+            if (!company) {
+                errorText.textContent = 'Por favor selecciona una empresa';
+                errorMessage.style.display = 'flex';
+                return;
+            }
+
+            // Show loading state
+            loginBtn.classList.add('loading');
+
+            // Simulate login (remove this in production)
+            setTimeout(() => {
+                loginBtn.classList.remove('loading');
+                // Here you would handle the actual login logic
+                console.log('Login attempted with:', { username, password, company });
+            }, 2000);
+        });
+
+        // Forgot password
+        document.getElementById('forgotPassword').addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Forgot password clicked');
+            alert('Funcionalidad de recuperación de contraseña');
+        });
+
+        // Only allow numbers in username field
+        usernameInput.addEventListener('keypress', (e) => {
+            if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

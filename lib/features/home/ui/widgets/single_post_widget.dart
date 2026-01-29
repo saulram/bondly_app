@@ -156,7 +156,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
                 );
               },
               errorWidget: (context, error, stackTrace) {
-                Logger().e(error, stackTrace.toString());
+                Logger().e('Error loading badge image', error: error);
                 return const SizedBox(
                   height: 50,
                   width: 50,
@@ -197,7 +197,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
             child: CachedNetworkImage(
                 imageUrl: "https://api.bondly.mx/${widget.post.image}",
                 errorWidget: (context, error, stackTrace) {
-                  Logger().e(error, stackTrace.toString());
+                  Logger().e('Error loading post image', error: error);
                   return const SizedBox(
                     height: 50,
                     width: 50,
