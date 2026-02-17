@@ -98,6 +98,51 @@ class User {
     "token": token,
   };
 
+  factory User.fromSupabaseAuth(Map<String, dynamic> json, String accessToken) {
+    return User(
+      id: json['id'],
+      completeName: json['complete_name'],
+      employeeNumber: json['employee_number'] ?? 1,
+      role: json['role'],
+      accountNumber: json['account_number']?.toString(),
+      accountHolder: json['account_holder']?.toString(),
+      email: json['email'],
+      isActive: json['is_active'] ?? false,
+      seats: json['seats'] ?? 0,
+      planType: json['plan_type'],
+      monthlyPoints: json['monthly_points'] ?? 0,
+      accountType: json['account_type'],
+      companyName: json['company_name'],
+      avatar: json['avatar'],
+      giftedPoints: json['gifted_points'] ?? 0,
+      pointsReceived: json['points_received'] ?? 0,
+      isVisible: json['visible'] ?? false,
+      token: accessToken,
+    );
+  }
+
+  factory User.fromSupabase(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      completeName: json['complete_name'],
+      employeeNumber: json['employee_number'] ?? 1,
+      role: json['role'],
+      accountNumber: json['account_number']?.toString(),
+      accountHolder: json['account_holder']?.toString(),
+      email: json['email'],
+      isActive: json['is_active'] ?? false,
+      seats: json['seats'] ?? 0,
+      planType: json['plan_type'],
+      monthlyPoints: json['monthly_points'] ?? 0,
+      accountType: json['account_type'],
+      companyName: json['company_name'],
+      avatar: json['avatar'],
+      giftedPoints: json['gifted_points'] ?? 0,
+      pointsReceived: json['points_received'] ?? 0,
+      isVisible: json['visible'] ?? false,
+    );
+  }
+
   factory User.fromSingleJson(Map<String, dynamic> map) {
     Map<String, dynamic> json = map;
     return User(

@@ -65,6 +65,16 @@ class Banner {
         v: json["__v"],
       );
 
+  factory Banner.fromSupabase(Map<String, dynamic> json) => Banner(
+        id: json["id"],
+        name: json["name"],
+        slug: json["slug"],
+        image: json["image"],
+        description: json["description"],
+        isActive: json["is_active"],
+        companyName: json["company_name"],
+      );
+
   Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,

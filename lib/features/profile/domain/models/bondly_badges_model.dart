@@ -160,4 +160,16 @@ class BondlyBadge {
       visible: json['visible'],
     );
   }
+
+  factory BondlyBadge.fromSupabase(Map<String, dynamic> json) {
+    return BondlyBadge(
+      id: json['id'] ?? '',
+      categoryId: json['category_id'] ?? '',
+      name: json['name'] ?? '',
+      image: json['image'] ?? '',
+      value: json['value'] ?? 0,
+      isActive: json['is_active'] ?? true,
+      visible: json['visible'] ?? true,
+    );
+  }
 }

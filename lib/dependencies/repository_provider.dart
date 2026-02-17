@@ -1,7 +1,16 @@
+import 'package:bondly_app/config/backend_config.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/auth/data/mappers/user_entity_mapper.dart';
+import 'package:bondly_app/features/auth/data/repositories/supabase_auth_repository.dart';
+import 'package:bondly_app/features/auth/data/repositories/supabase_users_repository.dart';
 import 'package:bondly_app/features/base/data/repositories/default_supabase_repository.dart';
 import 'package:bondly_app/features/base/domain/repositories/supabase_repository.dart';
+import 'package:bondly_app/features/home/data/repositories/supabase_banners_repository.dart';
+import 'package:bondly_app/features/home/data/repositories/supabase_company_feeds_repository.dart';
+import 'package:bondly_app/features/profile/data/repositories/supabase_account_statement_repository.dart';
+import 'package:bondly_app/features/profile/data/repositories/supabase_activity_repository.dart';
+import 'package:bondly_app/features/profile/data/repositories/supabase_bondly_badges_repository.dart';
+import 'package:bondly_app/features/profile/data/repositories/supabase_cart_repository.dart';
 import 'package:bondly_app/src/supabase_client_provider.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/users_api.dart';
@@ -40,28 +49,47 @@ import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
 
 class RepositoryProvider {
   static provide() {
-    // This probably could be a factory
-    getIt.registerSingleton<AuthRepository>(
-      DefaultAuthRepository(getIt<AuthAPI>()),
-    );
+    if (BackendConfig.isSupabase) {
+      getIt.registerSingleton<AuthRepository>(
+        SupabaseAuthRepository(getIt<SupabaseClientProvider>()),
+      );
+    } else {
+      getIt.registerSingleton<AuthRepository>(
+        DefaultAuthRepository(getIt<AuthAPI>()),
+      );
+    }
 
-    getIt.registerSingleton<BannersRepository>(
-        DefaultBannersRepository(getIt<BannersAPI>()));
+    if (BackendConfig.isSupabase) {
+      getIt.registerSingleton<BannersRepository>(
+        SupabaseBannersRepository(getIt<SupabaseClientProvider>()),
+      );
+    } else {
+      getIt.registerSingleton<BannersRepository>(
+        DefaultBannersRepository(getIt<BannersAPI>()),
+      );
+    }
 
-    getIt.registerSingleton<CompanyFeedsRepository>(
-      DefaultCompanyFeedsRepository(
-        getIt<CompanyFeedsAPI>(),
-        getIt<CreateCommentAPI>(),
-        getIt<HandleLikeAPI>(),
-        getIt<CategoriesAPI>(),
-        getIt<BadgesAPI>(),
-        getIt<CompanyCollaboratorsAPI>(),
-        getIt<CreateAcknowledgmentAPI>(),
-        getIt<AnnouncementsAPI>(),
-        getIt<AmbassadorsAPI>(),
-      ),
-    );
+    if (BackendConfig.isSupabase) {
+      getIt.registerSingleton<CompanyFeedsRepository>(
+        SupabaseCompanyFeedsRepository(getIt<SupabaseClientProvider>()),
+      );
+    } else {
+      getIt.registerSingleton<CompanyFeedsRepository>(
+        DefaultCompanyFeedsRepository(
+          getIt<CompanyFeedsAPI>(),
+          getIt<CreateCommentAPI>(),
+          getIt<HandleLikeAPI>(),
+          getIt<CategoriesAPI>(),
+          getIt<BadgesAPI>(),
+          getIt<CompanyCollaboratorsAPI>(),
+          getIt<CreateAcknowledgmentAPI>(),
+          getIt<AnnouncementsAPI>(),
+          getIt<AmbassadorsAPI>(),
+        ),
+      );
+    }
 
+    // Local cache always registered
     getIt.registerSingletonWithDependencies<UsersRepository>(
         () => DefaultUsersRepository(
               getIt<UsersDao>(),
@@ -70,28 +98,57 @@ class RepositoryProvider {
         instanceName: DefaultUsersRepository.name,
         dependsOn: [AppDatabase, UsersDao]);
 
-    getIt.registerSingletonAsync<UsersRepository>(
-        () async => RemoteUsersRepository(getIt<UsersAPI>()),
-        instanceName: RemoteUsersRepository.name);
+    // Conditional remote users repository (must be async to satisfy InitDependency in UseCaseProvider)
+    if (BackendConfig.isSupabase) {
+      getIt.registerSingletonAsync<UsersRepository>(
+        () async => SupabaseUsersRepository(getIt<SupabaseClientProvider>()),
+        instanceName: SupabaseUsersRepository.name,
+      );
+    } else {
+      getIt.registerSingletonAsync<UsersRepository>(
+          () async => RemoteUsersRepository(getIt<UsersAPI>()),
+          instanceName: RemoteUsersRepository.name);
+    }
 
-    getIt.registerSingleton<ActivityRepository>(
-        DefaultActivityRepository(getIt<UsersAPI>()));
+    if (BackendConfig.isSupabase) {
+      getIt.registerSingleton<ActivityRepository>(
+        SupabaseActivityRepository(getIt<SupabaseClientProvider>()),
+      );
+    } else {
+      getIt.registerSingleton<ActivityRepository>(
+        DefaultActivityRepository(getIt<UsersAPI>()),
+      );
+    }
 
-    getIt.registerSingleton<CartRepository>(
-      DefaultCartRepository(
-        getIt<CartAPI>(),
-      ),
-    );
-    getIt.registerSingleton<BondlyBadgesRepository>(
-      DefaultBondlyBadgesRepository(
-        getIt<BondlyBadgesAPI>(),
-      ),
-    );
-    getIt.registerSingleton<AccountStatementRepository>(
-      DefaultAccountStatementRepository(
-        getIt<AccountBalanceAPI>(),
-      ),
-    );
+    if (BackendConfig.isSupabase) {
+      getIt.registerSingleton<CartRepository>(
+        SupabaseCartRepository(getIt<SupabaseClientProvider>()),
+      );
+    } else {
+      getIt.registerSingleton<CartRepository>(
+        DefaultCartRepository(getIt<CartAPI>()),
+      );
+    }
+
+    if (BackendConfig.isSupabase) {
+      getIt.registerSingleton<BondlyBadgesRepository>(
+        SupabaseBondlyBadgesRepository(getIt<SupabaseClientProvider>()),
+      );
+    } else {
+      getIt.registerSingleton<BondlyBadgesRepository>(
+        DefaultBondlyBadgesRepository(getIt<BondlyBadgesAPI>()),
+      );
+    }
+
+    if (BackendConfig.isSupabase) {
+      getIt.registerSingleton<AccountStatementRepository>(
+        SupabaseAccountStatementRepository(getIt<SupabaseClientProvider>()),
+      );
+    } else {
+      getIt.registerSingleton<AccountStatementRepository>(
+        DefaultAccountStatementRepository(getIt<AccountBalanceAPI>()),
+      );
+    }
 
     getIt.registerSingleton<SupabaseRepository>(
       DefaultSupabaseRepository(

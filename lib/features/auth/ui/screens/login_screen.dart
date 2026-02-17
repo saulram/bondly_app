@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 48.dp, vertical: 36.dp),
+      margin: EdgeInsets.symmetric(horizontal: 32.dp, vertical: 36.dp),
       child: Column(
         children: [
           TextFormField(
@@ -185,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           SizedBox(height: 8.dp),
           DropdownButtonFormField(
-              value: LoginStrings.selectYourCompany,
+              initialValue: LoginStrings.selectYourCompany,
               dropdownColor: Theme.of(context).cardColor,
               items: model.companies.map((e) {
                 return DropdownMenuItem(value: e, child: Text(e));

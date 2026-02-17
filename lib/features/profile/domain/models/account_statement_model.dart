@@ -76,6 +76,25 @@ class AccountStatement {
         v: json["__v"],
       );
 
+  factory AccountStatement.fromSupabase(Map<String, dynamic> json) =>
+      AccountStatement(
+        user: json["user_id"],
+        date: json["date"] == null ? null : DateTime.parse(json["date"]),
+        transactions: json["statement_transactions"] == null
+            ? []
+            : List<Transaction>.from(json["statement_transactions"]!
+                .map((x) => Transaction.fromSupabase(x))),
+        balance: json["balance"],
+        description: json["description"],
+        id: json["id"],
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.parse(json["created_at"]),
+        updatedAt: json["updated_at"] == null
+            ? null
+            : DateTime.parse(json["updated_at"]),
+      );
+
   Map<String, dynamic> toJson() => {
         "user": user,
         "date": date?.toIso8601String(),
@@ -127,6 +146,14 @@ class Transaction {
         type: json["type"],
         date: json["date"] == null ? null : DateTime.parse(json["date"]),
         id: json["_id"],
+      );
+
+  factory Transaction.fromSupabase(Map<String, dynamic> json) => Transaction(
+        name: json["name"],
+        amount: json["amount"],
+        type: json["type"],
+        date: json["date"] == null ? null : DateTime.parse(json["date"]),
+        id: json["id"],
       );
 
   Map<String, dynamic> toJson() => {

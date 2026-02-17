@@ -65,4 +65,13 @@ class Embassy {
             json["badge_id"] == null ? null : Badge.fromJson(json["badge_id"]),
         date: json["date"] == null ? null : DateTime.parse(json["date"]),
       );
+
+  factory Embassy.fromSupabase(Map<String, dynamic> json) => Embassy(
+        id: json["id"],
+        userId: json["user"] != null ? User.fromSupabase(json["user"]) : null,
+        badgeId: json["badge"] != null
+            ? Badge.fromSupabase(json["badge"])
+            : null,
+        date: json["date"] == null ? null : DateTime.parse(json["date"]),
+      );
 }
