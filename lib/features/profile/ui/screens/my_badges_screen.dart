@@ -129,13 +129,13 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
         children: [
           Text(
             "Insignas Bondly",
-            style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+            style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
           ),
           const SizedBox(height: 12.0),
           Text(
             StringsProfile.bondlyBadgesSubHeader,
             style: theme.textTheme.labelLarge!
-                .copyWith(height: 1.4, fontSize: 16.0, color: Colors.white),
+                .copyWith(height: 1.4, fontSize: 16.0, color: theme.colorScheme.onPrimary),
           )
         ],
       ),

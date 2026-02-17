@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -158,7 +159,7 @@ class _MyActivityScreenState
                   decoration: BoxDecoration(
                       color: theme.dividerColor,
                       border: Border.all(color: AppColors.secondaryColor),
-                      borderRadius: BorderRadius.circular(16.0)),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
                   child: Text(
                     model.notificationMessage,
                     style:
@@ -196,13 +197,13 @@ class _MyActivityScreenState
         children: [
           Text(
             StringsProfile.myActivityHeader,
-            style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+            style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
           ),
           const SizedBox(height: 12.0),
           Text(
             StringsProfile.myActivitySubHeader,
             style: theme.textTheme.labelLarge!
-                .copyWith(height: 1.4, fontSize: 16.0, color: Colors.white),
+                .copyWith(height: 1.4, fontSize: 16.0, color: theme.colorScheme.onPrimary),
           )
         ],
       ),

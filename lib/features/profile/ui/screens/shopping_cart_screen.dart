@@ -1,3 +1,4 @@
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_cart.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -178,7 +179,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
               label: const Text(StringsCart.confirm),
             ),
             child: Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(AppDimensions.spacingMd),
               height: size.height * .6,
               child: rewardsModel.busy
                   ? const Center(
@@ -257,7 +258,7 @@ class CartListFooter extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusRound),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -284,7 +285,7 @@ class CartListHeader extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusRound),
       ),
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -318,7 +319,7 @@ class CartItemTile extends StatelessWidget {
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
           image: DecorationImage(
             image: CachedNetworkImageProvider(safeImageUrl(item.reward.imageUrl)),
             fit: BoxFit.cover,

@@ -1,5 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
-import 'package:bondly_app/config/theme.dart';
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
@@ -11,7 +11,6 @@ import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:moment_dart/moment_dart.dart';
 
@@ -36,45 +35,37 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
 
   Container _buildBadgePost(Size size, BuildContext context) {
     var theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
         width: size.width,
-        margin: const EdgeInsets.symmetric(vertical: 10),
+        margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingMd),
         decoration: BoxDecoration(
             border: Border.all(color: theme.cardColor),
             color: theme.dividerColor,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: const Offset(0, 3),
-              ),
-            ]),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+            boxShadow: AppDimensions.cardShadow(colorScheme.onSurface)),
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(AppDimensions.spacingMd),
               child: Column(
                 children: [
                   _buildPostHeader(context),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppDimensions.spacingMd),
                   _buildPostBody(theme),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppDimensions.spacingMd),
                   widget.post.image != null
                       ? _buildPostImage(context)
                       : _buildBadgePostImage(context),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppDimensions.spacingMd),
                 ],
               ),
             ),
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(AppDimensions.spacingMd),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                color: context.isDarkMode
-                    ? AppColors.greyBackGroundColorDark
-                    : AppColors.greyBackGroundColor,
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                color: colorScheme.surfaceContainerHighest,
               ),
               child: Column(
                 children: [
@@ -88,6 +79,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   }
 
   Widget _buildPostHeader(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     Moment postDate = Moment(widget.post.createdAt.toLocal());
     //format postType to be always first letter uppercase
     String type =
@@ -100,7 +92,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
           backgroundImage: NetworkImage(
               safeImageUrl(widget.post.sender.avatar, isAvatar: true)),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: AppDimensions.spacingMd),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
             widget.post.sender.completeName.trim(),
@@ -108,7 +100,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
           ),
           Text(
             postDate.format('DD/MM/YYYY hh:mm'),
-            style: context.themeData.textTheme.labelSmall,
+            style: Theme.of(context).textTheme.labelSmall,
           ),
         ]),
         const Expanded(
@@ -117,16 +109,12 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
         Chip(
           label: Text(
             type,
-            style: GoogleFonts.montserrat(
-              color: context.isDarkMode
-                  ? AppColors.tertiaryColorLight
-                  : AppColors.tertiaryColor,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: colorScheme.tertiary,
               fontSize: 12,
             ),
           ),
-          backgroundColor: context.isDarkMode
-              ? AppColors.tertiaryColor
-              : AppColors.tertiaryColorLight,
+          backgroundColor: AppColors.tertiaryColorLight,
         ),
       ],
     );
@@ -140,10 +128,11 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   }
 
   Widget _buildBadgePostImage(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         ClipRRect(
-          borderRadius: BorderRadius.circular(50),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusRound),
           child: CachedNetworkImage(
               imageUrl: safeImageUrl(widget.post.badge?.image),
               width: 50,
@@ -168,10 +157,8 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
         const SizedBox(height: 5),
         Text(
           widget.post.badge?.name ?? 'Badge Name',
-          style: context.themeData.textTheme.titleSmall?.copyWith(
-              color: context.isDarkMode
-                  ? AppColors.tertiaryColorLight
-                  : AppColors.tertiaryColor),
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: colorScheme.tertiary),
         ),
       ],
     );
@@ -179,7 +166,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
 
   Widget _buildPostImage(BuildContext context) {
     return ClipRRect(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
         child: Hero(
           tag: widget.post.id!,
           child: GestureDetector(
@@ -214,13 +201,14 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
       children: [
         const Expanded(child: SizedBox()),
         _buildLike(),
-        const SizedBox(width: 10),
+        const SizedBox(width: AppDimensions.spacingMd),
         _buildComents(context),
       ],
     );
   }
 
   Widget _buildLike() {
+    final colorScheme = Theme.of(context).colorScheme;
     return AnimatedOpacity(
       opacity: likesBusy ? 0.4 : 1.0,
       duration: const Duration(milliseconds: 300),
@@ -235,22 +223,16 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
                 ? IconsaxBold.heart
                 : IconsaxOutline.heart,
             color: widget.post.isLiked == true
-                ? (context.isDarkMode
-                    ? AppColors.secondaryColorLight
-                    : AppColors.secondaryColor)
-                : (context.isDarkMode
-                    ? AppColors.greyBackGroundColor
-                    : AppColors.primaryColor),
+                ? colorScheme.secondary
+                : colorScheme.outline,
           ),
           const SizedBox(width: 5),
           Text(
             widget.post.likes.length.toString(),
-            style: GoogleFonts.montserrat(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: context.isDarkMode
-                    ? AppColors.secondaryColorLight
-                    : AppColors.secondaryColor),
+                color: colorScheme.secondary),
           ),
         ],
       ),
@@ -269,6 +251,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   }
 
   Widget _buildComents(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -278,18 +261,14 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
       child: Row(
         children: [
           Icon(IconsaxOutline.message,
-              color: context.isDarkMode
-                  ? AppColors.tertiaryColorLight
-                  : AppColors.tertiaryColor),
+              color: colorScheme.tertiary),
           const SizedBox(width: 5),
           Text(
             widget.post.comments.length.toString(),
-            style: GoogleFonts.montserrat(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: context.isDarkMode
-                    ? AppColors.tertiaryColorLight
-                    : AppColors.tertiaryColor),
+                color: colorScheme.tertiary),
           ),
         ],
       ),

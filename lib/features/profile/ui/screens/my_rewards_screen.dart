@@ -1,4 +1,4 @@
-import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -116,11 +116,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                                                   .textTheme
                                                   .bodyMedium
                                                   ?.copyWith(
-                                                      color: context.isDarkMode
-                                                          ? AppColors
-                                                              .tertiaryColor
-                                                          : AppColors
-                                                              .tertiaryColorLight)),
+                                                      color: Theme.of(context).colorScheme.tertiary)),
                                         ),
                                       ),
                                     );
@@ -216,7 +212,7 @@ class RewardFooterCardSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -295,7 +291,7 @@ class RewardCardImage extends StatelessWidget {
           aspectRatio: 1,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
               image: DecorationImage(
                 image: CachedNetworkImageProvider(
                   safeImageUrl(reward.imageUrl),
@@ -331,9 +327,7 @@ class RewardCardHeader extends StatelessWidget {
             reward.enable == false
                 ? IconsaxOutline.lock
                 : IconsaxOutline.unlock,
-            color: context.isDarkMode
-                ? AppColors.tertiaryColorLight
-                : AppColors.tertiaryColor),
+            color: Theme.of(context).colorScheme.tertiary),
         SizedBox(width: size.width * .4),
         //To be fixed, if item exist in cart, show the quantity and a + and - button to add or remove.
         //If not, show a button to add to cart.

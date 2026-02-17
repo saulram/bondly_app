@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_home.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
@@ -31,14 +32,14 @@ class _RecognizetabState extends State<Recognizetab> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(AppDimensions.spacingSm),
       child: SingleChildScrollView(
         child: Column(
           children: [
             _buildAnouncementsSection(),
-            const SizedBox(height: 15),
+            const SizedBox(height: AppDimensions.radiusLg),
             _buildAcknowledgmentsSection(),
-            const SizedBox(height: 15),
+            const SizedBox(height: AppDimensions.radiusLg),
           ],
         ),
       ),
@@ -55,7 +56,7 @@ class _RecognizetabState extends State<Recognizetab> {
             textAlign: TextAlign.center,
           ),
           const Divider(),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppDimensions.spacingMd),
           _buildAnnouncementsList(),
         ],
       ),
@@ -111,7 +112,7 @@ class _RecognizetabState extends State<Recognizetab> {
                 width: 8.0,
                 height: 8.0,
                 margin:
-                    const EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                    const EdgeInsets.symmetric(vertical: AppDimensions.spacingMd, horizontal: 2.0),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: model.currentAnnouncementIndex == index
@@ -136,7 +137,7 @@ class _RecognizetabState extends State<Recognizetab> {
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppDimensions.spacingMd),
           Text(
             StringsHome.acknowledgmentCategorySubHeader(
                 model.categories.categories?.length.toString() ?? ''),
@@ -144,7 +145,7 @@ class _RecognizetabState extends State<Recognizetab> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(
-            height: 10,
+            height: AppDimensions.spacingMd,
           ),
           _buildCategoriesSection(),
           model.selectedCategory == null
@@ -169,12 +170,13 @@ class _RecognizetabState extends State<Recognizetab> {
   }
 
   Widget _buildCreateAcknowledgment() {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Container(
           height: 120,
           width: 90,
-          margin: const EdgeInsets.symmetric(horizontal: 10),
+          margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMd),
           child: InkWell(
             onTap: () {},
             child: Column(
@@ -189,14 +191,13 @@ class _RecognizetabState extends State<Recognizetab> {
                 ),
                 Text(
                   "${model.selectedBadge?.value ?? ''} pts",
-                  style: Theme.of(context).textTheme.bodySmall
-                  ,
+                  style: Theme.of(context).textTheme.bodySmall,
                   textAlign: TextAlign.center,
                 ),
                 Text(
                   model.selectedBadge?.name ?? '',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: context.isDarkMode ?AppColors.tertiaryColorLight: AppColors.primaryColor,
+                      color: colorScheme.tertiary,
                       fontWeight: FontWeight.bold,
                       fontSize: 10),
                   textAlign: TextAlign.center,
@@ -228,25 +229,25 @@ class _RecognizetabState extends State<Recognizetab> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(
-                      color: AppColors.secondaryColor,
+                    borderSide: BorderSide(
+                      color: colorScheme.secondary,
                     ),
                   ),
                 ),
                 mentions: [
                   Mention(
                     trigger: '@',
-                    style:  TextStyle(
-                      color: context.isDarkMode ? AppColors.tertiaryColorLight : AppColors.secondaryColor,
+                    style: TextStyle(
+                      color: colorScheme.secondary,
                       fontWeight: FontWeight.bold,
                     ),
                     data: model.collaboratorsList,
                     matchAll: false,
                     suggestionBuilder: (data) {
                       return Container(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(AppDimensions.spacingMd),
                         decoration: BoxDecoration(
-                          color: context.isDarkMode ? Colors.grey[800] : Colors.white,
+                          color: colorScheme.surface,
                         ),
                         width: 150,
                         child: Row(
@@ -262,9 +263,7 @@ class _RecognizetabState extends State<Recognizetab> {
                             ),
                             Column(
                               children: <Widget>[
-                                Text("${data['display']}",style: context.themeData.textTheme.bodyMedium?.copyWith(
-
-                                ),),
+                                Text("${data['display']}",style: context.themeData.textTheme.bodyMedium),
                               ],
                             )
                           ],
@@ -275,7 +274,7 @@ class _RecognizetabState extends State<Recognizetab> {
                 ],
               ),
               const SizedBox(
-                height: 10,
+                height: AppDimensions.spacingMd,
               ),
               model.collaboratorsIds.isNotEmpty &&
                       model
@@ -286,7 +285,7 @@ class _RecognizetabState extends State<Recognizetab> {
                       buttonStyle: Theme.of(context).outlinedButtonTheme.style?.copyWith(
                         side: WidgetStateProperty.all(
                           BorderSide(
-                            color: context.isDarkMode ? AppColors.tertiaryColorLight : AppColors.tertiaryColor,
+                            color: colorScheme.tertiary,
                           ),
                       )
                       ),
@@ -300,8 +299,7 @@ class _RecognizetabState extends State<Recognizetab> {
                               StringsHome.acknowledgmentInputButtonText,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color:context.isDarkMode ? AppColors.tertiaryColorLight : AppColors.tertiaryColor
-
+                                color: colorScheme.tertiary,
                     ),),)
                   : const SizedBox()
             ],
@@ -320,13 +318,13 @@ class _RecognizetabState extends State<Recognizetab> {
             )
           : ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(AppDimensions.spacingMd),
               itemCount: model.badges.badges.length,
               itemBuilder: (context, index) {
                 return Container(
                   height: 100,
                   width: 90,
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMd),
                   child: InkWell(
                     onTap: () {
                       model.selectedBadge == model.badges.badges[index]
@@ -376,13 +374,13 @@ class _RecognizetabState extends State<Recognizetab> {
       height: 100,
       child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(AppDimensions.spacingMd),
           itemCount: model.categories.categories?.length ?? 0,
           itemBuilder: (context, index) {
             return Container(
               height: 80,
               width: 90,
-              margin: const EdgeInsets.symmetric(horizontal: 10),
+              margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMd),
               child: InkWell(
                 onTap: () {
                   model.loadingBadges = true;

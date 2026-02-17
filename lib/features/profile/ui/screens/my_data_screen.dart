@@ -1,4 +1,3 @@
-import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -49,7 +48,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
       model: _model,
       child: ModelBuilder<ProfileViewModel>(
         builder: (context, model, child) => Scaffold(
-          backgroundColor: AppColors.secondaryColor,
+          backgroundColor: theme.colorScheme.secondary,
           body: Column(
             children: [
               SafeArea(
@@ -77,14 +76,14 @@ class _MyDataScreenState extends State<MyDataScreen> {
                     child: Center(
                       child: Text(
                         StringsProfile.myData,
-                        style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+                        style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
                       ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       IconsaxOutline.arrow_left,
-                      color: Colors.white,
+                      color: theme.colorScheme.onPrimary,
                     ),
                     onPressed: () => context.pop(),
                     tooltip: 'Regresar',

@@ -10,7 +10,7 @@ class AppStyles {
       const TextStyle(color: AppColors.bodyColor, fontFamily: fontFamily);
 
   static TextStyle primaryButtonTextStyle =
-      baseTextStyle.copyWith(color: Colors.white);
+      baseTextStyle.copyWith(color: AppColors.bodyColorDark);
 
   static TextStyle transparentButtonTextStyle =
       baseTextStyle.copyWith(color: AppColors.transparentButtonColor);

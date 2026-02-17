@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:bondly_app/src/network_image_helpers.dart';
@@ -28,10 +29,10 @@ class _BannersCarouselState extends State<BannersCarousel> {
       child: GestureDetector(
         onTap: onPressed,
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16.0),
+          margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingLg),
           padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(color: bodyColor, shape: BoxShape.circle),
-          child: Center(child: Icon(iconData, color: Colors.white)),
+          child: Center(child: Icon(iconData, color: Theme.of(context).colorScheme.onPrimary)),
         ),
       ),
     );
@@ -45,7 +46,7 @@ class _BannersCarouselState extends State<BannersCarousel> {
         children: [
           widget.imageUris!.isEmpty
               ? const Center(
-                  child: BondlyShimmerBlock(width: 300, height: 120, borderRadius: 15),
+                  child: BondlyShimmerBlock(width: 300, height: 120, borderRadius: AppDimensions.radiusLg),
                 )
               : InfiniteCarousel.builder(
                   itemCount: widget.imageUris!.length,
@@ -59,18 +60,11 @@ class _BannersCarouselState extends State<BannersCarousel> {
                     return Container(
                         margin: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
-                              spreadRadius: 1,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                          boxShadow: AppDimensions.cardShadow(Theme.of(context).colorScheme.onSurface),
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
                           child: CachedNetworkImage(
                             imageUrl:
                                 safeImageUrl(widget.imageUris![index]),
