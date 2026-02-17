@@ -1,5 +1,8 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/auth/data/mappers/user_entity_mapper.dart';
+import 'package:bondly_app/features/base/data/repositories/default_supabase_repository.dart';
+import 'package:bondly_app/features/base/domain/repositories/supabase_repository.dart';
+import 'package:bondly_app/src/supabase_client_provider.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/users_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/default_auth_repository.dart';
@@ -87,6 +90,12 @@ class RepositoryProvider {
     getIt.registerSingleton<AccountStatementRepository>(
       DefaultAccountStatementRepository(
         getIt<AccountBalanceAPI>(),
+      ),
+    );
+
+    getIt.registerSingleton<SupabaseRepository>(
+      DefaultSupabaseRepository(
+        getIt<SupabaseClientProvider>(),
       ),
     );
   }

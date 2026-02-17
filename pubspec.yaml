@@ -54,7 +54,9 @@ dependencies:
   carousel_slider: ^5.1.1
   cached_network_image: ^3.3.0
   intl: ^0.20.2
-
+  supabase_flutter: ^2.8.4
+  flutter_dotenv: ^5.2.1
+  package_info_plus: ^9.0.0
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -105,6 +107,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/
+    - .env
 
   fonts:
     - family: Montserrat
