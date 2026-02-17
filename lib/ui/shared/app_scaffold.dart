@@ -12,12 +12,11 @@ class ScaffoldLayout extends StatelessWidget {
   final VoidCallback? afterProfileCall;
 
   const ScaffoldLayout(
-      {Key? key,
+      {super.key,
       required this.body,
       this.enableBottomNavBar = false,
       this.avatar,
-      this.afterProfileCall})
-      : super(key: key);
+      this.afterProfileCall});
 
   @override
   Widget build(BuildContext context) {

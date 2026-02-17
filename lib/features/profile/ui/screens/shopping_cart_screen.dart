@@ -88,9 +88,9 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     await model.checkOutCart();
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
+                    backgroundColor: WidgetStateProperty.all<Color>(
                         Theme.of(context).secondaryHeaderColor),
-                    textStyle: MaterialStateProperty.all<TextStyle>(
+                    textStyle: WidgetStateProperty.all<TextStyle>(
                       Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).secondaryHeaderColor,
                           ),

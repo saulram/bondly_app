@@ -92,7 +92,7 @@ class AppTheme extends ChangeNotifier {
     dropdownMenuTheme: DropdownMenuThemeData(
         menuStyle: MenuStyle(
       backgroundColor:
-          MaterialStateProperty.all<Color>(AppColors.darkBackgroundColor),
+          WidgetStateProperty.all<Color>(AppColors.darkBackgroundColor),
     )),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(

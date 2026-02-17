@@ -94,8 +94,8 @@ class ContextModel extends DebouncedChangeNotifier {
 class ModelProvider<T extends ContextModel> extends ChangeNotifierProvider<T> {
   final T model;
 
-  ModelProvider({Key? key, required this.model, required Widget child})
-      : super.value(key: key, value: model, child: child);
+  ModelProvider({super.key, required this.model, required Widget child})
+      : super.value(value: model, child: child);
 
   @override
   Widget build(BuildContext context) {
@@ -117,16 +117,11 @@ class ModelBuilder<T extends ContextModel> extends Consumer<T> {
   final bool listen;
 
   ModelBuilder({
-    Key? key,
-    required Widget Function(BuildContext context, T value, Widget? child)
-        builder,
-    Widget? child,
+    super.key,
+    required super.builder,
+    super.child,
     this.listen = true,
-  }) : super(
-          key: key,
-          builder: builder,
-          child: child,
-        );
+  });
 
   @override
   Widget buildWithChild(BuildContext context, Widget? child) {

@@ -1,5 +1,3 @@
-import 'package:logger/logger.dart';
-
 class UserCart {
   final String id;
   final String userId;
@@ -41,9 +39,6 @@ class UserCart {
   }
 
   factory UserCart.fromJson(Map<String, dynamic> json) {
-    Logger log = Logger(
-      printer: PrettyPrinter(methodCount: 0),
-    );
     List<CartItem> rewards = <CartItem>[];
     if (json['rewards'] != null) {
       rewards = List<CartItem>.from(

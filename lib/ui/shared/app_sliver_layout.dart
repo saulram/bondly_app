@@ -25,7 +25,6 @@ class _BondlySliverLayoutState extends State<BondlySliverLayout> {
   bool addMargin = false;
 
   double top = 0.0;
-  final String _value = "";
 
   @override
   Widget build(BuildContext context) {

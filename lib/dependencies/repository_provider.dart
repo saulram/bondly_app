@@ -48,7 +48,7 @@ import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
 
 class RepositoryProvider {
-  static provide() {
+  static void provide() {
     if (BackendConfig.isSupabase) {
       getIt.registerSingleton<AuthRepository>(
         SupabaseAuthRepository(getIt<SupabaseClientProvider>()),

@@ -45,7 +45,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 spreadRadius: 1,
                 blurRadius: 5,
                 offset: const Offset(0, 3),
@@ -148,8 +148,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
               imageUrl: safeImageUrl(widget.post.badge?.image),
               width: 50,
               height: 50,
-              progressIndicatorBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return Container();
+              progressIndicatorBuilder: (context, _, loadingProgress) {
                 return const SizedBox(
                   height: 50,
                   width: 50,

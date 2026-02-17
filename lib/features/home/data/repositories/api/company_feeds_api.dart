@@ -13,7 +13,7 @@ class CompanyFeedsAPI {
     lineLength: 220,
     colors: true,
     printEmojis: true,
-    printTime: false,
+    dateTimeFormat: DateTimeFormat.none,
   ));
 
   CompanyFeedsAPI(this._callsHandler);

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 class GoldBorderedContainer extends StatefulWidget {
   final Widget? child;
-  const GoldBorderedContainer({Key? key, this.child}) : super(key: key);
+  const GoldBorderedContainer({super.key, this.child});
 
   @override
-  _GoldBorderedContainerState createState() => _GoldBorderedContainerState();
+  State<GoldBorderedContainer> createState() => _GoldBorderedContainerState();
 }
 
 class _GoldBorderedContainerState extends State<GoldBorderedContainer> {
@@ -23,8 +23,8 @@ class _GoldBorderedContainerState extends State<GoldBorderedContainer> {
           boxShadow: [
             BoxShadow(
               color: context.isDarkMode
-                  ? Colors.white.withOpacity(0.1) // Adjust the shadow color for dark mode
-                  : Colors.black.withOpacity(0.2),
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.black.withValues(alpha: 0.2),
               spreadRadius: 1,
               blurRadius: 5,
               offset: const Offset(0, 3),

@@ -28,7 +28,6 @@ class _MyActivityScreenState
   bool addMargin = false;
 
   double top = 0.0;
-  String _value = "";
 
   @override
   bool get wantKeepAlive => true;
@@ -210,45 +209,6 @@ class _MyActivityScreenState
     );
   }
 
-  Container _buildChips(ThemeData theme) {
-    List<String> options = [
-      'Puntos',
-      'Recompensas',
-      'Social',
-    ];
-
-    return Container(
-      color: theme.scaffoldBackgroundColor,
-      height: 60.0,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: List<Widget>.generate(
-          options.length,
-          (int index) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 12.0),
-              child: ChoiceChip(
-                backgroundColor: AppColors.secondaryColor,
-                selectedColor: AppColors.tertiaryColor,
-                label: Text(
-                  options[index],
-                  style: theme.textTheme.headlineSmall!.copyWith(
-                      color: AppColors.backgroundColor, fontSize: 18.0),
-                ),
-                selected: _value == options[index],
-                onSelected: (bool selected) {
-                  setState(() {
-                    _value = selected ? options[index] : "";
-                  });
-                },
-              ),
-            );
-          },
-        ).toList(),
-      ),
-    );
-  }
-
   UserActivityItemWidget _buildActivityItem(UserActivityItem item) {
     return UserActivityItemWidget(
         key: Key(item.id),
@@ -274,29 +234,5 @@ class _MyActivityScreenState
           }
         }
     );
-  }
-}
-
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverAppBarDelegate(this._header);
-
-  final Container _header;
-
-  @override
-  double get minExtent => _header.constraints?.maxHeight ?? 60;
-  @override
-  double get maxExtent => _header.constraints?.maxHeight ?? 60;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      child: _header,
-    );
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
   }
 }

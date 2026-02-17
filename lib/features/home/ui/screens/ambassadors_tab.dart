@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class AmbassadorsTab extends StatefulWidget {
   final HomeViewModel model;
-  const AmbassadorsTab({Key? key, required this.model}) : super(key: key);
+  const AmbassadorsTab({super.key, required this.model});
 
   @override
   State<AmbassadorsTab> createState() => _AmbassadorsTabState();

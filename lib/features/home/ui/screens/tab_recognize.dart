@@ -116,7 +116,7 @@ class _RecognizetabState extends State<Recognizetab> {
                   shape: BoxShape.circle,
                   color: model.currentAnnouncementIndex == index
                       ? AppColors.primaryColor
-                      : AppColors.primaryColor.withOpacity(0.5),
+                      : AppColors.primaryColor.withValues(alpha: 0.5),
                 ),
               ),
             );
@@ -284,7 +284,7 @@ class _RecognizetabState extends State<Recognizetab> {
                       isLoading: model.creatingAcknowledgment,
                       style: BondlyButtonStyle.outlined,
                       buttonStyle: Theme.of(context).outlinedButtonTheme.style?.copyWith(
-                        side: MaterialStateProperty.all(
+                        side: WidgetStateProperty.all(
                           BorderSide(
                             color: context.isDarkMode ? AppColors.tertiaryColorLight : AppColors.tertiaryColor,
                           ),

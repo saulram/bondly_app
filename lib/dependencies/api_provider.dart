@@ -18,7 +18,7 @@ import 'package:bondly_app/features/profile/data/api/cart_api.dart';
 import 'package:bondly_app/src/api_calls_handler.dart';
 
 class APIProvider {
-  static provide() {
+  static void provide() {
     getIt.registerSingleton<AuthAPI>(
       AuthAPI(getIt<ApiCallsHandler>()),
     );

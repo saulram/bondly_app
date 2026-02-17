@@ -26,7 +26,7 @@ class ImageHelper {
     lineLength: 220,
     colors: true,
     printEmojis: true,
-    printTime: false,
+    dateTimeFormat: DateTimeFormat.none,
   ));
   Future<Uint8List> displayFromNetwork({String imageUri = ''}) async {
     final response = await http.get(Uri.parse(imageUri), headers: {

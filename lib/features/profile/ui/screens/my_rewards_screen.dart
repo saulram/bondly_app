@@ -45,20 +45,21 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
             floatingActionButton: FloatingActionButton(
               isExtended: true,
               onPressed: () async {
+                final navigator = GoRouter.of(context);
                 if (!rewardsModel.cartEdited) {
-                  context.push(MyCartScreen.route);
+                  navigator.push(MyCartScreen.route);
                   return;
                 }
                 setState(() {
                   isLoading = true;
                 });
 
-                rewardsModel.sendItemsToCart().then((cartUpdated) {
-                  setState(() {
-                    isLoading = false;
-                  });
-                  context.push(MyCartScreen.route);
+                await rewardsModel.sendItemsToCart();
+                if (!mounted) return;
+                setState(() {
+                  isLoading = false;
                 });
+                navigator.push(MyCartScreen.route);
               },
               tooltip: "Carrito",
               child: Row(

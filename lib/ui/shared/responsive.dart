@@ -49,13 +49,12 @@ class Responsive extends StatefulWidget {
   final double? breakpointM;
 
   const Responsive(
-      {Key? key,
+      {super.key,
       this.mobile,
       this.tablet,
       this.breakpointM = Constants.tabletBreakPooint,
       this.breakpointS = Constants.mobileBreakpoint,
-      required this.desktop})
-      : super(key: key);
+      required this.desktop});
 
   @override
   State<Responsive> createState() => _ResponsiveState();

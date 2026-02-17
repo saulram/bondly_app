@@ -43,7 +43,7 @@ import 'package:bondly_app/src/app_services.dart';
 import 'package:bondly_app/src/routes.dart';
 
 class ViewModelProvider {
-  static provide() {
+  static void provide() {
     getIt.registerSingleton<AppRouter>(AppRouter());
 
     getIt.registerSingleton<NavigationModel>(NavigationModel());
