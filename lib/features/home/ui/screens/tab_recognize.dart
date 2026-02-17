@@ -3,7 +3,10 @@ import 'package:bondly_app/config/strings_home.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
+import 'package:bondly_app/ui/shared/bondly_loading_button.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart';
+import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -181,7 +184,7 @@ class _RecognizetabState extends State<Recognizetab> {
                   width: 50,
                   child: CachedNetworkImage(
                     imageUrl:
-                        "https://api.bondly.mx/${model.selectedBadge?.image}",
+                        safeImageUrl(model.selectedBadge?.image),
                   ),
                 ),
                 Text(
@@ -277,8 +280,10 @@ class _RecognizetabState extends State<Recognizetab> {
               model.collaboratorsIds.isNotEmpty &&
                       model
                           .mentionsKey.currentState!.controller!.text.isNotEmpty
-                  ? OutlinedButton(
-                      style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+                  ? BondlyLoadingButton(
+                      isLoading: model.creatingAcknowledgment,
+                      style: BondlyButtonStyle.outlined,
+                      buttonStyle: Theme.of(context).outlinedButtonTheme.style?.copyWith(
                         side: MaterialStateProperty.all(
                           BorderSide(
                             color: context.isDarkMode ? AppColors.tertiaryColorLight : AppColors.tertiaryColor,
@@ -291,9 +296,7 @@ class _RecognizetabState extends State<Recognizetab> {
 
                         model.creatingAcknowledgment = false;
                       },
-                      child: model.creatingAcknowledgment
-                          ? const CircularProgressIndicator.adaptive()
-                          :  Text(
+                      child: Text(
                               StringsHome.acknowledgmentInputButtonText,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -313,7 +316,7 @@ class _RecognizetabState extends State<Recognizetab> {
       height: 110,
       child: model.loadingBadges
           ? const Center(
-              child: CircularProgressIndicator.adaptive(),
+              child: BondlyShimmerBlock(width: 80, height: 80, borderRadius: 12),
             )
           : ListView.builder(
               scrollDirection: Axis.horizontal,
@@ -337,7 +340,7 @@ class _RecognizetabState extends State<Recognizetab> {
                           width: 50,
                           child: CachedNetworkImage(
                             imageUrl:
-                                "https://api.bondly.mx/${model.badges.badges[index].image}",
+                                safeImageUrl(model.badges.badges[index].image),
                           ),
                         ),
                         Text(
@@ -396,7 +399,7 @@ class _RecognizetabState extends State<Recognizetab> {
                       width: 50,
                       child: CachedNetworkImage(
                         imageUrl:
-                            "https://api.bondly.mx/${model.categories.categories?[index].imageUrl}",
+                            safeImageUrl(model.categories.categories?[index].imageUrl),
                       ),
                     ),
                     Text(

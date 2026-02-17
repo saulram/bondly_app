@@ -6,6 +6,8 @@ import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_coments_widget.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
+import 'package:bondly_app/src/network_image_helpers.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
@@ -95,9 +97,8 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
       children: [
         CircleAvatar(
           radius: 15,
-          backgroundImage: NetworkImage(widget.post.sender.avatar != null
-              ? widget.post.sender.avatar!
-              : "https://api.minimalavatars.com/avatar/avatar/png"),
+          backgroundImage: NetworkImage(
+              safeImageUrl(widget.post.sender.avatar, isAvatar: true)),
         ),
         const SizedBox(width: 10),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -144,7 +145,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
         ClipRRect(
           borderRadius: BorderRadius.circular(50),
           child: CachedNetworkImage(
-              imageUrl: "https://api.bondly.mx/${widget.post.badge?.image}",
+              imageUrl: safeImageUrl(widget.post.badge?.image),
               width: 50,
               height: 50,
               progressIndicatorBuilder: (context, child, loadingProgress) {
@@ -152,7 +153,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
                 return const SizedBox(
                   height: 50,
                   width: 50,
-                  child: Center(child: CircularProgressIndicator()),
+                  child: Center(child: BondlyShimmerCircle(size: 50)),
                 );
               },
               errorWidget: (context, error, stackTrace) {
@@ -195,7 +196,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
               );
             },
             child: CachedNetworkImage(
-                imageUrl: "https://api.bondly.mx/${widget.post.image}",
+                imageUrl: safeImageUrl(widget.post.image),
                 errorWidget: (context, error, stackTrace) {
                   Logger().e('Error loading post image', error: error);
                   return const SizedBox(
@@ -213,7 +214,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
     return Row(
       children: [
         const Expanded(child: SizedBox()),
-        likesBusy ? const CircularProgressIndicator.adaptive() : _buildLike(),
+        _buildLike(),
         const SizedBox(width: 10),
         _buildComents(context),
       ],
@@ -221,8 +222,11 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   }
 
   Widget _buildLike() {
-    return InkWell(
-      onTap: () {
+    return AnimatedOpacity(
+      opacity: likesBusy ? 0.4 : 1.0,
+      duration: const Duration(milliseconds: 300),
+      child: InkWell(
+      onTap: likesBusy ? null : () {
         _handleLikes();
       },
       child: Row(
@@ -251,7 +255,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
           ),
         ],
       ),
-    );
+    ),);
   }
 
   void _handleLikes() {

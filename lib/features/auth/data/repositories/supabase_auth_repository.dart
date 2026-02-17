@@ -57,4 +57,14 @@ class SupabaseAuthRepository extends AuthRepository {
       return Result.error(InvalidLoginException());
     }
   }
+
+  @override
+  Future<Result<bool, Exception>> resetPassword(String email) async {
+    try {
+      await _provider.client.auth.resetPasswordForEmail(email);
+      return Result.success(true);
+    } catch (exception) {
+      return Result.error(PasswordResetException());
+    }
+  }
 }

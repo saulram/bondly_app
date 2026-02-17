@@ -4,6 +4,7 @@ import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:ficonsax/ficonsax.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -72,18 +73,21 @@ class _MyDataScreenState extends State<MyDataScreen> {
           Expanded(
               child: Stack(
                 children: [
+                  IgnorePointer(
+                    child: Center(
+                      child: Text(
+                        StringsProfile.myData,
+                        style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+                      ),
+                    ),
+                  ),
                   IconButton(
                     icon: const Icon(
                       IconsaxOutline.arrow_left,
                       color: Colors.white,
                     ),
                     onPressed: () => context.pop(),
-                  ),
-                  Center(
-                    child: Text(
-                      StringsProfile.myData,
-                      style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
-                    ),
+                    tooltip: 'Regresar',
                   ),
                 ],
               )
@@ -116,8 +120,8 @@ class _MyDataScreenState extends State<MyDataScreen> {
             )
         ),
         width: double.infinity,
-        child: model.busy ? CircularProgressIndicator.adaptive(
-          backgroundColor: theme.unselectedWidgetColor,
+        child: model.busy ? const Center(
+          child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
         )
             : Container(
           margin: const EdgeInsets.symmetric(

@@ -3,10 +3,11 @@ import 'package:bondly_app/config/strings_login.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
+import 'package:bondly_app/features/auth/ui/screens/forgot_password_screen.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/main/ui/extensions/device_scale.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
@@ -60,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
         l.i("state ${viewModel.state.toString()}");
         switch (viewModel.state) {
           case LoadingLogin _:
-            return const Center(child: CupertinoActivityIndicator());
+            return LoginSkeletonLoader(screenWidth: screenWidth);
           case SuccessLogin _:
             return Container();
           case FailedLogin error:
@@ -218,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
           margin: EdgeInsets.only(top: 8.dp),
           child: TextButton(
             onPressed: () {
-              Logger().w("Forgot password pressed");
+              model.navigation.go(ForgotPasswordScreen.route);
             },
             child: const Text(
               LoginStrings.forgotPassword,

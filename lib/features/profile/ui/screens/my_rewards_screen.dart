@@ -8,7 +8,9 @@ import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
 import 'package:bondly_app/features/profile/ui/screens/shopping_cart_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
+import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -66,15 +68,13 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                   const SizedBox(
                     width: 5,
                   ),
-                  SizedBox(
-                    width: 15,
-                    height: 15,
-                    child: isLoading
-                        ? const CircularProgressIndicator.adaptive()
-                        : Text(
-                            "${rewardsModel.cartItems.length}",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                  AnimatedOpacity(
+                    opacity: isLoading ? 0.4 : 1.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      "${rewardsModel.cartItems.length}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
@@ -83,7 +83,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: rewardsModel.rewardList.rewards!.isEmpty
                   ? const Center(
-                      child: CircularProgressIndicator.adaptive(),
+                      child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
                     )
                   : Column(
                       children: [
@@ -91,7 +91,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                           height: 50,
                           child: rewardsModel.rewardList.rewards!.isEmpty
                               ? const Center(
-                                  child: CircularProgressIndicator.adaptive(),
+                                  child: BondlyShimmerBlock(width: double.infinity, height: 40, borderRadius: 20),
                                 )
                               : ListView.builder(
                                   scrollDirection: Axis.horizontal,
@@ -130,8 +130,10 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                           height: 10,
                         ),
                         rewardsModel.busy
-                            ? const Center(
-                                child: CircularProgressIndicator.adaptive(),
+                            ? const Expanded(
+                                child: Center(
+                                  child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
+                                ),
                               )
                             : Expanded(
                                 child: ListView.builder(
@@ -295,7 +297,7 @@ class RewardCardImage extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               image: DecorationImage(
                 image: CachedNetworkImageProvider(
-                  reward.imageUrl!,
+                  safeImageUrl(reward.imageUrl),
                 ),
                 fit: BoxFit.cover,
               ),

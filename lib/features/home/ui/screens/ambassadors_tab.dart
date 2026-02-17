@@ -1,3 +1,4 @@
+import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
                                     image: NetworkImage(
-                                        "https://api.bondly.mx/${model.embassys[index].badgeId!.image!}"),
+                                        safeImageUrl(model.embassys[index].badgeId?.image)),
                                   ),
                                 ),
                               ),

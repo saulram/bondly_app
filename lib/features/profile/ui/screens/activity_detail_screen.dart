@@ -4,6 +4,7 @@ import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/single_post_widget.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/activity_detail_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 
@@ -67,7 +68,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
 
   Widget _showLoading() {
     return const Center(
-      child: CircularProgressIndicator(),
+      child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
     );
   }
 

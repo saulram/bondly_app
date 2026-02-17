@@ -4,8 +4,10 @@ import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
+import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -180,7 +182,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
               height: size.height * .6,
               child: rewardsModel.busy
                   ? const Center(
-                      child: CircularProgressIndicator.adaptive(),
+                      child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
                     )
                   : rewardsModel.userCart.rewards.isEmpty
                       ? Center(
@@ -318,7 +320,7 @@ class CartItemTile extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           image: DecorationImage(
-            image: CachedNetworkImageProvider(item.reward.imageUrl ?? ''),
+            image: CachedNetworkImageProvider(safeImageUrl(item.reward.imageUrl)),
             fit: BoxFit.cover,
           ),
         ),

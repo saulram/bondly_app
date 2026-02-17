@@ -37,9 +37,10 @@ class _BondlySliverLayoutState extends State<BondlySliverLayout> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
-                leading: GestureDetector(
-                  onTap: context.pop,
-                  child: const Icon(
+                leading: IconButton(
+                  onPressed: () => context.pop(),
+                  tooltip: 'Regresar',
+                  icon: const Icon(
                     IconsaxOutline.arrow_left,
                   ),
                 ),

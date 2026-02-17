@@ -12,6 +12,7 @@ import 'package:bondly_app/features/profile/ui/screens/my_data_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_rewards_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/selectable_menu_option.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +82,7 @@ class ProfileScreenState extends State<ProfileScreen> {
       height: headerHeight,
       margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       child: model.busy
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: BondlyShimmerBlock(width: 180, height: 180, borderRadius: 12))
           : Column(
               children: [
                 _buildGreetingAndAvatar(theme, model),
@@ -104,21 +105,23 @@ class ProfileScreenState extends State<ProfileScreen> {
           Expanded(
               child: Stack(
             children: [
+              IgnorePointer(
+                child: Center(
+                  child: Text(
+                    StringsProfile.profileTitle,
+                    style:
+                        theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+                  ),
+                ),
+              ),
               IconButton(
                 icon: const Icon(
                   IconsaxOutline.arrow_left,
                   color: Colors.white,
                 ),
                 onPressed: () => context.pop(),
+                tooltip: 'Regresar',
               ),
-              Center(
-                child: Text(
-                  StringsProfile.profileTitle,
-                  style:
-                      theme.textTheme.titleLarge!.copyWith(color: Colors.white),
-                ),
-              ),
-
             ],
           ))
         ],

@@ -1,3 +1,4 @@
+import 'package:bondly_app/features/auth/ui/screens/forgot_password_screen.dart';
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/activity_detail_screen.dart';
@@ -24,6 +25,9 @@ class AppRouter {
       ),
       GoRoute(
           path: LoginScreen.route, builder: (context, state) => const LoginScreen()),
+      GoRoute(
+          path: ForgotPasswordScreen.route,
+          builder: (context, state) => const ForgotPasswordScreen()),
       GoRoute(
           path: HomeScreen.route,
           builder: (context, state) => const HomeScreen()),

@@ -7,6 +7,7 @@ import 'package:bondly_app/features/profile/ui/screens/activity_detail_screen.da
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/user_activity_item.dart';
 import 'package:bondly_app/ui/shared/app_body_layout.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -61,9 +62,10 @@ class _MyActivityScreenState
                 headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                   return <Widget>[
                     SliverAppBar(
-                        leading: GestureDetector(
-                          onTap: context.pop,
-                          child: const Icon(
+                        leading: IconButton(
+                          onPressed: () => context.pop(),
+                          tooltip: 'Regresar',
+                          icon: const Icon(
                             IconsaxOutline.arrow_left,
                           ),
                         ),
@@ -139,7 +141,7 @@ class _MyActivityScreenState
                           return Container(
                               margin: const EdgeInsets.only(top: 16),
                               child: model.notificationMessage.isEmpty && model.busy
-                                  ? const Center(child: CircularProgressIndicator())
+                                  ? const Center(child: BondlyShimmerBlock(width: 40, height: 40, borderRadius: 20))
                                   : Container());
                         }),
                   ),

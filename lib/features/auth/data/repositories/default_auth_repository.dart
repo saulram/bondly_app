@@ -30,4 +30,14 @@ class DefaultAuthRepository extends AuthRepository {
       return Result.error(InvalidLoginException());
     }
   }
+
+  @override
+  Future<Result<bool, Exception>> resetPassword(String email) async {
+    try {
+      await _authAPI.resetPassword(email);
+      return Result.success(true);
+    } catch (exception) {
+      return Result.error(PasswordResetException());
+    }
+  }
 }

@@ -1,6 +1,8 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
+import 'package:bondly_app/src/network_image_helpers.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_carousel/infinite_carousel.dart';
 
@@ -43,7 +45,7 @@ class _BannersCarouselState extends State<BannersCarousel> {
         children: [
           widget.imageUris!.isEmpty
               ? const Center(
-                  child: CircularProgressIndicator.adaptive(),
+                  child: BondlyShimmerBlock(width: 300, height: 120, borderRadius: 15),
                 )
               : InfiniteCarousel.builder(
                   itemCount: widget.imageUris!.length,
@@ -71,7 +73,7 @@ class _BannersCarouselState extends State<BannersCarousel> {
                           borderRadius: BorderRadius.circular(15),
                           child: CachedNetworkImage(
                             imageUrl:
-                                "https://api.bondly.mx/${widget.imageUris![index]}",
+                                safeImageUrl(widget.imageUris![index]),
                             fit: BoxFit.fill,
                             alignment: Alignment.topLeft,
                           ),

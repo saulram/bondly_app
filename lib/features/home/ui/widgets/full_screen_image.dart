@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
@@ -36,9 +37,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
               child: widget.isFile
                   ? Image.file(widget.imageFile!)
                   : CachedNetworkImage(
-                      imageUrl: widget.image.contains("http")
-                          ? widget.image
-                          : "https://api.bondly.mx/${widget.image}",
+                      imageUrl: safeImageUrl(widget.image),
                       fit: BoxFit.contain,
                     ),
             ),

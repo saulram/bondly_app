@@ -5,6 +5,7 @@ import 'package:bondly_app/features/profile/domain/models/account_statement_mode
 import 'package:bondly_app/features/profile/ui/viewmodels/account_statement_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
 import 'package:ficonsax/ficonsax.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -31,7 +32,7 @@ class MonthlyBalanceScreen extends StatelessWidget {
                 ),
                 model.busy
                     ? const Center(
-                        child: CircularProgressIndicator.adaptive(),
+                        child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
                       )
                     : Expanded(
                         child: Column(
