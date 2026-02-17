@@ -5,6 +5,8 @@ import 'package:bondly_app/features/auth/domain/usecases/login_state_usecase.dar
 import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/forgot_password_usecase.dart';
+import 'package:bondly_app/features/auth/ui/viewmodels/forgot_password_viewmodel.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
@@ -41,7 +43,7 @@ import 'package:bondly_app/src/app_services.dart';
 import 'package:bondly_app/src/routes.dart';
 
 class ViewModelProvider {
-  static provide() {
+  static void provide() {
     getIt.registerSingleton<AppRouter>(AppRouter());
 
     getIt.registerSingleton<NavigationModel>(NavigationModel());
@@ -81,6 +83,12 @@ class ViewModelProvider {
         getIt<GetLoginStateUseCase>(),
         getIt<UserUseCase>(),
         getIt<SessionTokenHandler>(),
+      );
+    });
+
+    getIt.registerFactory<ForgotPasswordViewModel>(() {
+      return ForgotPasswordViewModel(
+        getIt<ForgotPasswordUseCase>(),
       );
     });
 

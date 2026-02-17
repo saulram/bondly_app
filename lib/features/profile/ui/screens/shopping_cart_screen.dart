@@ -1,11 +1,14 @@
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_cart.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
+import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -86,9 +89,9 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     await model.checkOutCart();
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
+                    backgroundColor: WidgetStateProperty.all<Color>(
                         Theme.of(context).secondaryHeaderColor),
-                    textStyle: MaterialStateProperty.all<TextStyle>(
+                    textStyle: WidgetStateProperty.all<TextStyle>(
                       Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: Theme.of(context).secondaryHeaderColor,
                           ),
@@ -176,11 +179,11 @@ class _MyCartScreenState extends State<MyCartScreen> {
               label: const Text(StringsCart.confirm),
             ),
             child: Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(AppDimensions.spacingMd),
               height: size.height * .6,
               child: rewardsModel.busy
                   ? const Center(
-                      child: CircularProgressIndicator.adaptive(),
+                      child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
                     )
                   : rewardsModel.userCart.rewards.isEmpty
                       ? Center(
@@ -255,7 +258,7 @@ class CartListFooter extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusRound),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -282,7 +285,7 @@ class CartListHeader extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusRound),
       ),
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -316,9 +319,9 @@ class CartItemTile extends StatelessWidget {
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
           image: DecorationImage(
-            image: CachedNetworkImageProvider(item.reward.imageUrl ?? ''),
+            image: CachedNetworkImageProvider(safeImageUrl(item.reward.imageUrl)),
             fit: BoxFit.cover,
           ),
         ),

@@ -5,6 +5,7 @@ import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dar
 import 'package:bondly_app/features/auth/domain/repositories/users_repository.dart';
 import 'package:bondly_app/features/auth/domain/usecases/get_login_companies_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_state_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/forgot_password_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
@@ -46,6 +47,10 @@ class UseCaseProvider {
   static void provide() {
     getIt.registerSingleton<LoginUseCase>(
       LoginUseCase(getIt<AuthRepository>()),
+    );
+
+    getIt.registerSingleton<ForgotPasswordUseCase>(
+      ForgotPasswordUseCase(getIt<AuthRepository>()),
     );
 
     getIt.registerSingleton<GetCompaniesUseCase>(

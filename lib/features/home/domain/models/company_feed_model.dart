@@ -18,6 +18,12 @@ class CompanyFeed {
 
     return CompanyFeed(success: json['success'], data: feedDataList);
   }
+
+  factory CompanyFeed.fromSupabase(List<Map<String, dynamic>> rows) {
+    List<FeedData> feedDataList =
+        rows.map((feed) => FeedData.fromSupabase(feed)).toList();
+    return CompanyFeed(success: true, data: feedDataList);
+  }
 }
 
 class FeedData {
@@ -87,6 +93,49 @@ class FeedData {
         visible: json['visible'],
         isLiked: json['userLike'] ?? false,
         image: json['image']);
+  }
+
+  factory FeedData.fromSupabase(Map<String, dynamic> json) {
+    List<Comment> comments = [];
+    if (json['feed_comments'] != null) {
+      comments = (json['feed_comments'] as List)
+          .map((c) => Comment.fromSupabase(c))
+          .toList();
+    }
+
+    List<Like> likes = [];
+    if (json['feed_likes'] != null) {
+      likes = (json['feed_likes'] as List)
+          .map((l) => Like.fromSupabase(l))
+          .toList();
+    }
+
+    Badge? badge;
+    if (json['badge'] != null) {
+      badge = Badge.fromSupabase(json['badge']);
+    }
+
+    return FeedData(
+      id: json['id'],
+      account: json['account'],
+      header: json['header'] ?? '',
+      body: json['body'] ?? '',
+      footer: json['footer'],
+      sender: Sender.fromSupabase(json['sender'] ?? {}),
+      type: json['type'] ?? '',
+      badge: badge,
+      comments: comments,
+      likes: likes,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
+      visible: json['visible'] ?? true,
+      isLiked: json['user_like'] ?? false,
+      image: json['image'],
+    );
   }
 }
 
@@ -160,6 +209,29 @@ class Sender {
               : StringsMain.baseImagesUrl + json["avatar"].toString(),
     );
   }
+
+  factory Sender.fromSupabase(Map<String, dynamic> json) {
+    return Sender(
+      id: json['id'] ?? '',
+      completeName: json['complete_name'] ?? '',
+      employeeNumber: json['employee_number'] ?? 0,
+      role: json['role'],
+      createdAt: json['created_at'],
+      accountNumber: json['account_number'],
+      accountHolder: json['account_holder'],
+      email: json['email'] ?? '',
+      isActive: json['is_active'] ?? false,
+      seats: json['seats'] ?? 0,
+      planType: json['plan_type'],
+      monthlyPoints: json['monthly_points'],
+      accountType: json['account_type'],
+      companyName: json['company_name'],
+      giftedPoints: json['gifted_points'],
+      pointsReceived: json['points_received'],
+      visible: json['visible'] ?? false,
+      avatar: json['avatar'],
+    );
+  }
 }
 
 class Comment {
@@ -183,6 +255,17 @@ class Comment {
       id: json['_id'],
     );
   }
+
+  factory Comment.fromSupabase(Map<String, dynamic> json) {
+    return Comment(
+      user: json['user'] != null
+          ? Sender.fromSupabase(json['user'])
+          : Sender.fromSupabase({}),
+      message: json['message'],
+      timeStamp: json['created_at'],
+      id: json['id'],
+    );
+  }
 }
 
 class Like {
@@ -193,6 +276,12 @@ class Like {
   factory Like.fromJson(Map<String, dynamic> json) {
     return Like(
       id: json['_id'],
+    );
+  }
+
+  factory Like.fromSupabase(Map<String, dynamic> json) {
+    return Like(
+      id: json['id'],
     );
   }
 }

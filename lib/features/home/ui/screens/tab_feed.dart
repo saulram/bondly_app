@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 class FeedTab extends StatefulWidget {
   final HomeViewModel model;
-  const FeedTab({Key? key, required this.model}) : super(key: key);
+  const FeedTab({super.key, required this.model});
 
   @override
-  _FeedTabState createState() => _FeedTabState();
+  State<FeedTab> createState() => _FeedTabState();
 }
 
 class _FeedTabState extends State<FeedTab> {

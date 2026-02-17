@@ -13,7 +13,7 @@ class AmbassadorsAPI {
     lineLength: 220,
     colors: true,
     printEmojis: true,
-    printTime: false,
+    dateTimeFormat: DateTimeFormat.none,
   ));
 
   AmbassadorsAPI(this._callsHandler);

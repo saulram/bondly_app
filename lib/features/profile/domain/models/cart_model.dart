@@ -1,5 +1,3 @@
-import 'package:logger/logger.dart';
-
 class UserCart {
   final String id;
   final String userId;
@@ -21,10 +19,26 @@ class UserCart {
     this.total = 0,
   });
 
-  factory UserCart.fromJson(Map<String, dynamic> json) {
-    Logger log = Logger(
-      printer: PrettyPrinter(methodCount: 0),
+  factory UserCart.fromSupabase(Map<String, dynamic> json) {
+    List<CartItem> rewards = <CartItem>[];
+    if (json['cart_items'] != null) {
+      rewards = List<CartItem>.from(
+          json['cart_items'].map((item) => CartItem.fromSupabase(item)));
+    }
+
+    return UserCart(
+      id: json['id'] ?? '',
+      userId: json['user_id'] ?? '',
+      rewards: rewards,
+      type: json['type'] ?? '',
+      companyName: json['company_name'] ?? '',
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+      total: json['total'] ?? 0,
     );
+  }
+
+  factory UserCart.fromJson(Map<String, dynamic> json) {
     List<CartItem> rewards = <CartItem>[];
     if (json['rewards'] != null) {
       rewards = List<CartItem>.from(
@@ -75,6 +89,14 @@ class CartItem {
       reward: Reward.fromJson(json['reward']),
       quantity: json['quantity'],
       id: json['_id'],
+    );
+  }
+
+  factory CartItem.fromSupabase(Map<String, dynamic> json) {
+    return CartItem(
+      reward: Reward.fromSupabase(json['reward'] ?? {}),
+      quantity: json['quantity'] ?? 0,
+      id: json['id'] ?? '',
     );
   }
 }
@@ -131,6 +153,30 @@ class Reward {
       updatedAt:
           json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
       imageUrl: json['imageUrl'],
+    );
+  }
+
+  factory Reward.fromSupabase(Map<String, dynamic> json) {
+    return Reward(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      category: json['category'] ?? '',
+      points: json['points'] ?? 0,
+      image: json['image'] ?? '',
+      deadline:
+          json["deadline"] == null ? null : DateTime.parse(json["deadline"]),
+      companyName: json['company_name'] ?? '',
+      enable: json['enable'] ?? true,
+      visible: json['visible'] ?? true,
+      likes: json['likes'] != null ? List<dynamic>.from(json['likes']) : [],
+      createdAt: json["created_at"] == null
+          ? null
+          : DateTime.parse(json["created_at"]),
+      updatedAt: json["updated_at"] == null
+          ? null
+          : DateTime.parse(json["updated_at"]),
+      imageUrl: json['image_url'],
     );
   }
 }

@@ -1,9 +1,11 @@
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/single_post_widget.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/activity_detail_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 
@@ -67,7 +69,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
 
   Widget _showLoading() {
     return const Center(
-      child: CircularProgressIndicator(),
+      child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
     );
   }
 
@@ -76,15 +78,8 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
       decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).cardColor),
           color: Theme.of(context).dividerColor,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ]
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+          boxShadow: AppDimensions.cardShadow(Theme.of(context).colorScheme.onSurface),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
       width: double.infinity,

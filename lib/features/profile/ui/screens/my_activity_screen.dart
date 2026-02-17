@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -7,6 +8,7 @@ import 'package:bondly_app/features/profile/ui/screens/activity_detail_screen.da
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/user_activity_item.dart';
 import 'package:bondly_app/ui/shared/app_body_layout.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +29,6 @@ class _MyActivityScreenState
   bool addMargin = false;
 
   double top = 0.0;
-  String _value = "";
 
   @override
   bool get wantKeepAlive => true;
@@ -61,9 +62,10 @@ class _MyActivityScreenState
                 headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                   return <Widget>[
                     SliverAppBar(
-                        leading: GestureDetector(
-                          onTap: context.pop,
-                          child: const Icon(
+                        leading: IconButton(
+                          onPressed: () => context.pop(),
+                          tooltip: 'Regresar',
+                          icon: const Icon(
                             IconsaxOutline.arrow_left,
                           ),
                         ),
@@ -139,7 +141,7 @@ class _MyActivityScreenState
                           return Container(
                               margin: const EdgeInsets.only(top: 16),
                               child: model.notificationMessage.isEmpty && model.busy
-                                  ? const Center(child: CircularProgressIndicator())
+                                  ? const Center(child: BondlyShimmerBlock(width: 40, height: 40, borderRadius: 20))
                                   : Container());
                         }),
                   ),
@@ -157,7 +159,7 @@ class _MyActivityScreenState
                   decoration: BoxDecoration(
                       color: theme.dividerColor,
                       border: Border.all(color: AppColors.secondaryColor),
-                      borderRadius: BorderRadius.circular(16.0)),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
                   child: Text(
                     model.notificationMessage,
                     style:
@@ -195,54 +197,15 @@ class _MyActivityScreenState
         children: [
           Text(
             StringsProfile.myActivityHeader,
-            style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+            style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
           ),
           const SizedBox(height: 12.0),
           Text(
             StringsProfile.myActivitySubHeader,
             style: theme.textTheme.labelLarge!
-                .copyWith(height: 1.4, fontSize: 16.0, color: Colors.white),
+                .copyWith(height: 1.4, fontSize: 16.0, color: theme.colorScheme.onPrimary),
           )
         ],
-      ),
-    );
-  }
-
-  Container _buildChips(ThemeData theme) {
-    List<String> options = [
-      'Puntos',
-      'Recompensas',
-      'Social',
-    ];
-
-    return Container(
-      color: theme.scaffoldBackgroundColor,
-      height: 60.0,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: List<Widget>.generate(
-          options.length,
-          (int index) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 12.0),
-              child: ChoiceChip(
-                backgroundColor: AppColors.secondaryColor,
-                selectedColor: AppColors.tertiaryColor,
-                label: Text(
-                  options[index],
-                  style: theme.textTheme.headlineSmall!.copyWith(
-                      color: AppColors.backgroundColor, fontSize: 18.0),
-                ),
-                selected: _value == options[index],
-                onSelected: (bool selected) {
-                  setState(() {
-                    _value = selected ? options[index] : "";
-                  });
-                },
-              ),
-            );
-          },
-        ).toList(),
       ),
     );
   }
@@ -272,29 +235,5 @@ class _MyActivityScreenState
           }
         }
     );
-  }
-}
-
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverAppBarDelegate(this._header);
-
-  final Container _header;
-
-  @override
-  double get minExtent => _header.constraints?.maxHeight ?? 60;
-  @override
-  double get maxExtent => _header.constraints?.maxHeight ?? 60;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      child: _header,
-    );
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
   }
 }

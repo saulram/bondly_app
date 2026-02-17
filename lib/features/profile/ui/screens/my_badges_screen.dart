@@ -6,6 +6,7 @@ import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart
 import 'package:bondly_app/features/profile/ui/viewmodels/bondly_badges_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/badges_grid.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 
@@ -70,37 +71,28 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
                   flex: 1,
                   child: viewModel.busy
                       ? const Center(
-                          child: CircularProgressIndicator.adaptive())
+                          child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12))
                       : PageView(
                           controller: viewModel.scrollController,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GoldBorderedContainer(
-                                child: BadgesGrid(
-                                    size: size,
-                                    embassys: viewModel.bondlyBadges.embassys,
-                                    type: BadgeType.embassys),
+                            _buildBadgePage(
+                              child: BadgesGrid(
+                                  size: size,
+                                  embassys: viewModel.bondlyBadges.embassys,
+                                  type: BadgeType.embassys),
+                            ),
+                            _buildBadgePage(
+                              child: BadgesGrid(
+                                size: size,
+                                myBadges: viewModel.bondlyBadges.myBadges,
+                                type: BadgeType.myBadges,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GoldBorderedContainer(
-                                child: BadgesGrid(
-                                  size: size,
-                                  myBadges: viewModel.bondlyBadges.myBadges,
-                                  type: BadgeType.myBadges,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GoldBorderedContainer(
-                                child: BadgesGrid(
-                                  size: size,
-                                  categories: viewModel.bondlyBadges.categories,
-                                  type: BadgeType.categories,
-                                ),
+                            _buildBadgePage(
+                              child: BadgesGrid(
+                                size: size,
+                                categories: viewModel.bondlyBadges.categories,
+                                type: BadgeType.categories,
                               ),
                             ),
                           ],
@@ -137,15 +129,24 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
         children: [
           Text(
             "Insignas Bondly",
-            style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+            style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
           ),
           const SizedBox(height: 12.0),
           Text(
             StringsProfile.bondlyBadgesSubHeader,
             style: theme.textTheme.labelLarge!
-                .copyWith(height: 1.4, fontSize: 16.0, color: Colors.white),
+                .copyWith(height: 1.4, fontSize: 16.0, color: theme.colorScheme.onPrimary),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildBadgePage({required Widget child}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GoldBorderedContainer(
+        child: child,
       ),
     );
   }

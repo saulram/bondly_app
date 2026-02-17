@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -12,6 +13,7 @@ import 'package:bondly_app/features/profile/ui/screens/my_data_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_rewards_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/selectable_menu_option.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +83,7 @@ class ProfileScreenState extends State<ProfileScreen> {
       height: headerHeight,
       margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
       child: model.busy
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: BondlyShimmerBlock(width: 180, height: 180, borderRadius: 12))
           : Column(
               children: [
                 _buildGreetingAndAvatar(theme, model),
@@ -104,21 +106,23 @@ class ProfileScreenState extends State<ProfileScreen> {
           Expanded(
               child: Stack(
             children: [
+              IgnorePointer(
+                child: Center(
+                  child: Text(
+                    StringsProfile.profileTitle,
+                    style:
+                        theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
+                  ),
+                ),
+              ),
               IconButton(
-                icon: const Icon(
+                icon: Icon(
                   IconsaxOutline.arrow_left,
-                  color: Colors.white,
+                  color: theme.colorScheme.onPrimary,
                 ),
                 onPressed: () => context.pop(),
+                tooltip: 'Regresar',
               ),
-              Center(
-                child: Text(
-                  StringsProfile.profileTitle,
-                  style:
-                      theme.textTheme.titleLarge!.copyWith(color: Colors.white),
-                ),
-              ),
-
             ],
           ))
         ],
@@ -133,7 +137,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           child: Text(
             StringsProfile.welcomeGreeting(
                 model.user?.completeName ?? StringsProfile.defaultUser),
-            style: theme.textTheme.headlineSmall!.copyWith(color: Colors.white),
+            style: theme.textTheme.headlineSmall!.copyWith(color: theme.colorScheme.onPrimary),
           ),
         ),
         Stack(
@@ -172,9 +176,9 @@ class ProfileScreenState extends State<ProfileScreen> {
                 key: const Key("EditContainer"),
                 width: 40.0,
                 height: 40.0,
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(24))),
+                decoration: BoxDecoration(
+                    color: theme.colorScheme.onPrimary,
+                    borderRadius: BorderRadius.all(Radius.circular(AppDimensions.radiusXl))),
                 child: IconButton(
                     key: const Key("EditButton"),
                     onPressed: () {
@@ -202,14 +206,14 @@ class ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               model.user?.pointsReceived.toString() ?? "0",
-              style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+              style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
             ),
             const SizedBox(
               height: 8,
             ),
             Text(
               StringsProfile.receivedPoints,
-              style: theme.textTheme.bodyLarge!.copyWith(color: Colors.white),
+              style: theme.textTheme.bodyLarge!.copyWith(color: theme.colorScheme.onPrimary),
               textAlign: TextAlign.center,
             ),
           ],
@@ -220,14 +224,14 @@ class ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               model.user?.monthlyPoints.toString() ?? "0",
-              style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+              style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
             ),
             const SizedBox(
               height: 8,
             ),
             Text(
               StringsProfile.monthlyPoints,
-              style: theme.textTheme.bodyLarge!.copyWith(color: Colors.white),
+              style: theme.textTheme.bodyLarge!.copyWith(color: theme.colorScheme.onPrimary),
               textAlign: TextAlign.center,
             ),
           ],
@@ -238,14 +242,14 @@ class ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               model.user?.giftedPoints.toString() ?? "0",
-              style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+              style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
             ),
             const SizedBox(
               height: 8,
             ),
             Text(
               StringsProfile.givenPoints,
-              style: theme.textTheme.bodyLarge!.copyWith(color: Colors.white),
+              style: theme.textTheme.bodyLarge!.copyWith(color: theme.colorScheme.onPrimary),
               textAlign: TextAlign.center,
             ),
           ],
@@ -369,6 +373,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> showOptions() async {
+    final cs = Theme.of(context).colorScheme;
     showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
@@ -381,7 +386,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                 style: Theme.of(context)
                     .textTheme
                     .titleLarge!
-                    .copyWith(color: Colors.white),
+                    .copyWith(color: cs.onPrimary),
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -396,7 +401,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                   style: Theme.of(context)
                       .textTheme
                       .titleLarge!
-                      .copyWith(color: Colors.white)),
+                      .copyWith(color: cs.onPrimary)),
               onPressed: () {
                 Navigator.of(context).pop();
                 getImageFromCamera();

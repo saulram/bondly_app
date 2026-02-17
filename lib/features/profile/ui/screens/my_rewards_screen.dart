@@ -1,4 +1,4 @@
-import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -8,7 +8,9 @@ import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
 import 'package:bondly_app/features/profile/ui/screens/shopping_cart_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
+import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -43,20 +45,21 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
             floatingActionButton: FloatingActionButton(
               isExtended: true,
               onPressed: () async {
+                final navigator = GoRouter.of(context);
                 if (!rewardsModel.cartEdited) {
-                  context.push(MyCartScreen.route);
+                  navigator.push(MyCartScreen.route);
                   return;
                 }
                 setState(() {
                   isLoading = true;
                 });
 
-                rewardsModel.sendItemsToCart().then((cartUpdated) {
-                  setState(() {
-                    isLoading = false;
-                  });
-                  context.push(MyCartScreen.route);
+                await rewardsModel.sendItemsToCart();
+                if (!mounted) return;
+                setState(() {
+                  isLoading = false;
                 });
+                navigator.push(MyCartScreen.route);
               },
               tooltip: "Carrito",
               child: Row(
@@ -66,15 +69,13 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                   const SizedBox(
                     width: 5,
                   ),
-                  SizedBox(
-                    width: 15,
-                    height: 15,
-                    child: isLoading
-                        ? const CircularProgressIndicator.adaptive()
-                        : Text(
-                            "${rewardsModel.cartItems.length}",
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                  AnimatedOpacity(
+                    opacity: isLoading ? 0.4 : 1.0,
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      "${rewardsModel.cartItems.length}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
@@ -83,7 +84,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: rewardsModel.rewardList.rewards!.isEmpty
                   ? const Center(
-                      child: CircularProgressIndicator.adaptive(),
+                      child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
                     )
                   : Column(
                       children: [
@@ -91,7 +92,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                           height: 50,
                           child: rewardsModel.rewardList.rewards!.isEmpty
                               ? const Center(
-                                  child: CircularProgressIndicator.adaptive(),
+                                  child: BondlyShimmerBlock(width: double.infinity, height: 40, borderRadius: 20),
                                 )
                               : ListView.builder(
                                   scrollDirection: Axis.horizontal,
@@ -115,11 +116,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                                                   .textTheme
                                                   .bodyMedium
                                                   ?.copyWith(
-                                                      color: context.isDarkMode
-                                                          ? AppColors
-                                                              .tertiaryColor
-                                                          : AppColors
-                                                              .tertiaryColorLight)),
+                                                      color: Theme.of(context).colorScheme.tertiary)),
                                         ),
                                       ),
                                     );
@@ -130,8 +127,10 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                           height: 10,
                         ),
                         rewardsModel.busy
-                            ? const Center(
-                                child: CircularProgressIndicator.adaptive(),
+                            ? const Expanded(
+                                child: Center(
+                                  child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
+                                ),
                               )
                             : Expanded(
                                 child: ListView.builder(
@@ -213,7 +212,7 @@ class RewardFooterCardSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -292,10 +291,10 @@ class RewardCardImage extends StatelessWidget {
           aspectRatio: 1,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
               image: DecorationImage(
                 image: CachedNetworkImageProvider(
-                  reward.imageUrl!,
+                  safeImageUrl(reward.imageUrl),
                 ),
                 fit: BoxFit.cover,
               ),
@@ -328,9 +327,7 @@ class RewardCardHeader extends StatelessWidget {
             reward.enable == false
                 ? IconsaxOutline.lock
                 : IconsaxOutline.unlock,
-            color: context.isDarkMode
-                ? AppColors.tertiaryColorLight
-                : AppColors.tertiaryColor),
+            color: Theme.of(context).colorScheme.tertiary),
         SizedBox(width: size.width * .4),
         //To be fixed, if item exist in cart, show the quantity and a + and - button to add or remove.
         //If not, show a button to add to cart.

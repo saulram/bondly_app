@@ -72,6 +72,15 @@ class Announcement {
             : DateTime.parse(json["createdAt"]),
       );
 
+  factory Announcement.fromSupabase(Map<String, dynamic> json) => Announcement(
+        id: json["id"],
+        title: json["title"],
+        content: json["content"],
+        createdAt: json["created_at"] == null
+            ? null
+            : DateTime.parse(json["created_at"]),
+      );
+
   Map<String, dynamic> toJson() => {
         "_id": id,
         "title": title,

@@ -39,4 +39,16 @@ class AuthAPI {
       throw InvalidLoginException();
     }
   }
+
+  Future<void> resetPassword(String email) async {
+    try {
+      await _callsHandler.post(
+        path: "users/reset-password/",
+        data: {"email": email},
+      );
+    } catch (exception) {
+      Logger().e(exception.toString());
+      throw PasswordResetException();
+    }
+  }
 }

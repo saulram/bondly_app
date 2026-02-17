@@ -5,12 +5,14 @@ import 'package:bondly_app/dependencies/service_provider.dart';
 import 'package:bondly_app/dependencies/storage_objects_provider.dart';
 import 'package:bondly_app/dependencies/usecase_provider.dart';
 import 'package:bondly_app/dependencies/viewmodel_provider.dart';
+import 'package:bondly_app/src/supabase_client_provider.dart';
 import 'package:get_it/get_it.dart';
 
 GetIt getIt = GetIt.I;
 
 class DependencyManager {
   Future<void> initialize() async {
+    getIt.registerSingleton<SupabaseClientProvider>(SupabaseClientProvider());
     await StorageObjectsProvider.provide();
     HandlersProvider.provide();
     APIProvider.provide();

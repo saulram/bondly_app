@@ -34,4 +34,18 @@ class UserActivityItem {
     required this.updatedAt,
     required this.type,
   });
+
+  factory UserActivityItem.fromSupabase(Map<String, dynamic> json) {
+    return UserActivityItem(
+      id: json['id'] ?? '',
+      userId: json['user_id'] ?? '',
+      feedId: json['feed_id'] ?? '',
+      title: json['title'] ?? '',
+      content: json['content'] ?? '',
+      read: json['read'] ?? false,
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+      type: json['type'] ?? '',
+    );
+  }
 }

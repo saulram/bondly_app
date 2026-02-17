@@ -25,4 +25,15 @@ class Badge {
       isActive: json['isActive'],
     );
   }
+
+  factory Badge.fromSupabase(Map<String, dynamic> json) {
+    return Badge(
+      id: json['id'],
+      categoryId: json['category_id'],
+      name: json['name'],
+      image: json['image'],
+      value: json['value'] ?? 0,
+      isActive: json['is_active'] ?? true,
+    );
+  }
 }

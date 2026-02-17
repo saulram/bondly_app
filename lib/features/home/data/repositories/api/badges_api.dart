@@ -13,7 +13,7 @@ class BadgesAPI {
     lineLength: 220,
     colors: true,
     printEmojis: true,
-    printTime: false,
+    dateTimeFormat: DateTimeFormat.none,
   ));
 
   BadgesAPI(this._callsHandler);

@@ -1,9 +1,9 @@
-import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:ficonsax/ficonsax.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -48,7 +48,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
       model: _model,
       child: ModelBuilder<ProfileViewModel>(
         builder: (context, model, child) => Scaffold(
-          backgroundColor: AppColors.secondaryColor,
+          backgroundColor: theme.colorScheme.secondary,
           body: Column(
             children: [
               SafeArea(
@@ -72,18 +72,21 @@ class _MyDataScreenState extends State<MyDataScreen> {
           Expanded(
               child: Stack(
                 children: [
+                  IgnorePointer(
+                    child: Center(
+                      child: Text(
+                        StringsProfile.myData,
+                        style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
+                      ),
+                    ),
+                  ),
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       IconsaxOutline.arrow_left,
-                      color: Colors.white,
+                      color: theme.colorScheme.onPrimary,
                     ),
                     onPressed: () => context.pop(),
-                  ),
-                  Center(
-                    child: Text(
-                      StringsProfile.myData,
-                      style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
-                    ),
+                    tooltip: 'Regresar',
                   ),
                 ],
               )
@@ -116,8 +119,8 @@ class _MyDataScreenState extends State<MyDataScreen> {
             )
         ),
         width: double.infinity,
-        child: model.busy ? CircularProgressIndicator.adaptive(
-          backgroundColor: theme.unselectedWidgetColor,
+        child: model.busy ? const Center(
+          child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
         )
             : Container(
           margin: const EdgeInsets.symmetric(
