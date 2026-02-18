@@ -1,14 +1,12 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_home.dart';
+import 'package:bondly_app/ui/shared/badge_icon_button.dart';
 import 'package:bondly_app/ui/shared/tag_pill.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-
-/// Determines which badge gradient palette to use.
-enum FeedBadgeType { competencia, especial, valor }
 
 /// Data for a single comment preview shown inside the expanded post card.
 class FeedCommentData {
@@ -29,7 +27,7 @@ class FeedPostCard extends StatelessWidget {
   // Badge banner
   final String? badgeName;
   final String? badgeCategory;
-  final FeedBadgeType badgeType;
+  final BadgeType badgeType;
   final IconData? badgeIcon;
 
   // Author
@@ -67,7 +65,7 @@ class FeedPostCard extends StatelessWidget {
     super.key,
     this.badgeName,
     this.badgeCategory,
-    this.badgeType = FeedBadgeType.competencia,
+    this.badgeType = BadgeType.competencias,
     this.badgeIcon,
     required this.userName,
     this.userAvatarUrl,
@@ -545,19 +543,19 @@ class FeedPostCard extends StatelessWidget {
 
   // ─── Helpers ────────────────────────────────────────────────────────
 
-  static List<Color> _gradientColorsForType(FeedBadgeType type) {
+  static List<Color> _gradientColorsForType(BadgeType type) {
     switch (type) {
-      case FeedBadgeType.competencia:
+      case BadgeType.competencias:
         return const [
           BondlyColors.badgeCompetenciasStart,
           BondlyColors.badgeCompetenciasEnd,
         ];
-      case FeedBadgeType.especial:
+      case BadgeType.especiales:
         return const [
           BondlyColors.badgeEspecialesStart,
           BondlyColors.badgeEspecialesEnd,
         ];
-      case FeedBadgeType.valor:
+      case BadgeType.valores:
         return const [
           BondlyColors.badgeValoresStart,
           BondlyColors.badgeValoresEnd,
@@ -565,13 +563,13 @@ class FeedPostCard extends StatelessWidget {
     }
   }
 
-  static IconData _defaultIconForType(FeedBadgeType type) {
+  static IconData _defaultIconForType(BadgeType type) {
     switch (type) {
-      case FeedBadgeType.competencia:
+      case BadgeType.competencias:
         return LucideIcons.award;
-      case FeedBadgeType.especial:
+      case BadgeType.especiales:
         return LucideIcons.star;
-      case FeedBadgeType.valor:
+      case BadgeType.valores:
         return LucideIcons.shieldCheck;
     }
   }

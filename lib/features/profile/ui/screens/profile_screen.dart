@@ -512,6 +512,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   // ─── Logout Dialog ──────────────────────────────────────────────────
 
   void _showLogoutDialog(BondlyColorScheme colors, ProfileViewModel model) {
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(

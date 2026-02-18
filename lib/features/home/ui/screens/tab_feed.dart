@@ -6,6 +6,7 @@ import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
 import 'package:bondly_app/src/network_image_helpers.dart';
+import 'package:bondly_app/ui/shared/badge_icon_button.dart';
 import 'package:bondly_app/ui/shared/feed_post_card.dart';
 import 'package:bondly_app/ui/shared/slider_banner_card.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +53,9 @@ class _FeedTabState extends State<FeedTab> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     final posts = model.feeds.data;
+
+    // Dispose controllers for posts no longer in the list to avoid leaks.
+    _pruneStaleControllers(posts);
 
     if (posts.isEmpty) {
       return RefreshIndicator(
@@ -241,6 +245,17 @@ class _FeedTabState extends State<FeedTab> {
 
   // ─── Helpers ──────────────────────────────────────────────────────────
 
+  void _pruneStaleControllers(List<FeedData> posts) {
+    final activeIds = posts.map((p) => p.id ?? '').toSet();
+    final staleKeys = _commentControllers.keys
+        .where((key) => !activeIds.contains(key))
+        .toList();
+    for (final key in staleKeys) {
+      _commentControllers[key]?.dispose();
+      _commentControllers.remove(key);
+    }
+  }
+
   Future<void> _handleLike(FeedData post) async {
     final postId = post.id;
     if (postId == null) return;
@@ -271,13 +286,13 @@ class _FeedTabState extends State<FeedTab> {
     }
   }
 
-  static FeedBadgeType _resolveBadgeType(String type) {
+  static BadgeType _resolveBadgeType(String type) {
     final lower = type.toLowerCase();
-    if (lower.contains('especial')) return FeedBadgeType.especial;
+    if (lower.contains('especial')) return BadgeType.especiales;
     if (lower.contains('valor') || lower.contains('embajada')) {
-      return FeedBadgeType.valor;
+      return BadgeType.valores;
     }
-    return FeedBadgeType.competencia;
+    return BadgeType.competencias;
   }
 
   static String _resolveBadgeCategory(String type) {

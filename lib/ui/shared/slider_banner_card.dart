@@ -44,6 +44,7 @@ class _SliderBannerCardState extends State<SliderBannerCard> {
   void _startAutoPlay() {
     if (widget.items.length <= 1) return;
     _autoPlayTimer = Timer.periodic(widget.autoPlayDuration, (_) {
+      if (!mounted) return;
       final next = (_currentPage + 1) % widget.items.length;
       _pageController.animateToPage(
         next,
