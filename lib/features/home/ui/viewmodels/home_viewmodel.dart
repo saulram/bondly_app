@@ -368,11 +368,12 @@ class HomeViewModel extends NavigationModel {
     }
   }
 
-  Future<bool> submitAcknowledgmentDirect(String message) async {
+  /// Returns `null` on success, or the error message on failure.
+  Future<String?> submitAcknowledgmentDirect(String message) async {
     if (selectedBadge == null ||
         message.trim().isEmpty ||
         collaboratorsIds.isEmpty) {
-      return false;
+      return 'Datos incompletos';
     }
     creatingAcknowledgment = true;
     final result = await _createAcknowledgmentUseCase.invoke(
@@ -380,18 +381,18 @@ class HomeViewModel extends NavigationModel {
       message.trim(),
       collaboratorsIds,
     );
-    bool success = false;
+    String? errorMessage;
     result.when((s) {
-      success = true;
       getCompanyFeeds();
       collaboratorsIds = [];
       selectedCategory = null;
       selectedBadge = null;
     }, (error) {
       log.e(error.toString());
+      errorMessage = error.toString();
     });
     creatingAcknowledgment = false;
-    return success;
+    return errorMessage;
   }
 
   CarouselSliderController carouselController = CarouselSliderController();

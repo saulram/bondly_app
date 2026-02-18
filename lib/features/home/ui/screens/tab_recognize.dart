@@ -6,6 +6,7 @@ import 'package:bondly_app/config/strings_home.dart';
 import 'package:bondly_app/features/home/domain/models/badge_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/ui/shared/badge_icon_button.dart' show BadgeType;
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:bondly_app/ui/shared/info_card.dart';
 import 'package:bondly_app/ui/shared/slider_banner_card.dart';
 import 'package:flutter/material.dart' hide Badge;
@@ -153,9 +154,12 @@ class _RecognizeTabState extends State<RecognizeTab> {
     }
   }
 
+  bool get _isLoading => model.user == null;
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<BondlyColorScheme>()!;
+    if (_isLoading) return _buildSkeletonState(colors);
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -164,6 +168,97 @@ class _RecognizeTabState extends State<RecognizeTab> {
           _buildPointsSection(colors),
           const SizedBox(height: 20),
         ],
+      ),
+    );
+  }
+
+  // ─── Skeleton Loading State ─────────────────────────────────────────
+
+  Widget _buildSkeletonState(BondlyColorScheme colors) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.paddingScreen,
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            // Slider banner placeholder
+            const BondlyShimmerBlock(
+              width: double.infinity,
+              height: 160,
+              borderRadius: 16,
+            ),
+            const SizedBox(height: 12),
+            // Avisos card placeholder
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.radiusCard),
+                border: Border.all(color: colors.border, width: 1),
+              ),
+              child: const Row(
+                children: [
+                  BondlyShimmerCircle(size: 32),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BondlyShimmerBlock(width: 80, height: 12),
+                        SizedBox(height: 8),
+                        BondlyShimmerBlock(
+                          width: double.infinity,
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Points card placeholder
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.radiusCard),
+                border: Border.all(color: colors.border, width: 1),
+              ),
+              child: Column(
+                children: [
+                  // Points value
+                  const BondlyShimmerBlock(width: 100, height: 32),
+                  const SizedBox(height: 6),
+                  const BondlyShimmerBlock(width: 180, height: 12),
+                  const SizedBox(height: 20),
+                  Divider(color: colors.border, height: 1),
+                  const SizedBox(height: 14),
+                  // Subtitle
+                  const BondlyShimmerBlock(width: 140, height: 12),
+                  const SizedBox(height: 16),
+                  // 3 category circles
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _CategoryCircleSkeleton(),
+                      _CategoryCircleSkeleton(),
+                      _CategoryCircleSkeleton(),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Cost info row
+                  const BondlyShimmerBlock(width: 200, height: 10),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -810,17 +905,21 @@ class _RecognizeTabState extends State<RecognizeTab> {
   }
 
   Future<void> _handleSend() async {
-    final success =
-        await model.submitAcknowledgmentDirect(_messageController.text);
+    final personName = _selectedPerson?['display'] as String? ?? '';
+    final personId = _selectedPerson?['user_id'] as String? ?? '';
+    final taggedMessage =
+        '@[$personName]($personId) ${_messageController.text}';
+    final error =
+        await model.submitAcknowledgmentDirect(taggedMessage);
     if (!mounted) return;
-    if (success) {
+    if (error == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(StringsHome.acknowledgmentSuccess)),
       );
       _resetToStep1();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(StringsHome.acknowledgmentError)),
+        SnackBar(content: Text(error)),
       );
     }
   }
@@ -1010,6 +1109,22 @@ class _RecognizeTabState extends State<RecognizeTab> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _CategoryCircleSkeleton extends StatelessWidget {
+  const _CategoryCircleSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        BondlyShimmerCircle(size: 56),
+        SizedBox(height: 8),
+        BondlyShimmerBlock(width: 60, height: 10),
+      ],
     );
   }
 }
