@@ -40,7 +40,7 @@ class PointsCard extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.montserrat(
                   fontSize: 36,
                   fontWeight: FontWeight.w800,
                   color: colors.accent,
@@ -49,7 +49,7 @@ class PointsCard extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 valueLabel,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.montserrat(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: colors.textSecondary,
@@ -62,7 +62,7 @@ class PointsCard extends StatelessWidget {
             Text(
               description!,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.montserrat(
                 fontSize: 13,
                 color: colors.textMuted,
               ),
@@ -76,7 +76,7 @@ class PointsCard extends StatelessWidget {
               Text(
                 subtitle!,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
+                style: GoogleFonts.montserrat(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: colors.textSecondary,

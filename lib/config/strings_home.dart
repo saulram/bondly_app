@@ -29,6 +29,14 @@ class StringsHome {
   static const String badgeEspeciales = 'Especiales';
   static const String badgeValores = 'Valores';
 
+  // Feed
+  static const String feedTagRecognition = 'Reconocimiento';
+  static const String feedLike = 'Me gusta';
+  static const String feedComment = 'Comentar';
+  static const String feedEmptyTitle = 'No hay reconocimientos aún';
+  static const String feedEmptyBody =
+      'Sé el primero en reconocer a un compañero';
+
   // Acknowledgment
   static const String acknowledgMentInputHint = 'Escribe tu reconocimiento';
   static const String acknowledgmentInputButtonText = 'Reconocer';

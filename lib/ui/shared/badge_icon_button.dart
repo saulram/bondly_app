@@ -43,7 +43,7 @@ class BadgeIconButton extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             label,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.montserrat(
               fontSize: 11,
               fontWeight: FontWeight.w600,
               color: colors.textSecondary,
@@ -60,19 +60,28 @@ class BadgeIconButton extends StatelessWidget {
         return const LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [BondlyColors.badgeCompetenciasStart, BondlyColors.badgeCompetenciasEnd],
+          colors: [
+            BondlyColors.badgeCompetenciasStart,
+            BondlyColors.badgeCompetenciasEnd
+          ],
         );
       case BadgeType.especiales:
         return const LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [BondlyColors.badgeEspecialesStart, BondlyColors.badgeEspecialesEnd],
+          colors: [
+            BondlyColors.badgeEspecialesStart,
+            BondlyColors.badgeEspecialesEnd
+          ],
         );
       case BadgeType.valores:
         return const LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [BondlyColors.badgeValoresStart, BondlyColors.badgeValoresEnd],
+          colors: [
+            BondlyColors.badgeValoresStart,
+            BondlyColors.badgeValoresEnd
+          ],
         );
     }
   }

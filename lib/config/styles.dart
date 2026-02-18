@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class AppStyles {
   // Text
-  static const fontFamily = "Inter";
+  static const fontFamily = "Montserrat";
 
   static TextStyle baseTextStyle = const TextStyle(
       color: BondlyColors.lightTextPrimary, fontFamily: fontFamily);

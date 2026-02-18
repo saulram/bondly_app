@@ -30,15 +30,13 @@ class BondlyBottomTabBar extends StatelessWidget {
   }) : items = items ??
             const [
               BondlyTabItem(
-                  icon: LucideIcons.layoutGrid,
-                  label: StringsHome.tabFeed),
+                  icon: LucideIcons.layoutGrid, label: StringsHome.tabFeed),
               BondlyTabItem(
                   icon: LucideIcons.crown,
                   label: StringsHome.tabRecognize,
                   isCenterAction: true),
               BondlyTabItem(
-                  icon: LucideIcons.trophy,
-                  label: StringsHome.tabBadges),
+                  icon: LucideIcons.trophy, label: StringsHome.tabBadges),
             ];
 
   @override
@@ -86,7 +84,7 @@ class BondlyBottomTabBar extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               item.label,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.montserrat(
                 fontSize: 11,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
                 color: isActive ? colors.tabActive : colors.tabInactive,
@@ -135,7 +133,7 @@ class BondlyBottomTabBar extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               item.label,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.montserrat(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
                 color: isActive ? colors.tabActive : colors.tabInactive,

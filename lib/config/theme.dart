@@ -26,7 +26,7 @@ class AppTheme extends ChangeNotifier {
       surfaceContainerHighest: bondly.surfaceElevated,
     );
 
-    final baseTextTheme = GoogleFonts.interTextTheme(
+    final baseTextTheme = GoogleFonts.montserratTextTheme(
       ThemeData(brightness: brightness).textTheme,
     );
 
@@ -101,7 +101,7 @@ class AppTheme extends ChangeNotifier {
         color: bondly.accent,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        counterStyle: GoogleFonts.inter(
+        counterStyle: GoogleFonts.montserrat(
           color: bondly.textMuted,
           fontWeight: FontWeight.w300,
         ),
@@ -144,7 +144,7 @@ class AppTheme extends ChangeNotifier {
           fixedSize: const Size(150, 48),
           side: BorderSide(color: bondly.accent),
           foregroundColor: bondly.accent,
-          textStyle: GoogleFonts.inter(
+          textStyle: GoogleFonts.montserrat(
             fontWeight: FontWeight.w700,
             fontSize: 16,
           ),
@@ -158,7 +158,7 @@ class AppTheme extends ChangeNotifier {
           fixedSize: const Size(250, 48),
           foregroundColor: BondlyColors.white,
           backgroundColor: bondly.accent,
-          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w700),
+          textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
         ),
       ),
       extensions: [bondly],

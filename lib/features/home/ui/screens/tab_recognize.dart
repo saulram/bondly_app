@@ -6,7 +6,6 @@ import 'package:bondly_app/ui/shared/badge_icon_button.dart';
 import 'package:bondly_app/ui/shared/info_card.dart';
 import 'package:bondly_app/ui/shared/points_card.dart';
 import 'package:bondly_app/ui/shared/slider_banner_card.dart';
-import 'package:bondly_app/ui/shared/slider_dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -63,7 +62,12 @@ class RecognizeTab extends StatelessWidget {
   // ─── Avisos Section ───────────────────────────────────────────────────
 
   Widget _buildAvisosSection(BondlyColorScheme colors) {
-    final hasAnnouncements = model.announcements.isNotEmpty;
+    final bodies = model.announcements.isNotEmpty
+        ? model.announcements
+            .map((a) => a.content ?? '')
+            .where((c) => c.isNotEmpty)
+            .toList()
+        : [StringsHome.announcementDefaultBody];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -75,19 +79,7 @@ class RecognizeTab extends StatelessWidget {
       child: InfoCard(
         icon: LucideIcons.megaphone,
         title: StringsHome.announcementTitle,
-        body: hasAnnouncements
-            ? model.announcements[model.currentAnnouncementIndex].content ?? ''
-            : StringsHome.announcementDefaultBody,
-        footer: hasAnnouncements && model.announcements.length > 1
-            ? Center(
-                child: SliderDotsIndicator(
-                  count: model.announcements.length,
-                  activeIndex: model.currentAnnouncementIndex,
-                  activeColor: colors.accent,
-                  inactiveColor: colors.border,
-                ),
-              )
-            : null,
+        bodies: bodies,
       ),
     );
   }

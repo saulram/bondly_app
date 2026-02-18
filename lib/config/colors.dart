@@ -70,8 +70,8 @@ class BondlyColors {
   static const Color darkSurfaceElevated = Color(0xFF2A2A40);
 
   static const Color darkTextPrimary = Color(0xFFF5F5F8);
-  static const Color darkTextSecondary = Color(0xFFA0A0B8);
-  static const Color darkTextMuted = Color(0xFF6B6B80);
+  static const Color darkTextSecondary = Color(0xFFCBCBEA);
+  static const Color darkTextMuted = Color(0xFFB9B9BC);
 
   static const Color darkAccent = Color(0xFF9B7FFF);
   static const Color darkAccentGradientStart = Color(0xFFa78bfa);

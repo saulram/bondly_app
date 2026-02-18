@@ -53,7 +53,7 @@ class BondlyHeader extends StatelessWidget {
           // "bondly" text
           Text(
             StringsMain.appBrand,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.montserrat(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: colors.accent,

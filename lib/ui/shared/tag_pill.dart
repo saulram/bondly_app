@@ -32,7 +32,7 @@ class TagPill extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: GoogleFonts.inter(
+        style: GoogleFonts.montserrat(
           fontSize: fontSize,
           fontWeight: FontWeight.w600,
           color: textColor ?? colors.tagText,

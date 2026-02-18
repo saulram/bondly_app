@@ -94,7 +94,7 @@ class _SliderBannerCardState extends State<SliderBannerCard> {
                     if (item.tag != null) const SizedBox(height: 10),
                     Text(
                       item.title,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.montserrat(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: BondlyColors.white,
@@ -105,7 +105,7 @@ class _SliderBannerCardState extends State<SliderBannerCard> {
                       const SizedBox(height: 6),
                       Text(
                         item.subtitle!,
-                        style: GoogleFonts.inter(
+                        style: GoogleFonts.montserrat(
                           fontSize: 13,
                           color: BondlyColors.white.withValues(alpha: 0.8),
                         ),

@@ -56,7 +56,7 @@ class NotificationsScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             StringsNotifications.title,
-            style: GoogleFonts.inter(
+            style: GoogleFonts.montserrat(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: colors.textPrimary,
@@ -117,7 +117,7 @@ class NotificationsScreen extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               StringsNotifications.emptyTitle,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.montserrat(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: colors.textPrimary,
@@ -127,7 +127,7 @@ class NotificationsScreen extends StatelessWidget {
             Text(
               StringsNotifications.emptyBody,
               textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
+              style: GoogleFonts.montserrat(
                 fontSize: 14,
                 color: colors.textMuted,
                 height: 1.4,
@@ -196,7 +196,7 @@ class _NotificationTile extends StatelessWidget {
               children: [
                 Text(
                   item.title,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.montserrat(
                     fontSize: 14,
                     fontWeight: item.isRead ? FontWeight.w400 : FontWeight.w600,
                     color: colors.textPrimary,
@@ -207,7 +207,7 @@ class _NotificationTile extends StatelessWidget {
                   item.body,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.montserrat(
                     fontSize: 13,
                     color: colors.textSecondary,
                     height: 1.4,
@@ -216,7 +216,7 @@ class _NotificationTile extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   item.timeAgo,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.montserrat(
                     fontSize: 11,
                     color: colors.textMuted,
                   ),
