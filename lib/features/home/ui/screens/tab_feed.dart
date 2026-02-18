@@ -4,7 +4,6 @@ import 'package:bondly_app/config/strings_home.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
-import 'package:bondly_app/features/home/ui/widgets/post_coments_widget.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
 import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:bondly_app/ui/shared/feed_post_card.dart';
@@ -25,14 +24,28 @@ class FeedTab extends StatefulWidget {
 class _FeedTabState extends State<FeedTab> {
   HomeViewModel get model => widget.model;
 
-  /// Track which posts have their comments section expanded.
-  final Set<String> _expandedComments = {};
-
   /// Track which posts have a like request in progress.
   final Set<String> _likesInProgress = {};
 
+  /// Track which posts have their comments list expanded.
+  final Set<String> _expandedComments = {};
+
+  /// Track which posts have a comment submission in progress.
+  final Set<String> _commentBusy = {};
+
+  /// One TextEditingController per post for the inline comment field.
+  final Map<String, TextEditingController> _commentControllers = {};
+
   Future<void> _onRefresh() async {
     await model.getCompanyFeeds();
+  }
+
+  @override
+  void dispose() {
+    for (final c in _commentControllers.values) {
+      c.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -158,7 +171,22 @@ class _FeedTabState extends State<FeedTab> {
   Widget _buildPostCard(FeedData post, int index, BondlyColorScheme colors) {
     final badgeType = _resolveBadgeType(post.type);
     final postId = post.id ?? index.toString();
-    final isExpanded = _expandedComments.contains(postId);
+
+    // Ensure a controller exists for this post
+    _commentControllers.putIfAbsent(postId, () => TextEditingController());
+
+    // Build comments preview (last 2)
+    final previewComments = post.comments
+        .take(2)
+        .map((c) => FeedCommentData(
+              userName: c.user.completeName.trim(),
+              userAvatarUrl: safeImageUrl(c.user.avatar, isAvatar: true),
+              timeAgo: _formatTimeAgo(c.timeStamp),
+              message: c.message ?? '',
+            ))
+        .toList();
+
+    final currentUserAvatar = model.user?.avatar;
 
     return FeedPostCard(
       // Badge
@@ -186,26 +214,28 @@ class _FeedTabState extends State<FeedTab> {
       isLiked: post.isLiked ?? false,
       isLikeBusy: _likesInProgress.contains(postId),
       onLikeTap: () => _handleLike(post),
-      onCommentTap: () {
-        setState(() {
-          if (isExpanded) {
-            _expandedComments.remove(postId);
-          } else {
-            _expandedComments.add(postId);
-          }
-        });
-      },
-      onShareTap: () {
-        // TODO: Implement native share sheet
-      },
-      // Comments
-      commentsSection: isExpanded
-          ? PostCommentsWidget(
-              comments: post.comments,
-              feedId: post.id!,
-              feedIndex: index,
-            )
+      onCommentTap: post.comments.isNotEmpty
+          ? () {
+              setState(() {
+                if (_expandedComments.contains(postId)) {
+                  _expandedComments.remove(postId);
+                } else {
+                  _expandedComments.add(postId);
+                }
+              });
+            }
           : null,
+      // Comments preview
+      showComments: _expandedComments.contains(postId),
+      commentsPreview: previewComments,
+      onViewAllCommentsTap: null,
+      // Comment input
+      currentUserAvatarUrl: currentUserAvatar != null && currentUserAvatar.isNotEmpty
+          ? safeImageUrl(currentUserAvatar, isAvatar: true)
+          : null,
+      commentController: _commentControllers[postId],
+      isCommentBusy: _commentBusy.contains(postId),
+      onSendComment: () => _handleSendComment(postId, index),
     );
   }
 
@@ -221,6 +251,22 @@ class _FeedTabState extends State<FeedTab> {
     } finally {
       if (mounted) {
         setState(() => _likesInProgress.remove(postId));
+      }
+    }
+  }
+
+  Future<void> _handleSendComment(String postId, int feedIndex) async {
+    final controller = _commentControllers[postId];
+    if (controller == null || controller.text.trim().isEmpty) return;
+
+    final text = controller.text.trim();
+    setState(() => _commentBusy.add(postId));
+    try {
+      await getIt<HomeViewModel>().createComment(postId, text, feedIndex);
+      controller.clear();
+    } finally {
+      if (mounted) {
+        setState(() => _commentBusy.remove(postId));
       }
     }
   }
@@ -246,5 +292,16 @@ class _FeedTabState extends State<FeedTab> {
   static String _formatDate(DateTime date) {
     final moment = Moment(date.toLocal());
     return moment.format('DD MMM YYYY');
+  }
+
+  static String _formatTimeAgo(String? timestamp) {
+    if (timestamp == null) return '';
+    try {
+      final date = DateTime.parse(timestamp);
+      final moment = Moment(date.toLocal());
+      return moment.fromNow(dropPrefixOrSuffix: true);
+    } catch (_) {
+      return '';
+    }
   }
 }

@@ -36,6 +36,12 @@ class StringsHome {
   static const String feedEmptyTitle = 'No hay reconocimientos aún';
   static const String feedEmptyBody =
       'Sé el primero en reconocer a un compañero';
+  static const String feedCommentPlaceholder = 'Escribe un comentario...';
+
+  static String feedLikeCount(int count) => '$count me gusta';
+  static String feedCommentCount(int count) => '$count comentarios';
+  static String feedViewAllComments(int count) =>
+      'Ver los $count comentarios';
 
   // Acknowledgment
   static const String acknowledgMentInputHint = 'Escribe tu reconocimiento';

@@ -40,8 +40,9 @@ class _PostCommentsWidgetState extends State<PostCommentsWidget> {
   Widget _buildCommentsHeader() {
     var theme = Theme.of(context);
 
-    return SizedBox(
-      height: 65,
+    return Container(
+      margin: EdgeInsets.only(left: 4),
+      height: 64,
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         CircleAvatar(
           backgroundImage: getIt<HomeViewModel>().user!.avatar != null
