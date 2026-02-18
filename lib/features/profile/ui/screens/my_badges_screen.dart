@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -71,7 +72,8 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
                   flex: 1,
                   child: viewModel.busy
                       ? const Center(
-                          child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12))
+                          child: BondlyShimmerBlock(
+                              width: 200, height: 200, borderRadius: 12))
                       : PageView(
                           controller: viewModel.scrollController,
                           children: [
@@ -107,6 +109,7 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
   }
 
   Widget _buildHeaderCard(ThemeData theme) {
+    final colors = theme.extension<BondlyColorScheme>()!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
@@ -115,27 +118,21 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
         right: 12.0,
       ),
       decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.secondaryColor,
-              theme.primaryColor,
-            ],
-          ),
+          gradient: AppDimensions.accentGradient(colors),
           borderRadius: const BorderRadius.all(Radius.circular(20.0))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "Insignas Bondly",
-            style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
+            style:
+                theme.textTheme.titleLarge!.copyWith(color: BondlyColors.white),
           ),
           const SizedBox(height: 12.0),
           Text(
             StringsProfile.bondlyBadgesSubHeader,
-            style: theme.textTheme.labelLarge!
-                .copyWith(height: 1.4, fontSize: 16.0, color: theme.colorScheme.onPrimary),
+            style: theme.textTheme.labelLarge!.copyWith(
+                height: 1.4, fontSize: 16.0, color: BondlyColors.white),
           )
         ],
       ),

@@ -12,8 +12,6 @@ class UpdateUserAvatarUseCase {
       throw UserUpdateException();
     }
 
-    await remoteRepository.updateAvatar(
-      [userId, file]
-    );
+    await remoteRepository.updateAvatar([userId, file]);
   }
 }

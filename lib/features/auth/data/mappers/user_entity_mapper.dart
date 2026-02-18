@@ -2,9 +2,7 @@ import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/storage/data/local/entities/user_entity.dart';
 
 class UserEntityMapper {
-  User map({
-    required UserEntity from
-  }) {
+  User map({required UserEntity from}) {
     return User(
         rewards: null,
         id: from.id,
@@ -24,8 +22,7 @@ class UserEntityMapper {
         giftedPoints: from.giftedPoints,
         pointsReceived: from.pointsReceived,
         isVisible: from.isVisible,
-        token: from.token
-    );
+        token: from.token);
   }
 
   UserEntity mapReverse(User from) {
@@ -47,8 +44,6 @@ class UserEntityMapper {
         giftedPoints: from.giftedPoints,
         pointsReceived: from.pointsReceived,
         isVisible: from.isVisible,
-        token: from.token
-    );
+        token: from.token);
   }
-
 }

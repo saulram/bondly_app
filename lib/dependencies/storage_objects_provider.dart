@@ -9,7 +9,7 @@ class StorageObjectsProvider {
     getIt.registerSingleton<SharedPreferences>(sharedPreferences);
 
     getIt.registerSingletonAsync<AppDatabase>(
-            () async => $FloorAppDatabase.databaseBuilder('bondly.db').build());
+        () async => $FloorAppDatabase.databaseBuilder('bondly.db').build());
 
     getIt.registerSingletonWithDependencies<UsersDao>(() {
       return getIt<AppDatabase>().usersDao;

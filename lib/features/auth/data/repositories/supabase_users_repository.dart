@@ -56,22 +56,19 @@ class SupabaseUsersRepository extends UsersRepository {
       if (userId == null) throw UserUnavailableException();
 
       final fileBytes = params.first;
-      final fileName = params.length > 1
-          ? params.last as String
-          : 'avatar_$userId.jpg';
+      final fileName =
+          params.length > 1 ? params.last as String : 'avatar_$userId.jpg';
 
       await _provider.client.storage
           .from('avatars')
           .uploadBinary(fileName, fileBytes);
 
-      final publicUrl = _provider.client.storage
-          .from('avatars')
-          .getPublicUrl(fileName);
+      final publicUrl =
+          _provider.client.storage.from('avatars').getPublicUrl(fileName);
 
       await _provider.client
           .from('users')
-          .update({'avatar': publicUrl})
-          .eq('id', userId);
+          .update({'avatar': publicUrl}).eq('id', userId);
     } catch (exception) {
       throw UserUpdateException();
     }

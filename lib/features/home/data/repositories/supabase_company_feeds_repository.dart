@@ -218,8 +218,7 @@ class SupabaseCompanyFeedsRepository extends CompanyFeedsRepository {
           .order('created_at', ascending: false);
 
       final announcements = (response as List)
-          .map((row) =>
-              Announcement.fromSupabase(row as Map<String, dynamic>))
+          .map((row) => Announcement.fromSupabase(row as Map<String, dynamic>))
           .toList();
 
       return Result.success(Announcements(announcement: announcements));

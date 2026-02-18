@@ -3,20 +3,22 @@ import 'package:flutter/material.dart';
 
 class AppServices {
   void showSnackbar(GlobalKey<ScaffoldState> scaffoldKey, String msg) {
-    ScaffoldMessenger.of(scaffoldKey.currentContext!).showSnackBar(
+    final context = scaffoldKey.currentContext!;
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(milliseconds: 5000),
         showCloseIcon: true,
-        closeIconColor: AppColors.bodyColorDark,
+        closeIconColor: BondlyColors.white,
         content: Text(
           msg,
           style: const TextStyle(
-            color: AppColors.bodyColorDark,
+            color: BondlyColors.white,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: AppColors.secondaryColor,
+        backgroundColor: colors.accent,
       ),
     );
   }

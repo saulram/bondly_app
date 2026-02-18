@@ -23,11 +23,7 @@ class DefaultUsersRepository extends UsersRepository {
         return Result.error(UserUnavailableException());
       }
 
-      return Result.success(
-        _userMapper.map(
-          from: userEntity
-        )
-      );
+      return Result.success(_userMapper.map(from: userEntity));
     } catch (exception) {
       return Result.error(UserUnavailableException());
     }
@@ -57,5 +53,4 @@ class DefaultUsersRepository extends UsersRepository {
   Future<void> updateProfile(Map<String, String> data) {
     throw UnimplementedError();
   }
-
 }

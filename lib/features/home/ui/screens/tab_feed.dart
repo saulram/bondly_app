@@ -1,7 +1,14 @@
 import 'package:bondly_app/features/ai/ui/widgets/feed_personalization_banner.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
-import 'package:bondly_app/features/home/ui/widgets/single_post_widget.dart';
+import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
+import 'package:bondly_app/src/network_image_helpers.dart';
+import 'package:bondly_app/ui/shared/badge_icon_button.dart';
+import 'package:bondly_app/ui/shared/feed_post_card.dart';
+import 'package:bondly_app/ui/shared/slider_banner_card.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import 'package:moment_dart/moment_dart.dart';
 
 class FeedTab extends StatefulWidget {
   final HomeViewModel model;
@@ -12,58 +19,223 @@ class FeedTab extends StatefulWidget {
 }
 
 class _FeedTabState extends State<FeedTab> {
-  late HomeViewModel model;
+  HomeViewModel get model => widget.model;
+
+  /// Track which posts have a like request in progress.
+  final Set<String> _likesInProgress = {};
+
+  /// Track which posts have their comments list expanded.
+  final Set<String> _expandedComments = {};
+
+  /// Track which posts have a comment submission in progress.
+  final Set<String> _commentBusy = {};
+
+  /// One TextEditingController per post for the inline comment field.
+  final Map<String, TextEditingController> _commentControllers = {};
+
+  Future<void> _onRefresh() async {
+    await model.getCompanyFeeds();
+  }
+
   @override
-  void initState() {
-    model = widget.model;
-    super.initState();
+  void dispose() {
+    for (final c in _commentControllers.values) {
+      c.dispose();
+    }
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SingleChildScrollView(
-        child: Column(
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
+    final posts = model.feeds.data;
+
+    // Dispose controllers for posts no longer in the list to avoid leaks.
+    _pruneStaleControllers(posts);
+
+    if (posts.isEmpty) {
+      return RefreshIndicator(
+        color: colors.accent,
+        onRefresh: _onRefresh,
+        child: ListView(
           children: [
-            FeedPersonalizationBanner(
-              isPersonalized: model.isPersonalized,
-              isLoading: model.personalizingFeed,
-              onToggle: () {
-                model.toggleFeedPersonalization();
-              },
+            _buildSliderSection(),
+            const SizedBox(height: 12),
+            _buildEmptyState(colors),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      color: colors.accent,
+      onRefresh: _onRefresh,
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: posts.length + 1, // +1 for the slider header
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return Column(
+              children: [
+                _buildSliderSection(),
+                const SizedBox(height: 12),
+              ],
+            );
+          }
+
+          final post = posts[index - 1];
+          return Padding(
+            padding: EdgeInsets.fromLTRB(
+              AppDimensions.paddingScreen,
+              0,
+              AppDimensions.paddingScreen,
+              index == posts.length ? 20 : 16,
             ),
-            SizedBox(
-              height: 500,
-              child: ListView.builder(
-                itemCount: model.feeds.data.length,
-                itemBuilder: (context, index) {
-                  final post = model.feeds.data[index];
-                  if (index == 0) {
-                    return Column(
-                      children: [
-                        const SizedBox(height: 10),
-                        SinglePostWidget(
-                          post: post,
-                          index: index,
-                        ),
-                      ],
-                    );
-                  }
-                  return Column(
-                    children: [
-                      SinglePostWidget(
-                        post: post,
-                        index: index,
-                      ),
-                    ],
-                  );
-                },
+            child: _buildPostCard(post, index - 1, colors),
+          );
+        },
+      ),
+    );
+  }
+
+  // ─── Slider Section ───────────────────────────────────────────────────
+
+  Widget _buildSliderSection() {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppDimensions.paddingScreen,
+        8,
+        AppDimensions.paddingScreen,
+        0,
+      ),
+      child: SliderBannerCard(
+        items: [
+          BannerItem(
+            tag: StringsHome.bannerTag1,
+            title: StringsHome.bannerTitle1,
+            subtitle: StringsHome.bannerSubtitle1,
+          ),
+          BannerItem(
+            tag: StringsHome.bannerTag2,
+            title: StringsHome.bannerTitle2,
+            subtitle: StringsHome.bannerSubtitle2,
+          ),
+          BannerItem(
+            title: StringsHome.bannerTitle3,
+            subtitle: StringsHome.bannerSubtitle3,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Empty State ──────────────────────────────────────────────────────
+
+  Widget _buildEmptyState(BondlyColorScheme colors) {
+    return SizedBox(
+      height: 300,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              LucideIcons.inbox,
+              size: 48,
+              color: colors.textMuted,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              StringsHome.feedEmptyTitle,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: colors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              StringsHome.feedEmptyBody,
+              style: GoogleFonts.montserrat(
+                fontSize: 13,
+                color: colors.textMuted,
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  // ─── Post Card ────────────────────────────────────────────────────────
+
+  Widget _buildPostCard(FeedData post, int index, BondlyColorScheme colors) {
+    final badgeType = _resolveBadgeType(post.type);
+    final postId = post.id ?? index.toString();
+
+    // Ensure a controller exists for this post
+    _commentControllers.putIfAbsent(postId, () => TextEditingController());
+
+    // Build comments preview (last 2)
+    final previewComments = post.comments
+        .take(2)
+        .map((c) => FeedCommentData(
+              userName: c.user.completeName.trim(),
+              userAvatarUrl: safeImageUrl(c.user.avatar, isAvatar: true),
+              timeAgo: _formatTimeAgo(c.timeStamp),
+              message: c.message ?? '',
+            ))
+        .toList();
+
+    final currentUserAvatar = model.user?.avatar;
+
+    return FeedPostCard(
+      // Badge
+      badgeName: post.badge?.name,
+      badgeCategory: _resolveBadgeCategory(post.type),
+      badgeType: badgeType,
+      // Author
+      userName: post.sender.completeName.trim(),
+      userAvatarUrl: safeImageUrl(post.sender.avatar, isAvatar: true),
+      date: _formatDate(post.createdAt),
+      tag: StringsHome.feedTagRecognition,
+      // Content
+      message: post.body,
+      mentionWidget: PostMentionsWidget(
+        text: post.body,
+        style: GoogleFonts.montserrat(
+          fontSize: 13,
+          color: colors.textSecondary,
+          height: 1.5,
+        ),
+      ),
+      // Actions
+      likeCount: post.likes.length,
+      commentCount: post.comments.length,
+      isLiked: post.isLiked ?? false,
+      isLikeBusy: _likesInProgress.contains(postId),
+      onLikeTap: () => _handleLike(post),
+      onCommentTap: post.comments.isNotEmpty
+          ? () {
+              setState(() {
+                if (_expandedComments.contains(postId)) {
+                  _expandedComments.remove(postId);
+                } else {
+                  _expandedComments.add(postId);
+                }
+              });
+            }
+          : null,
+      // Comments preview
+      showComments: _expandedComments.contains(postId),
+      commentsPreview: previewComments,
+      onViewAllCommentsTap: null,
+      // Comment input
+      currentUserAvatarUrl: currentUserAvatar != null && currentUserAvatar.isNotEmpty
+          ? safeImageUrl(currentUserAvatar, isAvatar: true)
+          : null,
+      commentController: _commentControllers[postId],
+      isCommentBusy: _commentBusy.contains(postId),
+      onSendComment: () => _handleSendComment(postId, index),
     );
   }
 }

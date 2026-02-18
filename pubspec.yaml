@@ -47,6 +47,7 @@ dependencies:
   floor: ^1.4.2
   sqflite: ^2.3.0
   ficonsax: ^0.0.3
+  lucide_icons: ^0.257.0
   infinite_carousel: ^1.0.3
   moment_dart: ^5.3.0+1
   image_picker: ^1.0.4

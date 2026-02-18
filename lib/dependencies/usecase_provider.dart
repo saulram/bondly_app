@@ -1,8 +1,4 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
-import 'package:bondly_app/features/ai/domain/repositories/ai_repository.dart';
-import 'package:bondly_app/features/ai/domain/usecases/analyze_sentiment_usecase.dart';
-import 'package:bondly_app/features/ai/domain/usecases/get_reward_recommendations_usecase.dart';
-import 'package:bondly_app/features/ai/domain/usecases/personalize_feed_usecase.dart';
 import 'package:bondly_app/features/auth/data/repositories/default_users_repository.dart';
 import 'package:bondly_app/features/auth/data/repositories/remote_users_repository.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
@@ -164,14 +160,13 @@ class UseCaseProvider {
 
     getIt.registerSingletonWithDependencies<UserProfileUseCase>(
         () => UserProfileUseCase(
-          getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)
-        ),
-      dependsOn: [
-        AppDatabase,
-        UsersDao,
-        InitDependency(UsersRepository, instanceName: RemoteUsersRepository.name)
-      ]
-    );
+            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
+        dependsOn: [
+          AppDatabase,
+          UsersDao,
+          InitDependency(UsersRepository,
+              instanceName: RemoteUsersRepository.name)
+        ]);
 
     getIt.registerSingleton<PersonalizeFeedUseCase>(
         PersonalizeFeedUseCase(getIt<AIRepository>()));

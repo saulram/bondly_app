@@ -14,10 +14,7 @@ class UsersAPI {
   final ApiCallsHandler _callsHandler;
   final UserActivityResponseMapper _activityMapper;
 
-  UsersAPI(
-    this._callsHandler,
-    this._activityMapper
-  );
+  UsersAPI(this._callsHandler, this._activityMapper);
 
   Future<User> getUser() async {
     try {
@@ -34,8 +31,7 @@ class UsersAPI {
       await _callsHandler.sendMultipart(
           method: Methods.PUT.name,
           path: "users/uploadAvatar/$id",
-          file: avatar
-      );
+          file: avatar);
     } catch (exception) {
       Logger().e(exception.toString());
       throw NoConnectionException();
@@ -43,22 +39,15 @@ class UsersAPI {
   }
 
   Future<UserActivityHolder> loadActivity(
-      String id,
-      int limit,
-      int page
-  ) async {
+      String id, int limit, int page) async {
     try {
-      var response = await _callsHandler.get(
-          path: "activity",
-          params: {
-              "user_id": id,
-              "limit": limit.toString(),
-              "page": page.toString(),
-          }
-      );
-      var activityResponse = PaginatedUserActivityResponse.fromJson(
-          json.decode(response.body)
-      );
+      var response = await _callsHandler.get(path: "activity", params: {
+        "user_id": id,
+        "limit": limit.toString(),
+        "page": page.toString(),
+      });
+      var activityResponse =
+          PaginatedUserActivityResponse.fromJson(json.decode(response.body));
 
       if (!activityResponse.success) {
         throw NoConnectionException();
@@ -73,10 +62,8 @@ class UsersAPI {
 
   Future<bool> updateActivity(String activityId) async {
     try {
-      await _callsHandler.put(
-        path: "activity/$activityId",
-        data: {"read": true}
-      );
+      await _callsHandler
+          .put(path: "activity/$activityId", data: {"read": true});
       return true;
     } catch (exception) {
       Logger().e(exception.toString());
@@ -95,15 +82,15 @@ class UsersAPI {
           data["jobPosition"] ?? "",
           data["location"] ?? "",
           DateTime.parse(data["bDay"]),
-          data["_id"] ?? ""
-      );
+          data["_id"] ?? "");
     } catch (exception) {
       Logger().e(exception.toString());
       rethrow;
     }
   }
 
-  Future<void> updateUserProfile(String userId, Map<String, String> data) async {
+  Future<void> updateUserProfile(
+      String userId, Map<String, String> data) async {
     try {
       await _callsHandler.put(path: "userProfile/$userId", data: data);
     } catch (exception) {

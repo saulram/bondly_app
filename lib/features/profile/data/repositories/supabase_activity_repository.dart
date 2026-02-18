@@ -56,8 +56,7 @@ class SupabaseActivityRepository extends ActivityRepository {
     try {
       await _provider.client
           .from('activities')
-          .update({'read': true})
-          .eq('id', activityId);
+          .update({'read': true}).eq('id', activityId);
 
       return Result.success(true);
     } catch (exception) {

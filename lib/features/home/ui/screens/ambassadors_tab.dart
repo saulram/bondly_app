@@ -47,8 +47,8 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
                               child: Container(
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
-                                    image: NetworkImage(
-                                        safeImageUrl(model.embassys[index].badgeId?.image)),
+                                    image: NetworkImage(safeImageUrl(
+                                        model.embassys[index].badgeId?.image)),
                                   ),
                                 ),
                               ),

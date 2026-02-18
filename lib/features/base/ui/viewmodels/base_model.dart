@@ -29,10 +29,11 @@ class NavigationModel extends ContextModel {
     version = packageInfo.version;
     buildNumber = packageInfo.buildNumber;
   }
-  String? _appName ;
-  String? _packageName ;
-  String? _version ;
-  String? _buildNumber ;
+
+  String? _appName;
+  String? _packageName;
+  String? _version;
+  String? _buildNumber;
 
   String? get appName => _appName;
   String? get packageName => _packageName;
@@ -43,18 +44,22 @@ class NavigationModel extends ContextModel {
     _appName = value;
     notifyListeners();
   }
+
   set packageName(String? value) {
     _packageName = value;
     notifyListeners();
   }
+
   set version(String? value) {
     _version = value;
     notifyListeners();
   }
+
   set buildNumber(String? value) {
     _buildNumber = value;
     notifyListeners();
   }
+
   final GoRouter _navigation = getIt<AppRouter>().router;
   GoRouter get navigation => _navigation;
   bool _busy = false;
@@ -63,8 +68,6 @@ class NavigationModel extends ContextModel {
     _busy = value;
     notifyListeners();
   }
-
-
 }
 
 class DebouncedChangeNotifier extends ChangeNotifier {

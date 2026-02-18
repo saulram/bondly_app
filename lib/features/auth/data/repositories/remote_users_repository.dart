@@ -38,7 +38,7 @@ class RemoteUsersRepository extends UsersRepository {
         throw UserUpdateException();
       }
       await _usersApi.updateAvatar(params.first, params.last);
-    } catch(exception) {
+    } catch (exception) {
       rethrow;
     }
   }
