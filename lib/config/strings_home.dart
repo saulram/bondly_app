@@ -54,4 +54,17 @@ class StringsHome {
   static String acknowledgmentAmountOfPoints(String pointsToGive) {
     return 'Tienes $pointsToGive puntos para reconocer a tus compañeros.';
   }
+
+  // 3-Step Recognize Flow
+  static const String step1ChooseBadge = 'Elige una insignia';
+  static const String step1BadgeCostInfo = 'Cada insignia cuesta 10 puntos';
+  static const String step2SearchLabel = 'A quién quieres reconocer?';
+  static const String step2SearchHint = 'Buscar compañero...';
+  static const String step2NoResults = 'No se encontraron resultados';
+  static const String step3WriteLabel = 'Escribe tu reconocimiento';
+  static const String step3SendButton = 'Enviar reconocimiento';
+  static const String acknowledgmentSuccess =
+      'Reconocimiento enviado exitosamente';
+  static const String acknowledgmentError =
+      'Error al enviar reconocimiento';
 }

@@ -310,8 +310,7 @@ class HomeViewModel extends NavigationModel {
             return {
               "id": collaborator.id ?? "No Name",
               "display": collaborator.completeName ?? "No Name",
-              "avatar": collaborator.avatar ??
-                  "https://api.minimalavatars.com/avatar/random/png",
+              "avatar": collaborator.avatar ?? "",
               "user_id": collaborator.id ?? "No Id"
             };
           })
@@ -367,6 +366,32 @@ class HomeViewModel extends NavigationModel {
         }
       });
     }
+  }
+
+  Future<bool> submitAcknowledgmentDirect(String message) async {
+    if (selectedBadge == null ||
+        message.trim().isEmpty ||
+        collaboratorsIds.isEmpty) {
+      return false;
+    }
+    creatingAcknowledgment = true;
+    final result = await _createAcknowledgmentUseCase.invoke(
+      selectedBadge!.id!,
+      message.trim(),
+      collaboratorsIds,
+    );
+    bool success = false;
+    result.when((s) {
+      success = true;
+      getCompanyFeeds();
+      collaboratorsIds = [];
+      selectedCategory = null;
+      selectedBadge = null;
+    }, (error) {
+      log.e(error.toString());
+    });
+    creatingAcknowledgment = false;
+    return success;
   }
 
   CarouselSliderController carouselController = CarouselSliderController();
