@@ -160,13 +160,12 @@ class UseCaseProvider {
 
     getIt.registerSingletonWithDependencies<UserProfileUseCase>(
         () => UserProfileUseCase(
-          getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)
-        ),
-      dependsOn: [
-        AppDatabase,
-        UsersDao,
-        InitDependency(UsersRepository, instanceName: RemoteUsersRepository.name)
-      ]
-    );
+            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
+        dependsOn: [
+          AppDatabase,
+          UsersDao,
+          InitDependency(UsersRepository,
+              instanceName: RemoteUsersRepository.name)
+        ]);
   }
 }

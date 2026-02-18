@@ -181,7 +181,7 @@ class Sender {
   });
 
   factory Sender.fromJson(Map<String, dynamic> json) {
-    if(json['seats'] == null){
+    if (json['seats'] == null) {
       debugPrint("Sender ## ${json['completeName']} ");
       debugger();
     }

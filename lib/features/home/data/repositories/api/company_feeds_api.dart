@@ -33,7 +33,8 @@ class CompanyFeedsAPI {
 
   Future<FeedData> getFeedById(String feedId) async {
     try {
-      var response = await _callsHandler.get(path: "accountFeeds/feeds/$feedId");
+      var response =
+          await _callsHandler.get(path: "accountFeeds/feeds/$feedId");
       Map<String, dynamic> jsonMap = json.decode(response.body);
 
       return FeedData.fromJson(jsonMap["data"]);

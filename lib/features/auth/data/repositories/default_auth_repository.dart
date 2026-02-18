@@ -10,10 +10,7 @@ class DefaultAuthRepository extends AuthRepository {
 
   @override
   Future<Result<User, Exception>> doLogin(
-      String user,
-      String password,
-      String company
-  ) async {
+      String user, String password, String company) async {
     try {
       User userDetails = await _authAPI.attemptLogin(user, password, company);
       return Result.success(userDetails);

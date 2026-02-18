@@ -32,7 +32,6 @@ class ActivityDetailScreen extends StatefulWidget {
 }
 
 class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -43,28 +42,28 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     return ModelProvider<ActivityDetailViewModel>(
-      model: widget.model,
-        child: ModelBuilder<ActivityDetailViewModel>(builder: (context, model, child) {
+        model: widget.model,
+        child: ModelBuilder<ActivityDetailViewModel>(
+            builder: (context, model, child) {
           return Scaffold(
             backgroundColor: theme.scaffoldBackgroundColor,
             body: SafeArea(
               child: BondlySliverLayout(
-                title: "",
-                child: model.post != null && !model.busy
-                    ? Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Column(
-                        children: [
-                          SinglePostWidget(post: model.post!, index: 0)
-                        ],
-                      )
-                    )
-                    : (model.busy ? _showLoading() : _showNoConnectionError())
-              ),
+                  title: "",
+                  child: model.post != null && !model.busy
+                      ? Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Column(
+                            children: [
+                              SinglePostWidget(post: model.post!, index: 0)
+                            ],
+                          ))
+                      : (model.busy
+                          ? _showLoading()
+                          : _showNoConnectionError())),
             ),
           );
-        })
-    );
+        }));
   }
 
   Widget _showLoading() {
@@ -76,10 +75,11 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
   Widget _showNoConnectionError() {
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(color: Theme.of(context).cardColor),
-          color: Theme.of(context).dividerColor,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-          boxShadow: AppDimensions.cardShadow(Theme.of(context).colorScheme.onSurface),
+        border: Border.all(color: Theme.of(context).cardColor),
+        color: Theme.of(context).dividerColor,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+        boxShadow:
+            AppDimensions.cardShadow(Theme.of(context).colorScheme.onSurface),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
       width: double.infinity,
@@ -93,7 +93,8 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
             size: 64.0,
           ),
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+            margin:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
             child: Text(
               StringsProfile.myActivityLoadError,
               style: Theme.of(context).textTheme.headlineSmall,

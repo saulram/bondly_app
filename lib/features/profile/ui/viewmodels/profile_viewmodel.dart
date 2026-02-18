@@ -21,30 +21,26 @@ class ProfileViewModel extends NavigationModel {
   UserProfile? userProfile;
   bool showUserUpdateError = false;
 
-  ProfileViewModel({
-    required this.userUseCase,
-    required this.logoutUseCase,
-    required this.updateUserUseCase,
-    required this.profileUseCase
-  });
+  ProfileViewModel(
+      {required this.userUseCase,
+      required this.logoutUseCase,
+      required this.updateUserUseCase,
+      required this.profileUseCase});
 
   Future<void> load({bool remote = true}) async {
     busy = true;
     notifyListeners();
 
     Result<User, Exception> result = await userUseCase.invoke(remote: remote);
-    result.when(
-      (user) {
-        this.user = user;
-        busy = false;
-        notifyListeners();
-      },
-      (error) {
-        busy = false;
-        notifyListeners();
-        handleError(error);
-      }
-    );
+    result.when((user) {
+      this.user = user;
+      busy = false;
+      notifyListeners();
+    }, (error) {
+      busy = false;
+      notifyListeners();
+      handleError(error);
+    });
   }
 
   Future<void> closeSession() async {
@@ -69,22 +65,16 @@ class ProfileViewModel extends NavigationModel {
     }
   }
 
-  Future<void> saveMyData({
-    required String email,
-    required String location,
-    required String dob,
-    required String job
-  }) async {
+  Future<void> saveMyData(
+      {required String email,
+      required String location,
+      required String dob,
+      required String job}) async {
     try {
       await profileUseCase.update(
-        userProfile?.id ?? "",
-        UpdateProfileParams(
-            email: email,
-            location: location,
-            jobTitle: job,
-            dob: dob
-        )
-      );
+          userProfile?.id ?? "",
+          UpdateProfileParams(
+              email: email, location: location, jobTitle: job, dob: dob));
     } finally {
       busy = false;
       notifyListeners();
@@ -101,9 +91,7 @@ class ProfileViewModel extends NavigationModel {
     try {
       final result = await profileUseCase.invoke(user?.id ?? "");
       result.when(
-          (profile) => userProfile = profile,
-          (error) => handleError(error)
-      );
+          (profile) => userProfile = profile, (error) => handleError(error));
     } finally {
       busy = false;
       notifyListeners();

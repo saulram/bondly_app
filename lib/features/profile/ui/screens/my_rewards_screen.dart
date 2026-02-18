@@ -84,7 +84,8 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: rewardsModel.rewardList.rewards!.isEmpty
                   ? const Center(
-                      child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
+                      child: BondlyShimmerBlock(
+                          width: 200, height: 200, borderRadius: 12),
                     )
                   : Column(
                       children: [
@@ -92,7 +93,10 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                           height: 50,
                           child: rewardsModel.rewardList.rewards!.isEmpty
                               ? const Center(
-                                  child: BondlyShimmerBlock(width: double.infinity, height: 40, borderRadius: 20),
+                                  child: BondlyShimmerBlock(
+                                      width: double.infinity,
+                                      height: 40,
+                                      borderRadius: 20),
                                 )
                               : ListView.builder(
                                   scrollDirection: Axis.horizontal,
@@ -116,7 +120,9 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                                                   .textTheme
                                                   .bodyMedium
                                                   ?.copyWith(
-                                                      color: Theme.of(context).colorScheme.tertiary)),
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .tertiary)),
                                         ),
                                       ),
                                     );
@@ -129,7 +135,10 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                         rewardsModel.busy
                             ? const Expanded(
                                 child: Center(
-                                  child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
+                                  child: BondlyShimmerBlock(
+                                      width: 200,
+                                      height: 200,
+                                      borderRadius: 12),
                                 ),
                               )
                             : Expanded(

@@ -9,11 +9,13 @@ class BondlyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
   final String? avatar;
   final VoidCallback? onExitProfileCallback;
-  final String defaultAvatar = "https://www.gauchercommunity.org/wp-content/uploads/2020/09/avatar-placeholder.png";
+  final String defaultAvatar =
+      "https://www.gauchercommunity.org/wp-content/uploads/2020/09/avatar-placeholder.png";
   final String _logoImagePath = "assets/img_logo.png";
   final String _logoDarkImagePath = "assets/img_logo_dark.png";
 
-  const BondlyAppBar(this.avatar, {
+  const BondlyAppBar(
+    this.avatar, {
     super.key,
     this.child,
     this.height = kToolbarHeight,
@@ -33,9 +35,9 @@ class BondlyAppBar extends StatelessWidget implements PreferredSizeWidget {
         margin: const EdgeInsets.all(8),
         child: GestureDetector(
           onTap: () {
-            context.push(ProfileScreen.route).then(
-                (value) => onExitProfileCallback?.call()
-            );
+            context
+                .push(ProfileScreen.route)
+                .then((value) => onExitProfileCallback?.call());
           },
           child: Hero(
             tag: "AvatarWidget",

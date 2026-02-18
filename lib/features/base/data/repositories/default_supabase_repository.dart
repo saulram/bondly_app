@@ -25,8 +25,11 @@ class DefaultSupabaseRepository extends SupabaseRepository {
     String id,
   ) async {
     try {
-      final response =
-          await _clientProvider.client.from(table).select().eq('id', id).single();
+      final response = await _clientProvider.client
+          .from(table)
+          .select()
+          .eq('id', id)
+          .single();
       return Result.success(Map<String, dynamic>.from(response));
     } catch (e) {
       return Result.error(SupabaseQueryException(e.toString()));
@@ -58,8 +61,11 @@ class DefaultSupabaseRepository extends SupabaseRepository {
     Map<String, dynamic> data,
   ) async {
     try {
-      final response =
-          await _clientProvider.client.from(table).insert(data).select().single();
+      final response = await _clientProvider.client
+          .from(table)
+          .insert(data)
+          .select()
+          .single();
       return Result.success(Map<String, dynamic>.from(response));
     } catch (e) {
       return Result.error(SupabaseQueryException(e.toString()));

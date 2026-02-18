@@ -40,8 +40,7 @@ class DefaultCompanyFeedsRepository extends CompanyFeedsRepository {
       this._companyCollaboratorsAPI,
       this._createAcknowledgmentAPI,
       this._announcementsAPI,
-      this._ambassadorsAPI
-  );
+      this._ambassadorsAPI);
 
   @override
   Future<Result<CompanyFeed, Exception>> getCompanyFeeds() async {
@@ -61,14 +60,11 @@ class DefaultCompanyFeedsRepository extends CompanyFeedsRepository {
     try {
       return Result.success(await _feedsAPI.getFeedById(feedId));
     } catch (exception) {
-      return Result.error(
-        exception is TokenNotFoundException
-            ? exception
-            : (exception is FeedNotFoundException
-                ? exception
-                : NoConnectionException()
-        )
-      );
+      return Result.error(exception is TokenNotFoundException
+          ? exception
+          : (exception is FeedNotFoundException
+              ? exception
+              : NoConnectionException()));
     }
   }
 

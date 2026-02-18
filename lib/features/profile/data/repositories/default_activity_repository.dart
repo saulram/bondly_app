@@ -4,17 +4,13 @@ import 'package:bondly_app/features/profile/domain/repositories/activity_reposit
 import 'package:multiple_result/multiple_result.dart';
 
 class DefaultActivityRepository extends ActivityRepository {
-
   final UsersAPI _api;
 
   DefaultActivityRepository(this._api);
 
   @override
   Future<Result<UserActivityHolder, Exception>> getActivityList(
-      String userId,
-      int limit,
-      int page
-  ) async {
+      String userId, int limit, int page) async {
     try {
       var result = await _api.loadActivity(userId, limit, page);
       return Result.success(result);
@@ -24,7 +20,8 @@ class DefaultActivityRepository extends ActivityRepository {
   }
 
   @override
-  Future<Result<bool, Exception>> updateActivityStatus(String activityId) async {
+  Future<Result<bool, Exception>> updateActivityStatus(
+      String activityId) async {
     try {
       return Result.success(await _api.updateActivity(activityId));
     } catch (exception) {

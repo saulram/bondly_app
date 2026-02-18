@@ -39,5 +39,4 @@ class AccountStatementViewModel extends NavigationModel {
       logger.e(e);
     }
   }
-
 }

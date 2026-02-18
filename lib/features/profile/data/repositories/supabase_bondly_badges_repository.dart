@@ -67,8 +67,7 @@ class SupabaseBondlyBadgesRepository extends BondlyBadgesRepository {
           description: catMap['description'] ?? '',
           imageUrl: catMap['image_url'] ?? '',
           categoryBadges: badgesList
-              .map((b) =>
-                  BondlyBadge.fromSupabase(b as Map<String, dynamic>))
+              .map((b) => BondlyBadge.fromSupabase(b as Map<String, dynamic>))
               .toList(),
         );
       }).toList();

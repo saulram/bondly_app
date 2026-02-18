@@ -18,6 +18,7 @@ class SelectableMenuOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     var theme = Theme.of(context);
 
     return Container(
@@ -28,7 +29,7 @@ class SelectableMenuOption extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          splashColor: AppColors.primaryColor,
+          splashColor: colors.accentSoft,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -40,9 +41,7 @@ class SelectableMenuOption extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: theme.textTheme.titleMedium!.copyWith(
-                    fontSize: 18.0
-                  ),
+                  style: theme.textTheme.titleMedium!.copyWith(fontSize: 18.0),
                 ),
               ),
               Icon(

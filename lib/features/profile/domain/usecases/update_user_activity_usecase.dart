@@ -2,12 +2,9 @@ import 'package:bondly_app/features/profile/domain/repositories/activity_reposit
 import 'package:logger/logger.dart';
 
 class UpdateUserActivityUseCase {
-
   final ActivityRepository _repository;
 
-  UpdateUserActivityUseCase(
-      this._repository
-  );
+  UpdateUserActivityUseCase(this._repository);
 
   void invoke(String activityId, bool isRead) async {
     if (!isRead) {

@@ -40,7 +40,6 @@ import 'package:flutter/material.dart';
 ///   ),
 ///   )
 
-
 class Responsive extends StatefulWidget {
   final Widget? mobile;
   final Widget? tablet;

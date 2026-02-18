@@ -9,10 +9,7 @@ class LoginUseCase {
   LoginUseCase(this._repository);
 
   Future<Result<User, Exception>> invoke(
-      String user,
-      String password,
-      String company
-  ) async {
+      String user, String password, String company) async {
     if (company == LoginStrings.selectYourCompany || company.isEmpty) {
       return Result.error(DefaultCompanyException());
     }

@@ -14,19 +14,13 @@ class AppModel extends NavigationModel {
   void load() async {
     Result<bool, dynamic> result = _useCase.invoke();
     result.when(
-        (success) => _loginState = success,
-        (error) => _loginState = false
-    );
+        (success) => _loginState = success, (error) => _loginState = false);
 
     await Future.delayed(const Duration(milliseconds: 1500));
     if (!loginState) {
-      navigation.go(
-          LoginScreen.route
-      );
+      navigation.go(LoginScreen.route);
     } else {
-      navigation.go(
-          HomeScreen.route
-      );
+      navigation.go(HomeScreen.route);
     }
     notifyListeners();
   }

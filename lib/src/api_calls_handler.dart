@@ -14,7 +14,9 @@ const String jsonContentType = "application/json";
 const String formContentType = "application/x-www-form-urlencoded";
 
 class ServerErrorException implements Exception {}
+
 class ServiceNotFoundException implements Exception {}
+
 class UnauthorizedException implements Exception {}
 
 enum Methods {
@@ -57,7 +59,7 @@ abstract class CallsHandler {
 
   @visibleForTesting
   Map<String, String> get baseHeaders {
-    if(kIsWeb) return _webHeaders;
+    if (kIsWeb) return _webHeaders;
 
     return _mobileHeaders;
   }
@@ -74,7 +76,7 @@ abstract class CallsHandler {
       Logger().i("API end [${response.request?.method.toUpperCase()}] "
           "${response.statusCode} ${response.request?.url} "
           "success: ${data['success']} detail: $detail");
-    } catch(e) {
+    } catch (e) {
       Logger().i("API end [${response.request?.method.toUpperCase()}] "
           "${response.statusCode} ${response.request?.url} "
           "success: false detail: ${e.toString()}");
@@ -86,9 +88,12 @@ abstract class CallsHandler {
     logResponse(response);
 
     switch (response.statusCode) {
-      case 403: throw UnauthorizedException();
-      case 404: throw ServiceNotFoundException();
-      case >= 500: throw ServerErrorException();
+      case 403:
+        throw UnauthorizedException();
+      case 404:
+        throw ServiceNotFoundException();
+      case >= 500:
+        throw ServerErrorException();
     }
   }
 
@@ -104,14 +109,13 @@ abstract class CallsHandler {
 }
 
 class ApiCallsHandler extends CallsHandler {
-
   final SessionTokenHandler sessionTokenHandler;
 
-  ApiCallsHandler({
-    required String appVersion,
-    required String buildNumber,
-    required this.sessionTokenHandler
-  }) : super(appVersion, buildNumber);
+  ApiCallsHandler(
+      {required String appVersion,
+      required String buildNumber,
+      required this.sessionTokenHandler})
+      : super(appVersion, buildNumber);
 
   final http.Client _baseClient = http.Client();
   http.Client get _client {
@@ -122,67 +126,58 @@ class ApiCallsHandler extends CallsHandler {
   /// Http methods.
   /// -----------------------------------------------------------------------
 
-  Future<http.Response> post({
-      required String path,
+  Future<http.Response> post(
+      {required String path,
       Map<String, dynamic>? data,
-      Map<String, String>? extraHeaders
-  }) async {
-    return _enqueueCall(path, Methods.POST, params: data, extraHeaders: extraHeaders);
+      Map<String, String>? extraHeaders}) async {
+    return _enqueueCall(path, Methods.POST,
+        params: data, extraHeaders: extraHeaders);
   }
 
-  Future<http.Response> put({
-    required String path,
-    Map<String, dynamic>? data,
-    Map<String, String>? extraHeaders
-  }) async {
-    return _enqueueCall(path, Methods.PUT, params: data, extraHeaders: extraHeaders);
+  Future<http.Response> put(
+      {required String path,
+      Map<String, dynamic>? data,
+      Map<String, String>? extraHeaders}) async {
+    return _enqueueCall(path, Methods.PUT,
+        params: data, extraHeaders: extraHeaders);
   }
 
-  Future<http.Response> get({
-      required String path,
+  Future<http.Response> get(
+      {required String path,
       Map<String, String>? params,
-      Map<String, String>? extraHeaders
-  }) async {
-   return _enqueueCall(
-       path,
-       Methods.GET,
-       params: params,
-       extraHeaders: extraHeaders,
-       queryParams: params
-   );
+      Map<String, String>? extraHeaders}) async {
+    return _enqueueCall(path, Methods.GET,
+        params: params, extraHeaders: extraHeaders, queryParams: params);
   }
 
-  Future<http.Response> delete({
-      required String path,
+  Future<http.Response> delete(
+      {required String path,
       Map<String, dynamic>? params,
-      Map<String, String>? extraHeaders}
-  ) async {
-    return _enqueueCall(path, Methods.DELETE, params: params, extraHeaders: extraHeaders,);
+      Map<String, String>? extraHeaders}) async {
+    return _enqueueCall(
+      path,
+      Methods.DELETE,
+      params: params,
+      extraHeaders: extraHeaders,
+    );
   }
 
-  Future<void> sendMultipart({
-    required String method,
-    required String path,
-    required File file,
-    String? name,
-    Map<String, String>? extraHeader
-  }) async {
+  Future<void> sendMultipart(
+      {required String method,
+      required String path,
+      required File file,
+      String? name,
+      Map<String, String>? extraHeader}) async {
     var request = http.MultipartRequest(method, _bondlyUri(path));
     final httpFile = http.MultipartFile.fromBytes(
-      name ?? 'image',
-      file.readAsBytesSync(),
-      filename: "image"
-    );
+        name ?? 'image', file.readAsBytesSync(),
+        filename: "image");
 
-    request.headers.addAll({
-      "Authorization": sessionTokenHandler.get()!
-    });
+    request.headers.addAll({"Authorization": sessionTokenHandler.get()!});
     request.files.add(httpFile);
 
-    Logger().i(
-      "Sending ${request.method} multipart to: "
-          "$path with ${request.files.length} files: ${request.files.first.length}"
-    );
+    Logger().i("Sending ${request.method} multipart to: "
+        "$path with ${request.files.length} files: ${request.files.first.length}");
 
     final response = await request.send();
     if (response.statusCode != 200) {
@@ -202,13 +197,10 @@ class ApiCallsHandler extends CallsHandler {
     );
   }
 
-  Future<http.Response> _enqueueCall(
-      String path,
-      Methods method,
+  Future<http.Response> _enqueueCall(String path, Methods method,
       {Map<String, dynamic>? params,
       Map<String, String>? extraHeaders,
-      Map<String, String>? queryParams}
-  ) async {
+      Map<String, String>? queryParams}) async {
     Uri uri = _bondlyUri(path, params: queryParams);
 
     String payload = "";
@@ -223,9 +215,7 @@ class ApiCallsHandler extends CallsHandler {
     }
 
     if (sessionTokenHandler.get() != null) {
-      extraHeaders.addAll({
-        "Authorization": sessionTokenHandler.get()!
-      });
+      extraHeaders.addAll({"Authorization": sessionTokenHandler.get()!});
     }
 
     try {
@@ -235,13 +225,16 @@ class ApiCallsHandler extends CallsHandler {
       http.Response response;
       switch (method) {
         case Methods.POST:
-          response = await _client.post(uri, body: payload, headers: extraHeaders);
+          response =
+              await _client.post(uri, body: payload, headers: extraHeaders);
         case Methods.GET:
           response = await _client.get(uri, headers: extraHeaders);
         case Methods.DELETE:
-          response = await _client.delete(uri, body: payload, headers: extraHeaders);
+          response =
+              await _client.delete(uri, body: payload, headers: extraHeaders);
         case Methods.PUT:
-          response = await _client.put(uri, body: payload, headers: extraHeaders);
+          response =
+              await _client.put(uri, body: payload, headers: extraHeaders);
       }
       throwOnFailureCode(response);
       return response;

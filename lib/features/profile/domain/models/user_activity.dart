@@ -4,12 +4,11 @@ class UserActivityHolder {
   final int prevPage;
   final List<UserActivityItem> activity;
 
-  UserActivityHolder({
-    required this.count,
-    required this.nextPage,
-    required this.prevPage,
-    required this.activity
-  });
+  UserActivityHolder(
+      {required this.count,
+      required this.nextPage,
+      required this.prevPage,
+      required this.activity});
 }
 
 class UserActivityItem {

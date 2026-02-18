@@ -32,7 +32,8 @@ class MonthlyBalanceScreen extends StatelessWidget {
                 ),
                 model.busy
                     ? const Center(
-                        child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
+                        child: BondlyShimmerBlock(
+                            width: 200, height: 200, borderRadius: 12),
                       )
                     : Expanded(
                         child: Column(
@@ -79,13 +80,14 @@ class MonthlyBalanceScreen extends StatelessWidget {
   }
 
   Widget _buildTransactionItem(BuildContext context, Transaction transaction) {
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     bool isPositive = transaction.amount! > 0;
     return ListTile(
       leading: Icon(
         !isPositive
             ? IconsaxOutline.arrow_circle_up
             : IconsaxOutline.arrow_circle_down,
-        color: isPositive ? AppColors.tertiaryColor : AppColors.secondaryColor,
+        color: isPositive ? colors.gold : colors.likeColor,
       ),
       title: Text(
         transaction.name ?? "",
@@ -97,10 +99,10 @@ class MonthlyBalanceScreen extends StatelessWidget {
       ),
       trailing: Text(
         transaction.amount.toString(),
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: isPositive
-                ? AppColors.tertiaryColor
-                : AppColors.secondaryColor),
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium
+            ?.copyWith(color: isPositive ? colors.gold : colors.likeColor),
       ),
     );
   }
