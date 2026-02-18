@@ -12,20 +12,19 @@ class UserActivityItemWidget extends StatelessWidget {
   final bool read;
   final VoidCallback onTap;
 
-
-  const UserActivityItemWidget({
-    super.key,
-    required this.id,
-    required this.type,
-    required this.title,
-    required this.description,
-    required this.date,
-    required this.read,
-    required this.onTap
-  });
+  const UserActivityItemWidget(
+      {super.key,
+      required this.id,
+      required this.type,
+      required this.title,
+      required this.description,
+      required this.date,
+      required this.read,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     var theme = Theme.of(context);
     IconData icon;
     switch (type) {
@@ -41,8 +40,9 @@ class UserActivityItemWidget extends StatelessWidget {
     }
 
     var parsedDate = DateTime.parse(date).toString();
-    parsedDate =
-        parsedDate.replaceRange(parsedDate.length - 13, parsedDate.length, "").trim();
+    parsedDate = parsedDate
+        .replaceRange(parsedDate.length - 13, parsedDate.length, "")
+        .trim();
 
     return GestureDetector(
       onTap: onTap,
@@ -83,16 +83,13 @@ class UserActivityItemWidget extends StatelessWidget {
                         ),
                         const SizedBox(height: 24.0),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 4.0
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.dividerColor,
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                          child: Text(parsedDate)
-                        ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 4.0),
+                            decoration: BoxDecoration(
+                              color: theme.dividerColor,
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                            child: Text(parsedDate)),
                       ],
                     ),
                   ),
@@ -101,17 +98,18 @@ class UserActivityItemWidget extends StatelessWidget {
                   )
                 ],
               ),
-              !read ? const Positioned(
-                top: 0,
-                right: 0,
-                child: Icon(
-                  IconsaxBold.notification_status,
-                  color: AppColors.secondaryColor,
-                ),
-              ) : Container()
+              !read
+                  ? Positioned(
+                      top: 0,
+                      right: 0,
+                      child: Icon(
+                        IconsaxBold.notification_status,
+                        color: colors.likeColor,
+                      ),
+                    )
+                  : Container()
             ],
-          )
-      ),
+          )),
     );
   }
 }

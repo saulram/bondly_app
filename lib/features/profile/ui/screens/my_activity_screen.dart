@@ -22,8 +22,7 @@ class MyActivityScreen extends StatefulWidget {
   State<MyActivityScreen> createState() => _MyActivityScreenState();
 }
 
-class _MyActivityScreenState
-    extends State<MyActivityScreen>
+class _MyActivityScreenState extends State<MyActivityScreen>
     with AutomaticKeepAliveClientMixin<MyActivityScreen> {
   late MyActivityViewModel _viewModel;
   bool addMargin = false;
@@ -52,129 +51,131 @@ class _MyActivityScreenState
   }
 
   Widget _buildBody(ThemeData theme) {
+    final colors = theme.extension<BondlyColorScheme>()!;
     return ModelProvider<MyActivityViewModel>(
-      model: _viewModel,
-      child: ModelBuilder<MyActivityViewModel>(builder: (context, model, widget) {
-        var length = model.activities.length + (model.nextPage > -1 ? 1 : 0);
-        return Stack(
-          children: [
-            NestedScrollView(
-                headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    SliverAppBar(
-                        leading: IconButton(
-                          onPressed: () => context.pop(),
-                          tooltip: 'Regresar',
-                          icon: const Icon(
-                            IconsaxOutline.arrow_left,
+        model: _viewModel,
+        child: ModelBuilder<MyActivityViewModel>(
+            builder: (context, model, widget) {
+          var length = model.activities.length + (model.nextPage > -1 ? 1 : 0);
+          return Stack(
+            children: [
+              NestedScrollView(
+                  headerSliverBuilder:
+                      (BuildContext context, bool innerBoxIsScrolled) {
+                    return <Widget>[
+                      SliverAppBar(
+                          leading: IconButton(
+                            onPressed: () => context.pop(),
+                            tooltip: 'Regresar',
+                            icon: const Icon(
+                              IconsaxOutline.arrow_left,
+                            ),
                           ),
-                        ),
-                        backgroundColor: theme.scaffoldBackgroundColor,
-                        iconTheme: IconThemeData(
-                          color: theme.unselectedWidgetColor,
-                        ),
-                        expandedHeight: 260.0,
-                        floating: false,
-                        pinned: true,
-                        flexibleSpace: LayoutBuilder(
-                          builder: (context, constraints) {
-                            top = constraints.biggest.height;
+                          backgroundColor: theme.scaffoldBackgroundColor,
+                          iconTheme: IconThemeData(
+                            color: theme.unselectedWidgetColor,
+                          ),
+                          expandedHeight: 260.0,
+                          floating: false,
+                          pinned: true,
+                          flexibleSpace: LayoutBuilder(
+                            builder: (context, constraints) {
+                              top = constraints.biggest.height;
 
-                            return FlexibleSpaceBar(
-                              centerTitle: true,
-                              background: SafeArea(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 44.0),
-                                  child: BodyLayout(
-                                    enableBanners: true,
-                                    child: Container(),
+                              return FlexibleSpaceBar(
+                                centerTitle: true,
+                                background: SafeArea(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 44.0),
+                                    child: BodyLayout(
+                                      enableBanners: true,
+                                      child: Container(),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              title: top < 120.0
-                                  ? Text(
-                                StringsProfile.myActivity,
-                                style: theme.textTheme.titleLarge,
-                              )
-                                  : const SizedBox(),
-                            );
-                          },
-                        )),
-                    /*
-                  Leaving this commented until create filter feature
-                  SliverPersistentHeader(
-                    delegate: _SliverAppBarDelegate(_buildChips(theme)),
-                    pinned: true,
-                  )*/
-                  ];
-                },
-                body: NotificationListener<ScrollEndNotification>(
-                  onNotification: (notification) {
-                    var metrics = notification.metrics;
-                    if (metrics.atEdge && metrics.pixels > 0) {
-                      model.loadActivity();
-                    }
-
-                    return true;
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 24.0),
-                    child: ListView.builder(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        itemCount: length,
-                        itemBuilder: (context, index) {
-                          if (index < model.activities.length) {
-                            var item = model.activities[index];
-
-                            if (index == 0) {
-                              return Column(
-                                children: [
-                                  _buildHeaderCard(theme),
-                                  _buildActivityItem(item)
-                                ],
+                                title: top < 120.0
+                                    ? Text(
+                                        StringsProfile.myActivity,
+                                        style: theme.textTheme.titleLarge,
+                                      )
+                                    : const SizedBox(),
                               );
+                            },
+                          )),
+                    ];
+                  },
+                  body: NotificationListener<ScrollEndNotification>(
+                    onNotification: (notification) {
+                      var metrics = notification.metrics;
+                      if (metrics.atEdge && metrics.pixels > 0) {
+                        model.loadActivity();
+                      }
+
+                      return true;
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 24.0),
+                      child: ListView.builder(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          itemCount: length,
+                          itemBuilder: (context, index) {
+                            if (index < model.activities.length) {
+                              var item = model.activities[index];
+
+                              if (index == 0) {
+                                return Column(
+                                  children: [
+                                    _buildHeaderCard(theme),
+                                    _buildActivityItem(item)
+                                  ],
+                                );
+                              }
+
+                              return _buildActivityItem(item);
                             }
 
-                            return _buildActivityItem(item);
-                          }
-
-                          return Container(
-                              margin: const EdgeInsets.only(top: 16),
-                              child: model.notificationMessage.isEmpty && model.busy
-                                  ? const Center(child: BondlyShimmerBlock(width: 40, height: 40, borderRadius: 20))
-                                  : Container());
-                        }),
-                  ),
-                )
-            ),
-            !model.errorShown && model.notificationMessage.isNotEmpty
-                ? Positioned(
-                bottom: 24.0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(8.0),
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 16.0),
-                  decoration: BoxDecoration(
-                      color: theme.dividerColor,
-                      border: Border.all(color: AppColors.secondaryColor),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
-                  child: Text(
-                    model.notificationMessage,
-                    style:
-                    theme.textTheme.bodyLarge!.copyWith(fontSize: 18.0),
-                    textAlign: TextAlign.center,
-                  ),
-                ))
-                : Container()
-          ],
-        );
-      })
-    );
+                            return Container(
+                                margin: const EdgeInsets.only(top: 16),
+                                child: model.notificationMessage.isEmpty &&
+                                        model.busy
+                                    ? const Center(
+                                        child: BondlyShimmerBlock(
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: 20))
+                                    : Container());
+                          }),
+                    ),
+                  )),
+              !model.errorShown && model.notificationMessage.isNotEmpty
+                  ? Positioned(
+                      bottom: 24.0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 24.0, vertical: 16.0),
+                        decoration: BoxDecoration(
+                            color: theme.dividerColor,
+                            border: Border.all(color: colors.likeColor),
+                            borderRadius:
+                                BorderRadius.circular(AppDimensions.radiusLg)),
+                        child: Text(
+                          model.notificationMessage,
+                          style: theme.textTheme.bodyLarge!
+                              .copyWith(fontSize: 18.0),
+                          textAlign: TextAlign.center,
+                        ),
+                      ))
+                  : Container()
+            ],
+          );
+        }));
   }
 
   Widget _buildHeaderCard(ThemeData theme) {
+    final colors = theme.extension<BondlyColorScheme>()!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
@@ -183,27 +184,21 @@ class _MyActivityScreenState
         right: 12.0,
       ),
       decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.secondaryColor,
-              theme.primaryColor,
-            ],
-          ),
+          gradient: AppDimensions.accentGradient(colors),
           borderRadius: const BorderRadius.all(Radius.circular(20.0))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             StringsProfile.myActivityHeader,
-            style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
+            style:
+                theme.textTheme.titleLarge!.copyWith(color: BondlyColors.white),
           ),
           const SizedBox(height: 12.0),
           Text(
             StringsProfile.myActivitySubHeader,
-            style: theme.textTheme.labelLarge!
-                .copyWith(height: 1.4, fontSize: 16.0, color: theme.colorScheme.onPrimary),
+            style: theme.textTheme.labelLarge!.copyWith(
+                height: 1.4, fontSize: 16.0, color: BondlyColors.white),
           )
         ],
       ),
@@ -220,20 +215,16 @@ class _MyActivityScreenState
         date: item.createdAt,
         read: item.read,
         onTap: () {
-          context.push(
-              ActivityDetailScreen.route,
-              extra: {
-                ActivityDetailScreen.idParam: item.id,
-                ActivityDetailScreen.feedIdParam: item.feedId,
-                ActivityDetailScreen.readParam: item.read
-              }
-          );
+          context.push(ActivityDetailScreen.route, extra: {
+            ActivityDetailScreen.idParam: item.id,
+            ActivityDetailScreen.feedIdParam: item.feedId,
+            ActivityDetailScreen.readParam: item.read
+          });
 
           if (!item.read) {
             item.read = true;
             setState(() {});
           }
-        }
-    );
+        });
   }
 }

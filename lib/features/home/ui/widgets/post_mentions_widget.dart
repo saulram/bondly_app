@@ -1,5 +1,4 @@
 import 'package:bondly_app/config/colors.dart';
-import 'package:bondly_app/config/theme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -23,10 +22,12 @@ class _PostMentionsWidgetState extends State<PostMentionsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     List<TextSpan> textSpans = [];
 
     RegExp webRegex = RegExp(r"\@\[([^\]]+)\]\(([a-f0-9]+)\)");
-    RegExp mobileRegex = RegExp(r"\@\[(__)([a-f0-9]+)(__)\]\((__)([^\]]+)(__)\)");
+    RegExp mobileRegex =
+        RegExp(r"\@\[(__)([a-f0-9]+)(__)\]\((__)([^\]]+)(__)\)");
 
     int currentIndex = 0;
 
@@ -51,10 +52,7 @@ class _PostMentionsWidgetState extends State<PostMentionsWidget> {
       // Add the mention
       textSpans.add(TextSpan(
         text: "@$userName",
-        style: widget.style?.copyWith(color: context.isDarkMode
-            ? AppColors.secondaryColorLight
-            : AppColors.secondaryColor
-        ),
+        style: widget.style?.copyWith(color: colors.accent),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             debugPrint("Mention tapped: $userId");
@@ -84,5 +82,4 @@ class _PostMentionsWidgetState extends State<PostMentionsWidget> {
       text: TextSpan(children: textSpans),
     );
   }
-
 }

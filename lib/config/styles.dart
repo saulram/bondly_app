@@ -6,19 +6,19 @@ class AppStyles {
   // Text
   static const fontFamily = "Montserrat";
 
-  static TextStyle baseTextStyle =
-      const TextStyle(color: AppColors.bodyColor, fontFamily: fontFamily);
+  static TextStyle baseTextStyle = const TextStyle(
+      color: BondlyColors.lightTextPrimary, fontFamily: fontFamily);
 
   static TextStyle primaryButtonTextStyle =
-      baseTextStyle.copyWith(color: AppColors.bodyColorDark);
+      baseTextStyle.copyWith(color: BondlyColors.white);
 
   static TextStyle transparentButtonTextStyle =
-      baseTextStyle.copyWith(color: AppColors.transparentButtonColor);
+      baseTextStyle.copyWith(color: BondlyColors.lightAccent);
 
   // Buttons
   @Deprecated("Use Theme of primaryButton instead")
   static ButtonStyle primaryButtonStyle = ElevatedButton.styleFrom(
-      backgroundColor: AppColors.primaryButtonColor,
+      backgroundColor: BondlyColors.lightAccent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(0.dp),
       ),

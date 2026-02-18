@@ -13,11 +13,12 @@ class GoldBorderedContainer extends StatefulWidget {
 class _GoldBorderedContainerState extends State<GoldBorderedContainer> {
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-          border: Border.all(color: AppColors.tertiaryColorLight),
+          border: Border.all(color: colors.border),
           color: colorScheme.surfaceContainerHighest,
           boxShadow: AppDimensions.cardShadow(colorScheme.onSurface)),
       padding: const EdgeInsets.all(AppDimensions.radiusLg),

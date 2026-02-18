@@ -32,14 +32,6 @@ class _BadgesGridState extends State<BadgesGrid> {
   late MyBadges? myBadges;
   late List<BondlyCategory>? categories;
   late Size size;
-  final List<Color> bondlyColors = [
-    AppColors.primaryColor,
-    AppColors.secondaryColor,
-    AppColors.tertiaryColor,
-    AppColors.primaryColorLight,
-    AppColors.secondaryColorLight,
-    AppColors.tertiaryColorLight,
-  ];
 
   @override
   void initState() {
@@ -49,6 +41,17 @@ class _BadgesGridState extends State<BadgesGrid> {
     categories = widget.categories;
 
     super.initState();
+  }
+
+  List<Color> _getBondlyColors(BondlyColorScheme colors) {
+    return [
+      colors.accent,
+      colors.accentGradientEnd,
+      colors.gold,
+      colors.accentSoft,
+      colors.likeColor,
+      colors.tabActive,
+    ];
   }
 
   @override
@@ -112,6 +115,8 @@ class _BadgesGridState extends State<BadgesGrid> {
   }
 
   Widget _buildGrid(List<BondlyCategory> bondlyCategories) {
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
+    final bondlyColors = _getBondlyColors(colors);
     return ListView.builder(
       padding: const EdgeInsets.all(10),
       physics: const BouncingScrollPhysics(),
@@ -129,19 +134,17 @@ class _BadgesGridState extends State<BadgesGrid> {
                 ),
                 child: Text(bondlyCategories[i].name,
                     textAlign: TextAlign.center,
-                    style:
-                        Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: AppColors.backgroundColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ))),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: BondlyColors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ))),
             const SizedBox(height: 8),
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: bondlyCategories[i].categoryBadges.length,
-              gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,

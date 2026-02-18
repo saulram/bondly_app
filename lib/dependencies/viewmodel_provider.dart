@@ -51,12 +51,12 @@ class ViewModelProvider {
     getIt.registerSingleton<AppModel>(AppModel());
 
     getIt.registerFactory<ProfileViewModel>(
-        () => ProfileViewModel(
-              userUseCase: getIt<UserUseCase>(),
-              logoutUseCase: getIt<LogoutUseCase>(),
-              updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
-              profileUseCase: getIt<UserProfileUseCase>(),
-            ),
+      () => ProfileViewModel(
+        userUseCase: getIt<UserUseCase>(),
+        logoutUseCase: getIt<LogoutUseCase>(),
+        updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
+        profileUseCase: getIt<UserProfileUseCase>(),
+      ),
     );
 
     getIt.registerSingletonWithDependencies<HomeViewModel>(

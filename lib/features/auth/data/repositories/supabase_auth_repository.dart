@@ -41,9 +41,8 @@ class SupabaseAuthRepository extends AuthRepository {
   @override
   Future<Result<List<String>, Exception>> getCompanies() async {
     try {
-      final response = await _provider.client
-          .from('users')
-          .select('company_name');
+      final response =
+          await _provider.client.from('users').select('company_name');
 
       final companies = (response as List)
           .map((row) => row['company_name'] as String?)

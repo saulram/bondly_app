@@ -7,12 +7,9 @@ class StringListConverter extends TypeConverter<List<String>, String> {
   List<String> decode(String databaseValue) {
     final jsonFile = json.decode(databaseValue);
     Iterable list = jsonFile['value'];
-    List<String> stringList = List<String>.from(
-      list.map((e) => e.toString())
-    );
+    List<String> stringList = List<String>.from(list.map((e) => e.toString()));
 
     return stringList;
-
   }
 
   @override

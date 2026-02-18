@@ -1,4 +1,3 @@
-
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:multiple_result/multiple_result.dart';
 
@@ -14,5 +13,4 @@ class GetCompaniesUseCase {
       return Result.error(NoConnectionException());
     }
   }
-
 }

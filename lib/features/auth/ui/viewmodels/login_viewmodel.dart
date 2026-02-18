@@ -21,57 +21,52 @@ class LoginViewModel extends NavigationModel {
   LoginUIState? state;
   List<String> companies = [];
 
-  LoginViewModel(
-    this._useCase,
-    this._companiesUseCase,
-    this._loginStateUseCase,
-    this._userUseCase,
-    this._tokenHandler
-  );
+  LoginViewModel(this._useCase, this._companiesUseCase, this._loginStateUseCase,
+      this._userUseCase, this._tokenHandler);
 
   Future<void> onLoginAction(
-      String username,
-      String password,
-      String company
-  ) async {
+      String username, String password, String company) async {
     state = LoadingLogin();
     notifyListeners();
 
-    final Result<User, Exception> result = await _useCase.invoke(username, password, company);
-    result.when(
-      (user) {
-        if (user.token == null) {
-          state = FailedLogin(LoginErrorType.authError);
-          notifyListeners();
-          return;
-        }
-
-        _loginStateUseCase.update(user.token);
-        _userUseCase.update(user);
-        _tokenHandler.save(user.token!);
-
-        state = SuccessLogin();
+    final Result<User, Exception> result =
+        await _useCase.invoke(username, password, company);
+    result.when((user) {
+      if (user.token == null) {
+        state = FailedLogin(LoginErrorType.authError);
         notifyListeners();
-
-        navigation.go(HomeScreen.route);
-      },
-      (error) {
-        var errorType = LoginErrorType.authError;
-        switch (error) {
-          case EmptyLoginFieldsException _: errorType = LoginErrorType.invalidInputError;
-          case InvalidLoginException _: errorType = LoginErrorType.authError;
-          case TooManyLoginAttemptsException _: errorType = LoginErrorType.authError;
-          case NoConnectionException _: errorType = LoginErrorType.connectionError;
-          case DefaultCompanyException _: errorType = LoginErrorType.defaultCompanyError;
-        }
-        _loginStateUseCase.update(null);
-        state = FailedLogin(errorType);
-        notifyListeners();
+        return;
       }
-    );
+
+      _loginStateUseCase.update(user.token);
+      _userUseCase.update(user);
+      _tokenHandler.save(user.token!);
+
+      state = SuccessLogin();
+      notifyListeners();
+
+      navigation.go(HomeScreen.route);
+    }, (error) {
+      var errorType = LoginErrorType.authError;
+      switch (error) {
+        case EmptyLoginFieldsException _:
+          errorType = LoginErrorType.invalidInputError;
+        case InvalidLoginException _:
+          errorType = LoginErrorType.authError;
+        case TooManyLoginAttemptsException _:
+          errorType = LoginErrorType.authError;
+        case NoConnectionException _:
+          errorType = LoginErrorType.connectionError;
+        case DefaultCompanyException _:
+          errorType = LoginErrorType.defaultCompanyError;
+      }
+      _loginStateUseCase.update(null);
+      state = FailedLogin(errorType);
+      notifyListeners();
+    });
   }
 
-  Future<void > load() async {
+  Future<void> load() async {
     if (companies.isNotEmpty) {
       return;
     }
@@ -79,7 +74,8 @@ class LoginViewModel extends NavigationModel {
     state = LoadingLogin();
     notifyListeners();
 
-    final Result<List<String>, Exception> result = await _companiesUseCase.invoke();
+    final Result<List<String>, Exception> result =
+        await _companiesUseCase.invoke();
 
     result.when((success) {
       companies.add(LoginStrings.selectYourCompany);

@@ -5,10 +5,8 @@ class LogoutUseCase {
   final SharedPreferences sharedPreferences;
   final UsersRepository usersRepository;
 
-  LogoutUseCase({
-    required this.sharedPreferences,
-    required this.usersRepository
-  });
+  LogoutUseCase(
+      {required this.sharedPreferences, required this.usersRepository});
 
   Future<void> invoke() async {
     try {

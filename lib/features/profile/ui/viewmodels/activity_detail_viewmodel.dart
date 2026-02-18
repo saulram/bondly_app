@@ -4,7 +4,6 @@ import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_us
 import 'package:bondly_app/features/profile/domain/usecases/update_user_activity_usecase.dart';
 
 class ActivityDetailViewModel extends NavigationModel {
-
   final GetUserActivityUseCase _useCase;
   final UpdateUserActivityUseCase _updateActivityUseCase;
 
@@ -17,17 +16,12 @@ class ActivityDetailViewModel extends NavigationModel {
     notifyListeners();
     try {
       var response = await _useCase.invokeSingle(feedId);
-      response.when(
-          (success) {
-            post = success;
-            notifyListeners();
+      response.when((success) {
+        post = success;
+        notifyListeners();
 
-            _setPostAsRead(id, isRead);
-          },
-          (error) => {
-
-          }
-      );
+        _setPostAsRead(id, isRead);
+      }, (error) => {});
     } finally {
       busy = false;
       notifyListeners();

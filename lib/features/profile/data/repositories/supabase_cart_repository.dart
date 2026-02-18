@@ -52,11 +52,13 @@ class SupabaseCartRepository extends CartRepository {
     String cartId,
   ) async {
     try {
-      final rows = (items['items'] as List).map((item) => {
-            'cart_id': cartId,
-            'reward_id': item['reward_id'],
-            'quantity': item['quantity'],
-          }).toList();
+      final rows = (items['items'] as List)
+          .map((item) => {
+                'cart_id': cartId,
+                'reward_id': item['reward_id'],
+                'quantity': item['quantity'],
+              })
+          .toList();
 
       await _provider.client.from('cart_items').insert(rows);
 
@@ -80,10 +82,8 @@ class SupabaseCartRepository extends CartRepository {
 
       if ((existing as List).isNotEmpty) {
         final currentQty = existing.first['quantity'] as int;
-        await _provider.client
-            .from('cart_items')
-            .update({'quantity': currentQty + 1})
-            .eq('id', existing.first['id']);
+        await _provider.client.from('cart_items').update(
+            {'quantity': currentQty + 1}).eq('id', existing.first['id']);
       } else {
         await _provider.client.from('cart_items').insert({
           'cart_id': cartId,
@@ -118,10 +118,8 @@ class SupabaseCartRepository extends CartRepository {
               .delete()
               .eq('id', existing.first['id']);
         } else {
-          await _provider.client
-              .from('cart_items')
-              .update({'quantity': currentQty - 1})
-              .eq('id', existing.first['id']);
+          await _provider.client.from('cart_items').update(
+              {'quantity': currentQty - 1}).eq('id', existing.first['id']);
         }
       }
 
@@ -134,10 +132,7 @@ class SupabaseCartRepository extends CartRepository {
   @override
   Future<Result<UserCart, Exception>> clearShoppingCart(String cartId) async {
     try {
-      await _provider.client
-          .from('cart_items')
-          .delete()
-          .eq('cart_id', cartId);
+      await _provider.client.from('cart_items').delete().eq('cart_id', cartId);
 
       return getUserShoppingCart();
     } catch (exception) {
@@ -150,8 +145,7 @@ class SupabaseCartRepository extends CartRepository {
     try {
       await _provider.client
           .from('carts')
-          .update({'type': 'checkout'})
-          .eq('id', cartId);
+          .update({'type': 'checkout'}).eq('id', cartId);
 
       return Result.success(true);
     } catch (exception) {

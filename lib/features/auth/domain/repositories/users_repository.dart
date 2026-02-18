@@ -3,6 +3,7 @@ import 'package:bondly_app/features/profile/domain/models/user_profile.dart';
 import 'package:multiple_result/multiple_result.dart';
 
 class UserUnavailableException implements Exception {}
+
 class UserUpdateException implements Exception {}
 
 abstract class UsersRepository {

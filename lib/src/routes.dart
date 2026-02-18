@@ -1,6 +1,7 @@
 import 'package:bondly_app/features/auth/ui/screens/forgot_password_screen.dart';
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
+import 'package:bondly_app/features/notifications/ui/screens/notifications_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/activity_detail_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/monthly_balance_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_activity_screen.dart';
@@ -24,7 +25,8 @@ class AppRouter {
         builder: (context, state) => StartScreen(),
       ),
       GoRoute(
-          path: LoginScreen.route, builder: (context, state) => const LoginScreen()),
+          path: LoginScreen.route,
+          builder: (context, state) => const LoginScreen()),
       GoRoute(
           path: ForgotPasswordScreen.route,
           builder: (context, state) => const ForgotPasswordScreen()),
@@ -34,6 +36,9 @@ class AppRouter {
       GoRoute(
           path: ProfileScreen.route,
           builder: (context, state) => const ProfileScreen()),
+      GoRoute(
+          path: NotificationsScreen.route,
+          builder: (context, state) => const NotificationsScreen()),
       GoRoute(
           path: MyActivityScreen.route,
           builder: (context, state) => const MyActivityScreen()),
@@ -52,8 +57,7 @@ class AppRouter {
           builder: (context, state) => const MyBadgesScreen()),
       GoRoute(
           path: MyDataScreen.route,
-          builder: (context, state) => const MyDataScreen()
-      ),
+          builder: (context, state) => const MyDataScreen()),
       GoRoute(
           path: ActivityDetailScreen.route,
           builder: (context, state) {

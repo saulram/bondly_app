@@ -15,20 +15,19 @@ class UserProfileUseCase {
     return repository.getFullProfile(userId);
   }
 
-  Future<Result<bool, Exception>> update(String userId, UpdateProfileParams params) async {
+  Future<Result<bool, Exception>> update(
+      String userId, UpdateProfileParams params) async {
     if (userId.isEmpty) {
       return Result.error(UserUnavailableException());
     }
 
-    await repository.updateProfile(
-      {
-        "id": userId,
-        "email": params.email,
-        "location": params.location,
-        "bDay": params.dob,
-        "jobPosition": params.jobTitle,
-      }
-    );
+    await repository.updateProfile({
+      "id": userId,
+      "email": params.email,
+      "location": params.location,
+      "bDay": params.dob,
+      "jobPosition": params.jobTitle,
+    });
 
     return Result.success(userId.isNotEmpty);
   }
@@ -40,10 +39,9 @@ class UpdateProfileParams {
   final String jobTitle;
   final String dob;
 
-  UpdateProfileParams({
-    required this.email,
-    required this.location,
-    required this.jobTitle,
-    required this.dob
-  });
+  UpdateProfileParams(
+      {required this.email,
+      required this.location,
+      required this.jobTitle,
+      required this.dob});
 }
