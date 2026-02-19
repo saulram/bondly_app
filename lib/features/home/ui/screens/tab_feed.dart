@@ -62,6 +62,7 @@ class _FeedTabState extends State<FeedTab> {
         color: colors.accent,
         onRefresh: _onRefresh,
         child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           children: [
             _buildSliderSection(),
             const SizedBox(height: 12),
@@ -75,6 +76,7 @@ class _FeedTabState extends State<FeedTab> {
       color: colors.accent,
       onRefresh: _onRefresh,
       child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         itemCount: posts.length + 1, // +1 for the slider header
         itemBuilder: (context, index) {

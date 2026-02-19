@@ -13,11 +13,34 @@ import 'package:logger/logger.dart';
 const String jsonContentType = "application/json";
 const String formContentType = "application/x-www-form-urlencoded";
 
-class ServerErrorException implements Exception {}
+class ServerErrorException implements Exception {
+  final String? message;
+  ServerErrorException([this.message]);
+  @override
+  String toString() => message ?? 'ServerErrorException';
+}
 
-class ServiceNotFoundException implements Exception {}
+class ServiceNotFoundException implements Exception {
+  final String? message;
+  ServiceNotFoundException([this.message]);
+  @override
+  String toString() => message ?? 'ServiceNotFoundException';
+}
 
-class UnauthorizedException implements Exception {}
+class UnauthorizedException implements Exception {
+  final String? message;
+  UnauthorizedException([this.message]);
+  @override
+  String toString() => message ?? 'UnauthorizedException';
+}
+
+class ApiErrorException implements Exception {
+  final String message;
+  final int statusCode;
+  ApiErrorException(this.message, this.statusCode);
+  @override
+  String toString() => message;
+}
 
 enum Methods {
   POST,
@@ -87,13 +110,27 @@ abstract class CallsHandler {
     /// Log this response
     logResponse(response);
 
+    if (response.statusCode >= 200 && response.statusCode < 300) return;
+
+    String? apiMessage;
+    try {
+      final data = jsonDecode(response.body);
+      apiMessage = data['error'] as String?;
+    } catch (_) {}
+
     switch (response.statusCode) {
       case 403:
-        throw UnauthorizedException();
+        throw apiMessage != null
+            ? ApiErrorException(apiMessage, 403)
+            : UnauthorizedException();
       case 404:
-        throw ServiceNotFoundException();
+        throw ServiceNotFoundException(apiMessage);
       case >= 500:
-        throw ServerErrorException();
+        throw ServerErrorException(apiMessage);
+      default:
+        if (apiMessage != null) {
+          throw ApiErrorException(apiMessage, response.statusCode);
+        }
     }
   }
 
