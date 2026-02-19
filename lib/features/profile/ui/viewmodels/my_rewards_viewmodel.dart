@@ -1,9 +1,14 @@
+import 'dart:convert';
+
+import 'package:bondly_app/config/strings_cart.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
+import 'package:bondly_app/features/profile/domain/models/account_statement_model.dart';
 import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
 import 'package:bondly_app/features/profile/domain/models/rewards_list_model.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_account_statement_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/pull_cart_item.usecase.dart';
@@ -12,6 +17,7 @@ import 'package:bondly_app/src/app_services.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:multiple_result/multiple_result.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyRewardsViewModel extends NavigationModel {
   Logger log = Logger(
@@ -23,9 +29,13 @@ class MyRewardsViewModel extends NavigationModel {
   final PushCartItemUseCase _pushCartItemUseCase;
   final PullCartItemUseCase _pullCartItemUseCase;
   final CheckOutCartUseCase _checkOutCartUseCase;
+  final GetAccountStatementUseCase _getAccountStatementUseCase;
+  final SharedPreferences _sharedPreferences;
 
   final GlobalKey<ScaffoldState> cartScaffoldKey = GlobalKey<ScaffoldState>();
   final AppServices snackBarService;
+
+  static const String _cartStorageKey = 'local_cart_items';
 
   MyRewardsViewModel(
       this._getShoppingItemsUseCase,
@@ -34,17 +44,67 @@ class MyRewardsViewModel extends NavigationModel {
       this._pushCartItemUseCase,
       this._pullCartItemUseCase,
       this._checkOutCartUseCase,
-      this.snackBarService) {
+      this.snackBarService,
+      this._getAccountStatementUseCase,
+      this._sharedPreferences) {
     log.i("MyRewardsViewModel Created");
     init();
   }
 
   Future<void> init() async {
-    Future.wait([
+    _loadCartFromLocal();
+    await Future.wait([
       handleGetUserCart(),
       handleGetRewards(),
+      handleGetBalance(),
     ]);
   }
+
+  // ── Balance state ──────────────────────────────────────────────────
+
+  int? _userBalance;
+  int? get userBalance => _userBalance;
+
+  Future<void> handleGetBalance() async {
+    Result<AccountStatement, Exception> result =
+        await _getAccountStatementUseCase.invoke();
+    result.when((statement) {
+      _userBalance = statement.balance;
+      log.i("### User balance fetched: $_userBalance");
+      notifyListeners();
+    }, (error) {
+      log.e("### Error fetching user balance: $error");
+    });
+  }
+
+  // ── Reward points map ──────────────────────────────────────────────
+
+  final Map<String, int> _rewardPointsMap = {};
+
+  // ── Cart total ─────────────────────────────────────────────────────
+
+  int get cartTotal {
+    int total = 0;
+    for (var item in _cartItems) {
+      if (item == null) continue;
+      final id = item['id'] as String?;
+      final qty = item['quantity'] as int? ?? 0;
+      if (id != null && _rewardPointsMap.containsKey(id)) {
+        total += _rewardPointsMap[id]! * qty;
+      }
+    }
+    return total;
+  }
+
+  // ── Affordability check ────────────────────────────────────────────
+
+  bool canAffordItem(String itemId) {
+    if (_userBalance == null) return true; // Allow if balance unknown
+    final itemPoints = _rewardPointsMap[itemId] ?? 0;
+    return cartTotal + itemPoints <= _userBalance!;
+  }
+
+  // ── Rewards list ───────────────────────────────────────────────────
 
   RewardList _rewardList = RewardList(rewards: []);
 
@@ -67,7 +127,7 @@ class MyRewardsViewModel extends NavigationModel {
   Future<void> filterByCategory(String category) async {
     busy = true;
     await handleGetRewards();
-    if (category == "Todos") {
+    if (category == StringsCart.categoryAll) {
       rewardList = RewardList(rewards: _rewardList.rewards);
     } else {
       List<Reward> filteredList = [];
@@ -89,7 +149,11 @@ class MyRewardsViewModel extends NavigationModel {
     notifyListeners();
   }
 
-  void addToCart(String itemId, {int? quantity}) {
+  bool addToCart(String itemId, {int? quantity, bool skipValidation = false}) {
+    if (!skipValidation && !canAffordItem(itemId)) {
+      return false;
+    }
+
     // Busca si el elemento ya está en el carrito
     final existingItem = _cartItems.firstWhere(
       (item) => item!['id'] == itemId,
@@ -105,7 +169,9 @@ class MyRewardsViewModel extends NavigationModel {
       _cartItems.add({'id': itemId, 'quantity': quantity ?? 1});
     }
 
+    _saveCartToLocal();
     notifyListeners();
+    return true;
   }
 
   void removeFromCart(String itemId) {
@@ -126,6 +192,7 @@ class MyRewardsViewModel extends NavigationModel {
         _cartItems.remove(existingItem);
       }
 
+      _saveCartToLocal();
       notifyListeners();
     }
   }
@@ -143,6 +210,11 @@ class MyRewardsViewModel extends NavigationModel {
     Result result = await _getShoppingItemsUseCase.invoke();
     result.when((rewards) {
       rewardList = rewards;
+
+      // Populate reward points map from the full list
+      for (var reward in (rewards as RewardList).rewards ?? []) {
+        _rewardPointsMap[reward.id] = reward.points;
+      }
     }, (error) {
       log.e(error);
     });
@@ -163,13 +235,15 @@ class MyRewardsViewModel extends NavigationModel {
     result.when((cart) {
       UserCart myCart = cart;
 
+      _cartItems = [];
       for (var originalElement in myCart.rewards) {
         log.i("Cart Item: ${originalElement.quantity.toString()}");
         addToCart(originalElement.reward.id,
-            quantity: originalElement.quantity);
+            quantity: originalElement.quantity, skipValidation: true);
       }
       log.i("User Cart: ${cart.id.toString()}");
       userCart = myCart;
+      _saveCartToLocal();
     }, (error) {
       log.e(error);
     });
@@ -191,6 +265,7 @@ class MyRewardsViewModel extends NavigationModel {
     Result result = await _bulkAddCartItemsUseCase.invoke(body, _userCart.id);
     result.when((cart) {
       userCart = cart;
+      _saveCartToLocal();
     }, (error) {
       log.e(error);
     });
@@ -210,10 +285,10 @@ class MyRewardsViewModel extends NavigationModel {
   }
 
   List<String> _rewardCategories = [
-    "Todos",
-    "Experiencias",
-    "Gift Cards",
-    "Incentivos"
+    StringsCart.categoryAll,
+    StringsCart.categoryExperiences,
+    StringsCart.categoryGiftCards,
+    StringsCart.categoryIncentives,
   ];
   List<String> get rewardCategories => _rewardCategories;
   set rewardCategories(List<String> categories) {
@@ -239,14 +314,13 @@ class MyRewardsViewModel extends NavigationModel {
     Result result = await _checkOutCartUseCase.invoke(_userCart.id);
     busy = false;
     result.when((success) {
+      _clearLocalCart();
       navigation.go(HomeScreen.route);
-      handleShowSnackBar(
-          "¡Felicidades! Has canjeado tus puntos exitosamente! 🎉 El departamento de RR.HH. Se pondrá en contacto contigo.");
+      handleShowSnackBar(StringsCart.checkoutSuccess);
       return true;
     }, (error) {
       log.e(error);
-      handleShowSnackBar(
-          "¡Lo sentimos! No se pudo procesar tu solicitud. Por favor intenta de nuevo.");
+      handleShowSnackBar(StringsCart.checkoutError);
       return false;
     });
     return true;
@@ -255,11 +329,32 @@ class MyRewardsViewModel extends NavigationModel {
   void handleResetAll() {
     _cartItems = [];
     _userCart = UserCart(rewards: []);
+    _clearLocalCart();
     notifyListeners();
   }
 
   void handleShowSnackBar(String message) {
     snackBarService.showSnackbar(cartScaffoldKey, message);
+  }
+
+  // ── Local cart persistence ─────────────────────────────────────────
+
+  void _saveCartToLocal() {
+    final encoded = jsonEncode(_cartItems);
+    _sharedPreferences.setString(_cartStorageKey, encoded);
+  }
+
+  void _loadCartFromLocal() {
+    final stored = _sharedPreferences.getString(_cartStorageKey);
+    if (stored != null) {
+      final decoded = jsonDecode(stored) as List<dynamic>;
+      _cartItems = decoded.map((e) => e as Map<String, dynamic>?).toList();
+      notifyListeners();
+    }
+  }
+
+  void _clearLocalCart() {
+    _sharedPreferences.remove(_cartStorageKey);
   }
 
   @override

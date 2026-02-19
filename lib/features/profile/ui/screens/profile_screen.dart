@@ -373,8 +373,8 @@ class ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(width: 12),
         Expanded(
           child: _StatCard(
-            value: _formatNumber(model.user?.monthlyPoints ?? 0),
-            label: StringsProfile.monthlyPoints,
+            value: _formatNumber(model.spendableBalance ?? 0),
+            label: StringsProfile.spendablePoints,
             colors: colors,
           ),
         ),

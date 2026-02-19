@@ -6,7 +6,9 @@ import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:bondly_app/features/profile/domain/models/account_statement_model.dart';
 import 'package:bondly_app/features/profile/domain/models/user_profile.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_account_statement_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/user_profile_use_case.dart';
 import 'package:logger/logger.dart';
@@ -17,15 +19,20 @@ class ProfileViewModel extends NavigationModel {
   final LogoutUseCase logoutUseCase;
   final UpdateUserAvatarUseCase updateUserUseCase;
   final UserProfileUseCase profileUseCase;
+  final GetAccountStatementUseCase getAccountStatementUseCase;
   User? user;
   UserProfile? userProfile;
   bool showUserUpdateError = false;
+
+  int? _spendableBalance;
+  int? get spendableBalance => _spendableBalance;
 
   ProfileViewModel(
       {required this.userUseCase,
       required this.logoutUseCase,
       required this.updateUserUseCase,
-      required this.profileUseCase});
+      required this.profileUseCase,
+      required this.getAccountStatementUseCase});
 
   Future<void> load({bool remote = true}) async {
     busy = true;
@@ -40,6 +47,19 @@ class ProfileViewModel extends NavigationModel {
       busy = false;
       notifyListeners();
       handleError(error);
+    });
+
+    fetchSpendableBalance();
+  }
+
+  Future<void> fetchSpendableBalance() async {
+    Result<AccountStatement, Exception> result =
+        await getAccountStatementUseCase.invoke();
+    result.when((statement) {
+      _spendableBalance = statement.balance;
+      notifyListeners();
+    }, (error) {
+      Logger().e("Error fetching spendable balance: $error");
     });
   }
 
