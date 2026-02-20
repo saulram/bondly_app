@@ -1,14 +1,17 @@
-import 'package:bondly_app/features/ai/ui/widgets/feed_personalization_banner.dart';
+import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/dimensions.dart';
+import 'package:bondly_app/config/strings_home.dart';
+import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
 import 'package:bondly_app/src/network_image_helpers.dart';
-import 'package:bondly_app/ui/shared/badge_icon_button.dart';
 import 'package:bondly_app/ui/shared/feed_post_card.dart';
+import 'package:bondly_app/ui/shared/feed_post_helpers.dart';
 import 'package:bondly_app/ui/shared/slider_banner_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:moment_dart/moment_dart.dart';
 
 class FeedTab extends StatefulWidget {
   final HomeViewModel model;
@@ -171,7 +174,7 @@ class _FeedTabState extends State<FeedTab> {
   // ─── Post Card ────────────────────────────────────────────────────────
 
   Widget _buildPostCard(FeedData post, int index, BondlyColorScheme colors) {
-    final badgeType = _resolveBadgeType(post.type);
+    final badgeType = FeedPostHelpers.resolveBadgeType(post.type);
     final postId = post.id ?? index.toString();
 
     // Ensure a controller exists for this post
@@ -183,7 +186,7 @@ class _FeedTabState extends State<FeedTab> {
         .map((c) => FeedCommentData(
               userName: c.user.completeName.trim(),
               userAvatarUrl: safeImageUrl(c.user.avatar, isAvatar: true),
-              timeAgo: _formatTimeAgo(c.timeStamp),
+              timeAgo: FeedPostHelpers.formatTimeAgo(c.timeStamp),
               message: c.message ?? '',
             ))
         .toList();
@@ -193,12 +196,12 @@ class _FeedTabState extends State<FeedTab> {
     return FeedPostCard(
       // Badge
       badgeName: post.badge?.name,
-      badgeCategory: _resolveBadgeCategory(post.type),
+      badgeCategory: FeedPostHelpers.resolveBadgeCategory(post.type),
       badgeType: badgeType,
       // Author
       userName: post.sender.completeName.trim(),
       userAvatarUrl: safeImageUrl(post.sender.avatar, isAvatar: true),
-      date: _formatDate(post.createdAt),
+      date: FeedPostHelpers.formatDate(post.createdAt),
       tag: StringsHome.feedTagRecognition,
       // Content
       message: post.body,
@@ -240,4 +243,48 @@ class _FeedTabState extends State<FeedTab> {
       onSendComment: () => _handleSendComment(postId, index),
     );
   }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────
+
+  void _pruneStaleControllers(List<FeedData> posts) {
+    final activeIds = posts.map((p) => p.id ?? '').toSet();
+    final staleKeys = _commentControllers.keys
+        .where((key) => !activeIds.contains(key))
+        .toList();
+    for (final key in staleKeys) {
+      _commentControllers[key]?.dispose();
+      _commentControllers.remove(key);
+    }
+  }
+
+  Future<void> _handleLike(FeedData post) async {
+    final postId = post.id;
+    if (postId == null) return;
+
+    setState(() => _likesInProgress.add(postId));
+    try {
+      await getIt<HomeViewModel>().handleLikes(postId);
+    } finally {
+      if (mounted) {
+        setState(() => _likesInProgress.remove(postId));
+      }
+    }
+  }
+
+  Future<void> _handleSendComment(String postId, int feedIndex) async {
+    final controller = _commentControllers[postId];
+    if (controller == null || controller.text.trim().isEmpty) return;
+
+    final text = controller.text.trim();
+    setState(() => _commentBusy.add(postId));
+    try {
+      await getIt<HomeViewModel>().createComment(postId, text, feedIndex);
+      controller.clear();
+    } finally {
+      if (mounted) {
+        setState(() => _commentBusy.remove(postId));
+      }
+    }
+  }
+
 }
