@@ -46,7 +46,6 @@ class UserActivityItemWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: colors.surface,
-          borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
           border: Border.all(color: colors.accent, width: 1),
         ),
         child: IntrinsicHeight(

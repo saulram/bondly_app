@@ -94,6 +94,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                   ),
                 ),
               ),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   StringsProfile.myActivity,
@@ -105,7 +106,7 @@ class _MyActivityScreenState extends State<MyActivityScreen>
                   ),
                 ),
               ),
-              const SizedBox(width: 24),
+              const SizedBox(width: 36),
             ],
           ),
         ),

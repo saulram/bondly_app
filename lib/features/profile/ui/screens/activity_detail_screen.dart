@@ -9,14 +9,13 @@ import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/activity_detail_viewmodel.dart';
 import 'package:bondly_app/src/network_image_helpers.dart';
-import 'package:bondly_app/ui/shared/badge_icon_button.dart';
 import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:bondly_app/ui/shared/feed_post_card.dart';
+import 'package:bondly_app/ui/shared/feed_post_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:moment_dart/moment_dart.dart';
 
 class ActivityDetailScreen extends StatefulWidget {
   static const String route = "/activityDetailScreen";
@@ -113,6 +112,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
                   ),
                 ),
               ),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   StringsProfile.myActivity,
@@ -124,7 +124,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 24),
+              const SizedBox(width: 36),
             ],
           ),
         ),
@@ -133,7 +133,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
   }
 
   Widget _buildPostContent(FeedData post, BondlyColorScheme colors) {
-    final badgeType = _resolveBadgeType(post.type);
+    final badgeType = FeedPostHelpers.resolveBadgeType(post.type);
     final homeModel = getIt<HomeViewModel>();
     final currentUserAvatar = homeModel.user?.avatar;
 
@@ -142,7 +142,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
         .map((c) => FeedCommentData(
               userName: c.user.completeName.trim(),
               userAvatarUrl: safeImageUrl(c.user.avatar, isAvatar: true),
-              timeAgo: _formatTimeAgo(c.timeStamp),
+              timeAgo: FeedPostHelpers.formatTimeAgo(c.timeStamp),
               message: c.message ?? '',
             ))
         .toList();
@@ -154,11 +154,11 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
       ),
       child: FeedPostCard(
         badgeName: post.badge?.name,
-        badgeCategory: _resolveBadgeCategory(post.type),
+        badgeCategory: FeedPostHelpers.resolveBadgeCategory(post.type),
         badgeType: badgeType,
         userName: post.sender.completeName.trim(),
         userAvatarUrl: safeImageUrl(post.sender.avatar, isAvatar: true),
-        date: _formatDate(post.createdAt),
+        date: FeedPostHelpers.formatDate(post.createdAt),
         tag: StringsHome.feedTagRecognition,
         message: post.body,
         mentionWidget: PostMentionsWidget(
@@ -270,6 +270,7 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
     setState(() => _likeBusy = true);
     try {
       await getIt<HomeViewModel>().handleLikes(postId);
+      await widget.model.load(widget.feedId, widget.activityId, widget.isRead);
     } finally {
       if (mounted) setState(() => _likeBusy = false);
     }
@@ -285,44 +286,10 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
     try {
       await getIt<HomeViewModel>().createComment(postId, text, 0);
       _commentController.clear();
+      await widget.model.load(widget.feedId, widget.activityId, widget.isRead);
     } finally {
       if (mounted) setState(() => _commentBusy = false);
     }
   }
 
-  // ─── Helpers ───────────────────────────────────────────────────────
-
-  static BadgeType _resolveBadgeType(String type) {
-    final lower = type.toLowerCase();
-    if (lower.contains('especial')) return BadgeType.especiales;
-    if (lower.contains('valor') || lower.contains('embajada')) {
-      return BadgeType.valores;
-    }
-    return BadgeType.competencias;
-  }
-
-  static String _resolveBadgeCategory(String type) {
-    final lower = type.toLowerCase();
-    if (lower.contains('especial')) return StringsHome.badgeEspeciales;
-    if (lower.contains('valor') || lower.contains('embajada')) {
-      return StringsHome.badgeValores;
-    }
-    return StringsHome.badgeCompetencias;
-  }
-
-  static String _formatDate(DateTime date) {
-    final moment = Moment(date.toLocal());
-    return moment.format('DD MMM YYYY');
-  }
-
-  static String _formatTimeAgo(String? timestamp) {
-    if (timestamp == null) return '';
-    try {
-      final date = DateTime.parse(timestamp);
-      final moment = Moment(date.toLocal());
-      return moment.fromNow(dropPrefixOrSuffix: true);
-    } catch (_) {
-      return '';
-    }
-  }
 }
