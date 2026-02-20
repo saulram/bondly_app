@@ -99,6 +99,12 @@ class BondlyColors {
   static const Color badgeValoresStart = Color(0xFF10B981);
   static const Color badgeValoresEnd = Color(0xFF3B82F6);
 
+  // ─── Podium ───
+  static const Color lightPodiumGold = Color(0xFFF59E0B);
+  static const Color darkPodiumGold = Color(0xFFFBBF24);
+  static const Color silver = Color(0xFFC0C0C0);
+  static const Color bronze = Color(0xFFCD7F32);
+
   // ─── Fixed ───
   static const Color white = Color(0xFFFFFFFF);
 }
@@ -126,6 +132,9 @@ class BondlyColorScheme extends ThemeExtension<BondlyColorScheme> {
   final Color tabInactive;
   final Color sliderDotActive;
   final Color sliderDotInactive;
+  final Color podiumGold;
+  final Color silver;
+  final Color bronze;
 
   const BondlyColorScheme({
     required this.bg,
@@ -147,6 +156,9 @@ class BondlyColorScheme extends ThemeExtension<BondlyColorScheme> {
     required this.tabInactive,
     required this.sliderDotActive,
     required this.sliderDotInactive,
+    required this.podiumGold,
+    required this.silver,
+    required this.bronze,
   });
 
   static const light = BondlyColorScheme(
@@ -169,6 +181,9 @@ class BondlyColorScheme extends ThemeExtension<BondlyColorScheme> {
     tabInactive: BondlyColors.lightTabInactive,
     sliderDotActive: BondlyColors.lightSliderDotActive,
     sliderDotInactive: BondlyColors.lightSliderDotInactive,
+    podiumGold: BondlyColors.lightPodiumGold,
+    silver: BondlyColors.silver,
+    bronze: BondlyColors.bronze,
   );
 
   static const dark = BondlyColorScheme(
@@ -191,6 +206,9 @@ class BondlyColorScheme extends ThemeExtension<BondlyColorScheme> {
     tabInactive: BondlyColors.darkTabInactive,
     sliderDotActive: BondlyColors.darkSliderDotActive,
     sliderDotInactive: BondlyColors.darkSliderDotInactive,
+    podiumGold: BondlyColors.darkPodiumGold,
+    silver: BondlyColors.silver,
+    bronze: BondlyColors.bronze,
   );
 
   @override
@@ -214,6 +232,9 @@ class BondlyColorScheme extends ThemeExtension<BondlyColorScheme> {
     Color? tabInactive,
     Color? sliderDotActive,
     Color? sliderDotInactive,
+    Color? podiumGold,
+    Color? silver,
+    Color? bronze,
   }) {
     return BondlyColorScheme(
       bg: bg ?? this.bg,
@@ -235,6 +256,9 @@ class BondlyColorScheme extends ThemeExtension<BondlyColorScheme> {
       tabInactive: tabInactive ?? this.tabInactive,
       sliderDotActive: sliderDotActive ?? this.sliderDotActive,
       sliderDotInactive: sliderDotInactive ?? this.sliderDotInactive,
+      podiumGold: podiumGold ?? this.podiumGold,
+      silver: silver ?? this.silver,
+      bronze: bronze ?? this.bronze,
     );
   }
 
@@ -264,6 +288,9 @@ class BondlyColorScheme extends ThemeExtension<BondlyColorScheme> {
       sliderDotActive: Color.lerp(sliderDotActive, other.sliderDotActive, t)!,
       sliderDotInactive:
           Color.lerp(sliderDotInactive, other.sliderDotInactive, t)!,
+      podiumGold: Color.lerp(podiumGold, other.podiumGold, t)!,
+      silver: Color.lerp(silver, other.silver, t)!,
+      bronze: Color.lerp(bronze, other.bronze, t)!,
     );
   }
 }

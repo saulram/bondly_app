@@ -11,6 +11,8 @@ import 'package:bondly_app/features/profile/data/repositories/supabase_account_s
 import 'package:bondly_app/features/profile/data/repositories/supabase_activity_repository.dart';
 import 'package:bondly_app/features/profile/data/repositories/supabase_bondly_badges_repository.dart';
 import 'package:bondly_app/features/profile/data/repositories/supabase_cart_repository.dart';
+import 'package:bondly_app/features/ranking/data/repositories/supabase_ranking_repository.dart';
+import 'package:bondly_app/features/ranking/domain/repositories/ranking_repository.dart';
 import 'package:bondly_app/src/supabase_client_provider.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/users_api.dart';
@@ -154,6 +156,10 @@ class RepositoryProvider {
       DefaultSupabaseRepository(
         getIt<SupabaseClientProvider>(),
       ),
+    );
+
+    getIt.registerSingleton<RankingRepository>(
+      SupabaseRankingRepository(getIt<SupabaseClientProvider>()),
     );
   }
 }

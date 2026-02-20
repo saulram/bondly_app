@@ -67,4 +67,11 @@ class StringsHome {
       'Reconocimiento enviado exitosamente';
   static const String acknowledgmentError =
       'Error al enviar reconocimiento';
+
+  // Embajadas section
+  static const String embassySectionTitle = 'Embajadas';
+  static String badgeCount(int count) => '$count insignias';
+  static const String embassyEmptyTitle = 'No hay insignias aún';
+  static const String embassyEmptyBody =
+      'Las insignias aparecerán aquí cuando estén disponibles';
 }

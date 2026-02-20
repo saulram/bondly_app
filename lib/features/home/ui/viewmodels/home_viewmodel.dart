@@ -20,6 +20,9 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_collaborato
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
+import 'package:bondly_app/config/backend_config.dart';
+import 'package:bondly_app/features/ranking/domain/models/ranked_user.dart';
+import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -44,6 +47,7 @@ class HomeViewModel extends NavigationModel {
   final CreateAcknowledgmentUseCase _createAcknowledgmentUseCase;
   final GetCompanyAnnouncementsUseCase _getCompanyAnnouncementsUseCase;
   final GetUserEmbassysUseCase _getUserEmbassysUseCase;
+  final GetRankingUseCase _getRankingUseCase;
 
   final GlobalKey<FlutterMentionsState> mentionsKey =
       GlobalKey<FlutterMentionsState>();
@@ -65,7 +69,8 @@ class HomeViewModel extends NavigationModel {
       this._getCompanyCollaboratorsUseCase,
       this._createAcknowledgmentUseCase,
       this._getCompanyAnnouncementsUseCase,
-      this._getUserEmbassysUseCase) {
+      this._getUserEmbassysUseCase,
+      this._getRankingUseCase) {
     log.i("HomeViewModel created");
   }
 
@@ -97,6 +102,7 @@ class HomeViewModel extends NavigationModel {
       getCompanyCategories(),
       getCompanyCollaborators(),
       handleGetAnnounceMents(),
+      getRanking(),
     ]);
   }
 
@@ -446,6 +452,30 @@ class HomeViewModel extends NavigationModel {
       if (error is TokenNotFoundException) {
         // Dispatch logout
       }
+    });
+  }
+
+  // ─── Ranking ──────────────────────────────────────────────────────────
+
+  bool get isRankingEnabled => !BackendConfig.isApi;
+
+  List<RankedUser> _rankingUsers = [];
+  List<RankedUser> get rankingUsers => _rankingUsers;
+  set rankingUsers(List<RankedUser> data) {
+    _rankingUsers = data;
+    notifyListeners();
+  }
+
+  Future<void> getRanking() async {
+    if (!isRankingEnabled) return;
+
+    log.i("Get Ranking for home podium");
+    final result = await _getRankingUseCase.invoke(period: 'month', limit: 3);
+    result.when((users) {
+      log.i("HomeViewModel### Ranking: ${users.length} users");
+      rankingUsers = users;
+    }, (error) {
+      log.e("HomeViewModel### Ranking Error: $error");
     });
   }
 }
