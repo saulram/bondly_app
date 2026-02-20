@@ -39,6 +39,8 @@ import 'package:bondly_app/features/profile/ui/viewmodels/bondly_badges_viewmode
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
+import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
+import 'package:bondly_app/features/ranking/ui/viewmodels/ranking_viewmodel.dart';
 import 'package:bondly_app/src/app_services.dart';
 import 'package:bondly_app/src/routes.dart';
 
@@ -73,6 +75,7 @@ class ViewModelProvider {
               getIt<CreateAcknowledgmentUseCase>(),
               getIt<GetCompanyAnnouncementsUseCase>(),
               getIt<GetUserEmbassysUseCase>(),
+              getIt<GetRankingUseCase>(),
             ),
         dependsOn: [UserUseCase]);
 
@@ -117,5 +120,8 @@ class ViewModelProvider {
         ));
     getIt.registerFactory<AccountStatementViewModel>(
         () => AccountStatementViewModel(getIt<GetAccountStatementUseCase>()));
+
+    getIt.registerFactory<RankingViewModel>(
+        () => RankingViewModel(getIt<GetRankingUseCase>()));
   }
 }

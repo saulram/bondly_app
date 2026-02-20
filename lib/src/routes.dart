@@ -10,6 +10,7 @@ import 'package:bondly_app/features/profile/ui/screens/my_data_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/my_rewards_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/profile_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/shopping_cart_screen.dart';
+import 'package:bondly_app/features/ranking/ui/screens/ranking_screen.dart';
 import 'package:bondly_app/features/start/ui/screens/start_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -55,6 +56,9 @@ class AppRouter {
       GoRoute(
           path: MyBadgesScreen.route,
           builder: (context, state) => const MyBadgesScreen()),
+      GoRoute(
+          path: RankingScreen.route,
+          builder: (context, state) => const RankingScreen()),
       GoRoute(
           path: MyDataScreen.route,
           builder: (context, state) => const MyDataScreen()),
