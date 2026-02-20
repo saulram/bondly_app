@@ -63,7 +63,8 @@ class _RankingScreenState extends State<RankingScreen> {
             Expanded(
               child: model.loading
                   ? const Center(child: CircularProgressIndicator())
-                  : topThree.length < 3
+                  : topThree.length < 3 ||
+                          topThree.any((u) => u.name.trim().isEmpty)
                       ? _buildEmptyState(colors)
                       : SingleChildScrollView(
                           child: Column(
@@ -339,6 +340,11 @@ class _RankingScreenState extends State<RankingScreen> {
                 width: 40,
                 height: 40,
                 fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Icon(
+                  LucideIcons.user,
+                  size: 20,
+                  color: colors.textMuted,
+                ),
               ),
             )
           : Icon(

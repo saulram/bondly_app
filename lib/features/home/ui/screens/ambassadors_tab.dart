@@ -1,4 +1,3 @@
-import 'package:bondly_app/config/backend_config.dart';
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_home.dart';
@@ -74,11 +73,11 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
             ),
             const SizedBox(height: 16),
             // Ranking section skeleton (only when ranking is enabled)
-            if (!BackendConfig.isApi) ...[
-              Row(
+            if (model.isRankingEnabled) ...[
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const BondlyShimmerBlock(width: 100, height: 20),
+                  BondlyShimmerBlock(width: 100, height: 20),
                   BondlyShimmerBlock(width: 60, height: 14),
                 ],
               ),
@@ -91,10 +90,10 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
               const SizedBox(height: 16),
             ],
             // Section header placeholder
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const BondlyShimmerBlock(width: 120, height: 20),
+                BondlyShimmerBlock(width: 120, height: 20),
                 BondlyShimmerBlock(
                   width: 80,
                   height: 24,
@@ -191,7 +190,9 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
   Widget _buildRankingSection(BondlyColorScheme colors) {
     final ranking = model.rankingUsers;
 
-    if (ranking.length < 3) {
+    final hasValidPodium = ranking.length >= 3 &&
+        ranking.take(3).every((u) => u.name.trim().isNotEmpty);
+    if (!hasValidPodium) {
       return const SizedBox.shrink();
     }
 
@@ -326,30 +327,20 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
   // ─── Badge Grid (2 columns) ───────────────────────────────────────────
 
   Widget _buildBadgeGrid(List<Embassy> embassies) {
-    final rows = <Widget>[];
-    for (var i = 0; i < embassies.length; i += 2) {
-      final left = embassies[i];
-      final hasRight = i + 1 < embassies.length;
-
-      rows.add(
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(child: _buildBadgeCardFromEmbassy(left)),
-            const SizedBox(width: 12),
-            hasRight
-                ? Expanded(child: _buildBadgeCardFromEmbassy(embassies[i + 1]))
-                : const Expanded(child: SizedBox.shrink()),
-          ],
-        ),
-      );
-
-      if (i + 2 < embassies.length) {
-        rows.add(const SizedBox(height: 12));
-      }
-    }
-
-    return Column(children: rows);
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: embassies.length,
+      itemBuilder: (context, index) {
+        return _buildBadgeCardFromEmbassy(embassies[index]);
+      },
+    );
   }
 
   Widget _buildBadgeCardFromEmbassy(Embassy embassy) {
@@ -366,24 +357,30 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
       icon: icon,
       imageUrl: badge?.image,
       onTap: () {
-        // TODO: Navigate to badge detail
+        // TODO(BONDLY): Navigate to badge detail screen
       },
     );
   }
 
   // ─── Category Helpers ─────────────────────────────────────────────────
 
+  Map<String, Category>? _categoryLookup;
+
+  Map<String, Category> _getCategoryLookup() {
+    if (_categoryLookup != null) return _categoryLookup!;
+    final categories = model.categories.categories ?? [];
+    _categoryLookup = {
+      for (final cat in categories)
+        if (cat.id != null) cat.id!: cat,
+    };
+    return _categoryLookup!;
+  }
+
   BadgeType _resolveBadgeType(Badge? badge) {
     if (badge?.categoryId == null) return BadgeType.competencias;
 
-    final categories = model.categories.categories ?? [];
-    Category? matchedCategory;
-    for (final cat in categories) {
-      if (cat.id == badge!.categoryId) {
-        matchedCategory = cat;
-        break;
-      }
-    }
+    final lookup = _getCategoryLookup();
+    final matchedCategory = lookup[badge!.categoryId];
 
     if (matchedCategory != null) {
       final name =

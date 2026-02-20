@@ -20,6 +20,10 @@ RETURNS TABLE (
   recognition_count bigint
 ) AS $$
 BEGIN
+  IF period_filter NOT IN ('month', 'quarter', 'year') THEN
+    RAISE EXCEPTION 'Invalid period_filter: %. Valid values are month, quarter, year.', period_filter;
+  END IF;
+
   RETURN QUERY
   SELECT
     ROW_NUMBER() OVER (ORDER BY COUNT(ar.id) DESC) AS position,
@@ -35,14 +39,7 @@ BEGIN
   WHERE u.visible = true
     AND u.is_active = true
     AND a.visible = true
-    AND (
-      CASE
-        WHEN period_filter = 'month' THEN a.created_at >= date_trunc('month', now())
-        WHEN period_filter = 'quarter' THEN a.created_at >= date_trunc('quarter', now())
-        WHEN period_filter = 'year' THEN a.created_at >= date_trunc('year', now())
-        ELSE true
-      END
-    )
+    AND a.created_at >= date_trunc(period_filter, now())
   GROUP BY u.id, u.complete_name, u.avatar, up.job_position
   ORDER BY recognition_count DESC
   LIMIT result_limit;

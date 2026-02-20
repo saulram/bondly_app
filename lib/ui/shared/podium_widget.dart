@@ -288,6 +288,13 @@ class PodiumWidget extends StatelessWidget {
                       width: avatarSize,
                       height: avatarSize,
                       fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Center(
+                        child: Icon(
+                          LucideIcons.user,
+                          size: iconSize,
+                          color: iconColor,
+                        ),
+                      ),
                     ),
                   )
                 : Center(
