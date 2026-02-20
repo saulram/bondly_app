@@ -1,9 +1,9 @@
 class StringsProfile {
   static const String profileTitle = "Perfil";
   static const String defaultUser = "bienvenido";
-  static const String receivedPoints = "Puntos\nrecibidos";
+  static const String receivedPoints = "Puntos\nacumulados";
   static const String givenPoints = "Puntos\npara dar";
-  static const String monthlyPoints = "Puntos\ndel mes";
+  static const String spendablePoints = "Puntos\npara gastar";
   static const String closeSession = "Cerrar sesión";
   static const String myActivity = "Mi actividad";
   static const String monthlyReport = "Estado de cuenta";
