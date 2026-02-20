@@ -58,7 +58,6 @@ dependencies:
   flutter_dotenv: ^5.2.1
   package_info_plus: ^9.0.0
   google_generative_ai: ^0.4.6
-  flutter_dotenv: ^5.2.1
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -111,7 +110,6 @@ flutter:
   assets:
     - .env
     - assets/
-    - .env
 
   fonts:
     - family: Montserrat
