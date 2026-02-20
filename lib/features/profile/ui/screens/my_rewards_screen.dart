@@ -1,4 +1,6 @@
+import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/ai/ui/widgets/ai_recommendation_card.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
 import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart';
@@ -10,6 +12,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyRewardsScreen extends StatefulWidget {
   static const String route = "/myRewardsScreen";
@@ -84,9 +87,16 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                       child: CircularProgressIndicator.adaptive(),
                     )
                   : ListView.builder(
-                      itemCount: rewardsModel.rewardList.rewards?.length,
+                      itemCount: rewardsModel.rewardList.rewards!.length + 1,
                       itemBuilder: (context, index) {
-                        Reward reward = rewardsModel.rewardList.rewards![index];
+                        // First item: AI Recommendations section
+                        if (index == 0) {
+                          return _buildRecommendationsSection(rewardsModel);
+                        }
+
+                        final rewardIndex = index - 1;
+                        Reward reward =
+                            rewardsModel.rewardList.rewards![rewardIndex];
                         return Container(
                           margin: const EdgeInsets.only(bottom: 10),
                           child: GoldBorderedContainer(
@@ -116,6 +126,103 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                       }),
             ));
       }),
+    );
+  }
+
+  Widget _buildRecommendationsSection(MyRewardsViewModel rewardsModel) {
+    if (rewardsModel.loadingRecommendations) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFF3E5F5), Color(0xFFE8EAF6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Generando recomendaciones...',
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                color: AppColors.primaryColor,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (rewardsModel.recommendations.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.auto_awesome,
+                size: 20,
+                color: AppColors.primaryColor,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Recomendado para ti',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Text(
+            'Basado en tu perfil y actividad',
+            style: GoogleFonts.montserrat(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 180,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: rewardsModel.recommendations.length,
+            itemBuilder: (context, index) {
+              final rec = rewardsModel.recommendations[index];
+              final reward = rewardsModel.getRewardById(rec.rewardId);
+              return AIRecommendationCard(
+                recommendation: rec,
+                reward: reward,
+                onAddToCart: reward != null
+                    ? () {
+                        rewardsModel.cartEdited = true;
+                        rewardsModel.addToCart(reward.id);
+                      }
+                    : null,
+              );
+            },
+          ),
+        ),
+        const Divider(height: 24),
+      ],
     );
   }
 }

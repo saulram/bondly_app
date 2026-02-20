@@ -1,4 +1,7 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/ai/data/api/gemini_service.dart';
+import 'package:bondly_app/features/ai/data/repositories/default_ai_repository.dart';
+import 'package:bondly_app/features/ai/domain/repositories/ai_repository.dart';
 import 'package:bondly_app/features/auth/data/mappers/user_entity_mapper.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/users_api.dart';
@@ -88,6 +91,9 @@ class RepositoryProvider {
       DefaultAccountStatementRepository(
         getIt<AccountBalanceAPI>(),
       ),
+    );
+    getIt.registerSingleton<AIRepository>(
+      DefaultAIRepository(getIt<GeminiService>()),
     );
   }
 }

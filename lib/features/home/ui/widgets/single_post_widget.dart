@@ -1,6 +1,7 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/ai/ui/widgets/sentiment_badge.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
@@ -25,6 +26,19 @@ class SinglePostWidget extends StatefulWidget {
 class _SinglePostWidgetState extends State<SinglePostWidget> {
   bool toggleComents = false;
   bool likesBusy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Trigger sentiment analysis for this post
+    if (widget.post.id != null) {
+      getIt<HomeViewModel>().analyzeFeedSentiment(
+        widget.post.id!,
+        widget.post.body,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -210,8 +224,21 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   }
 
   Widget _buildActions(BuildContext context) {
+    final homeModel = getIt<HomeViewModel>();
+    final sentiment = homeModel.getSentiment(widget.post.id ?? '');
+    final isAnalyzing = homeModel.isAnalyzingSentiment(widget.post.id ?? '');
+
     return Row(
       children: [
+        // AI Sentiment badge
+        if (sentiment != null)
+          SentimentBadge(sentiment: sentiment)
+        else if (isAnalyzing)
+          const SizedBox(
+            width: 14,
+            height: 14,
+            child: CircularProgressIndicator(strokeWidth: 1.5),
+          ),
         const Expanded(child: SizedBox()),
         likesBusy ? const CircularProgressIndicator.adaptive() : _buildLike(),
         const SizedBox(width: 10),
