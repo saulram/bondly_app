@@ -53,11 +53,9 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                     _buildHeader(rewardsModel, colors),
                     _buildCategoryTabs(rewardsModel, colors),
                     Expanded(
-                      child: rewardsModel.rewardList.rewards!.isEmpty
+                      child: rewardsModel.busy
                           ? _buildSkeletonState(colors)
-                          : rewardsModel.busy
-                              ? _buildSkeletonState(colors)
-                              : _buildRewardsList(rewardsModel, colors),
+                          : _buildRewardsList(rewardsModel, colors),
                     ),
                   ],
                 ),

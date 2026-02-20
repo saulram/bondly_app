@@ -211,7 +211,7 @@ class MyRewardsViewModel extends NavigationModel {
     result.when((rewards) {
       rewardList = rewards;
 
-      // Populate reward points map from the full list
+      _rewardPointsMap.clear();
       for (var reward in (rewards as RewardList).rewards ?? []) {
         _rewardPointsMap[reward.id] = reward.points;
       }
@@ -313,17 +313,17 @@ class MyRewardsViewModel extends NavigationModel {
     busy = true;
     Result result = await _checkOutCartUseCase.invoke(_userCart.id);
     busy = false;
-    result.when((success) {
+    bool success = false;
+    result.when((_) {
       _clearLocalCart();
       navigation.go(HomeScreen.route);
       handleShowSnackBar(StringsCart.checkoutSuccess);
-      return true;
+      success = true;
     }, (error) {
       log.e(error);
       handleShowSnackBar(StringsCart.checkoutError);
-      return false;
     });
-    return true;
+    return success;
   }
 
   void handleResetAll() {
@@ -339,22 +339,35 @@ class MyRewardsViewModel extends NavigationModel {
 
   // ── Local cart persistence ─────────────────────────────────────────
 
-  void _saveCartToLocal() {
-    final encoded = jsonEncode(_cartItems);
-    _sharedPreferences.setString(_cartStorageKey, encoded);
+  Future<void> _saveCartToLocal() async {
+    try {
+      final encoded = jsonEncode(_cartItems);
+      await _sharedPreferences.setString(_cartStorageKey, encoded);
+    } catch (e) {
+      log.e("Failed to save cart locally: $e");
+    }
   }
 
   void _loadCartFromLocal() {
     final stored = _sharedPreferences.getString(_cartStorageKey);
     if (stored != null) {
-      final decoded = jsonDecode(stored) as List<dynamic>;
-      _cartItems = decoded.map((e) => e as Map<String, dynamic>?).toList();
-      notifyListeners();
+      try {
+        final decoded = jsonDecode(stored) as List<dynamic>;
+        _cartItems = decoded.map((e) => e as Map<String, dynamic>?).toList();
+        notifyListeners();
+      } catch (e) {
+        log.e("Corrupted local cart data, clearing: $e");
+        _clearLocalCart();
+      }
     }
   }
 
-  void _clearLocalCart() {
-    _sharedPreferences.remove(_cartStorageKey);
+  Future<void> _clearLocalCart() async {
+    try {
+      await _sharedPreferences.remove(_cartStorageKey);
+    } catch (e) {
+      log.e("Failed to clear local cart: $e");
+    }
   }
 
   @override

@@ -43,13 +43,12 @@ class ProfileViewModel extends NavigationModel {
       this.user = user;
       busy = false;
       notifyListeners();
+      fetchSpendableBalance();
     }, (error) {
       busy = false;
       notifyListeners();
       handleError(error);
     });
-
-    fetchSpendableBalance();
   }
 
   Future<void> fetchSpendableBalance() async {
