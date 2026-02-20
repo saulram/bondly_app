@@ -10,4 +10,5 @@ class BackendConfig {
   }
 
   static bool get isSupabase => current == BackendType.supabase;
+  static bool get isApi => current == BackendType.api;
 }

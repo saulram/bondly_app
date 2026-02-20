@@ -25,6 +25,8 @@ import 'package:bondly_app/features/profile/domain/repositories/account_statemen
 import 'package:bondly_app/features/profile/domain/repositories/activity_repository.dart';
 import 'package:bondly_app/features/profile/domain/repositories/bondly_badges_repository.dart';
 import 'package:bondly_app/features/profile/domain/repositories/cart_repository.dart';
+import 'package:bondly_app/features/ranking/domain/repositories/ranking_repository.dart';
+import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/clear_shopping_cart_usecase.dart';
@@ -157,6 +159,9 @@ class UseCaseProvider {
 
     getIt.registerSingleton<GetAccountStatementUseCase>(
         GetAccountStatementUseCase(getIt<AccountStatementRepository>()));
+
+    getIt.registerSingleton<GetRankingUseCase>(
+        GetRankingUseCase(getIt<RankingRepository>()));
 
     getIt.registerSingletonWithDependencies<UserProfileUseCase>(
         () => UserProfileUseCase(
