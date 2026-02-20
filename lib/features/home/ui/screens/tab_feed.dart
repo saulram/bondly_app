@@ -1,3 +1,4 @@
+import 'package:bondly_app/features/ai/ui/widgets/feed_personalization_banner.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/single_post_widget.dart';
 import 'package:flutter/material.dart';
@@ -25,24 +26,34 @@ class _FeedTabState extends State<FeedTab> {
       child: SingleChildScrollView(
         child: Column(
           children: [
+            FeedPersonalizationBanner(
+              isPersonalized: model.isPersonalized,
+              isLoading: model.personalizingFeed,
+              onToggle: () {
+                model.toggleFeedPersonalization();
+              },
+            ),
             SizedBox(
               height: 500,
               child: ListView.builder(
                 itemCount: model.feeds.data.length,
                 itemBuilder: (context, index) {
+                  final post = model.feeds.data[index];
                   if (index == 0) {
                     return Column(
                       children: [
                         const SizedBox(height: 10),
                         SinglePostWidget(
-                            post: model.feeds.data[index], index: index)
+                          post: post,
+                          index: index,
+                        ),
                       ],
                     );
                   }
                   return Column(
                     children: [
                       SinglePostWidget(
-                        post: model.feeds.data[index],
+                        post: post,
                         index: index,
                       ),
                     ],

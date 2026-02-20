@@ -1,4 +1,7 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/ai/domain/usecases/analyze_sentiment_usecase.dart';
+import 'package:bondly_app/features/ai/domain/usecases/get_reward_recommendations_usecase.dart';
+import 'package:bondly_app/features/ai/domain/usecases/personalize_feed_usecase.dart';
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:bondly_app/features/auth/domain/usecases/get_login_companies_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_state_usecase.dart';
@@ -73,6 +76,8 @@ class ViewModelProvider {
               getIt<CreateAcknowledgmentUseCase>(),
               getIt<GetCompanyAnnouncementsUseCase>(),
               getIt<GetUserEmbassysUseCase>(),
+              getIt<PersonalizeFeedUseCase>(),
+              getIt<AnalyzeSentimentUseCase>(),
             ),
         dependsOn: [UserUseCase]);
 
@@ -106,6 +111,7 @@ class ViewModelProvider {
         getIt<PullCartItemUseCase>(),
         getIt<CheckOutCartUseCase>(),
         getIt<AppServices>(),
+        getIt<GetRewardRecommendationsUseCase>(),
       ),
     );
 
