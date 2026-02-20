@@ -1,19 +1,20 @@
+import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/dimensions.dart';
-import 'package:bondly_app/config/theme.dart';
+import 'package:bondly_app/config/strings_cart.dart';
+import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
-import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart';
 import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
 import 'package:bondly_app/features/profile/ui/screens/shopping_cart_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
-import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
 import 'package:bondly_app/src/network_image_helpers.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class MyRewardsScreen extends StatefulWidget {
   static const String route = "/myRewardsScreen";
@@ -26,7 +27,9 @@ class MyRewardsScreen extends StatefulWidget {
 
 class _MyRewardsScreenState extends State<MyRewardsScreen> {
   late MyRewardsViewModel model;
-  bool isLoading = false;
+  int _selectedCategoryIndex = 0;
+  bool _isSendingCart = false;
+
   @override
   void initState() {
     model = getIt<MyRewardsViewModel>();
@@ -35,349 +38,610 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
+
     return ModelProvider<MyRewardsViewModel>(
       model: model,
       child: ModelBuilder<MyRewardsViewModel>(
-          builder: (context, rewardsModel, child) {
-        return BondlySliverLayout(
-            title: "Recompensas",
-            floatingActionButton: FloatingActionButton(
-              isExtended: true,
-              onPressed: () async {
-                final navigator = GoRouter.of(context);
-                if (!rewardsModel.cartEdited) {
-                  navigator.push(MyCartScreen.route);
-                  return;
-                }
-                setState(() {
-                  isLoading = true;
-                });
+        builder: (context, rewardsModel, child) {
+          return Scaffold(
+            backgroundColor: colors.bg,
+            body: Stack(
+              children: [
+                Column(
+                  children: [
+                    _buildHeader(rewardsModel, colors),
+                    _buildCategoryTabs(rewardsModel, colors),
+                    Expanded(
+                      child: rewardsModel.busy
+                          ? _buildSkeletonState(colors)
+                          : _buildRewardsList(rewardsModel, colors),
+                    ),
+                  ],
+                ),
+                Positioned(
+                  bottom: 20,
+                  right: 20,
+                  child: _buildCartFAB(rewardsModel, colors),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 
-                await rewardsModel.sendItemsToCart();
-                if (!mounted) return;
-                setState(() {
-                  isLoading = false;
-                });
-                navigator.push(MyCartScreen.route);
-              },
-              tooltip: "Carrito",
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(IconsaxOutline.shopping_cart),
-                  const SizedBox(
-                    width: 5,
+  Widget _buildHeader(
+    MyRewardsViewModel rewardsModel,
+    BondlyColorScheme colors,
+  ) {
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.paddingScreen,
+          vertical: AppDimensions.spacingSm,
+        ),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () => context.pop(),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: colors.surfaceElevated,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  LucideIcons.arrowLeft,
+                  size: 20,
+                  color: colors.textPrimary,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                StringsProfile.rewards,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.montserrat(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: colors.textPrimary,
+                ),
+              ),
+            ),
+            if (rewardsModel.userBalance != null)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  gradient: AppDimensions.accentGradient(colors),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusPill),
+                ),
+                child: Text(
+                  '${rewardsModel.userBalance} ${StringsCart.pointsSuffix}',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
-                  AnimatedOpacity(
-                    opacity: isLoading ? 0.4 : 1.0,
-                    duration: const Duration(milliseconds: 300),
-                    child: Text(
-                      "${rewardsModel.cartItems.length}",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              )
+            else
+              const SizedBox(width: 40),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryTabs(
+    MyRewardsViewModel rewardsModel,
+    BondlyColorScheme colors,
+  ) {
+    return SizedBox(
+      height: 48,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: rewardsModel.rewardCategories.length,
+        itemBuilder: (context, index) {
+          final isActive = _selectedCategoryIndex == index;
+          return Padding(
+            padding: EdgeInsets.only(
+              left: index == 0
+                  ? AppDimensions.paddingScreen
+                  : AppDimensions.spacingSm,
+              right: index == rewardsModel.rewardCategories.length - 1
+                  ? AppDimensions.paddingScreen
+                  : 0,
+            ),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedCategoryIndex = index;
+                });
+                rewardsModel.filterByCategory(
+                  rewardsModel.rewardCategories[index],
+                );
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: isActive
+                      ? AppDimensions.accentGradient(colors)
+                      : null,
+                  color: isActive ? null : colors.surfaceElevated,
+                  border: isActive
+                      ? null
+                      : Border.all(color: colors.border, width: 1),
+                  borderRadius:
+                      BorderRadius.circular(AppDimensions.radiusPill),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  rewardsModel.rewardCategories[index],
+                  style: GoogleFonts.montserrat(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isActive ? Colors.white : colors.textSecondary,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildRewardsList(
+    MyRewardsViewModel rewardsModel,
+    BondlyColorScheme colors,
+  ) {
+    final rewards = rewardsModel.rewardList.rewards!;
+
+    if (rewards.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(LucideIcons.gift, size: 48, color: colors.textMuted),
+            const SizedBox(height: 12),
+            Text(
+              StringsCart.noRewardsAvailable,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: colors.textMuted,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.paddingScreen,
+        12,
+        AppDimensions.paddingScreen,
+        100,
+      ),
+      physics: const AlwaysScrollableScrollPhysics(),
+      itemCount: rewards.length,
+      itemBuilder: (context, index) {
+        return _buildRewardCard(rewards[index], rewardsModel, colors);
+      },
+    );
+  }
+
+  void _handleAddToCart(MyRewardsViewModel rewardsModel, String rewardId) {
+    rewardsModel.cartEdited = true;
+    final added = rewardsModel.addToCart(rewardId);
+    if (!added) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(StringsCart.notEnoughPoints),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Widget _buildRewardCard(
+    Reward reward,
+    MyRewardsViewModel rewardsModel,
+    BondlyColorScheme colors,
+  ) {
+    final itemCount = rewardsModel.getItemCount(reward.id);
+    final canAfford = rewardsModel.canAffordItem(reward.id);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border.all(color: colors.border, width: 1),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+        boxShadow: AppDimensions.cardShadow(colors.textPrimary),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Card header row
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(
+                  reward.enable == false
+                      ? LucideIcons.lock
+                      : LucideIcons.unlock,
+                  size: 18,
+                  color:
+                      reward.enable == false ? colors.textMuted : colors.accent,
+                ),
+                itemCount == 0
+                    ? GestureDetector(
+                        onTap: () =>
+                            _handleAddToCart(rewardsModel, reward.id),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.accentSoft,
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusPill,
+                            ),
+                          ),
+                          child: Text(
+                            StringsCart.selectItem,
+                            style: GoogleFonts.montserrat(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: colors.accent,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              rewardsModel.cartEdited = true;
+                              rewardsModel.removeFromCart(reward.id);
+                            },
+                            child: Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: colors.surfaceElevated,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                LucideIcons.minus,
+                                size: 16,
+                                color: colors.textPrimary,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                            ),
+                            child: Text(
+                              '$itemCount',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: colors.textPrimary,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () =>
+                                _handleAddToCart(rewardsModel, reward.id),
+                            child: Container(
+                              width: 28,
+                              height: 28,
+                              decoration: BoxDecoration(
+                                color: colors.surfaceElevated,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                LucideIcons.plus,
+                                size: 16,
+                                color: colors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+              ],
+            ),
+          ),
+
+          // Image section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FullScreenImage(
+                      image: reward.image,
+                      tag: reward.id,
+                    ),
+                  ),
+                );
+              },
+              child: Hero(
+                tag: reward.id,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(
+                    AppDimensions.radiusCard - 4,
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 10,
+                    child: CachedNetworkImage(
+                      imageUrl: safeImageUrl(reward.imageUrl),
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          const BondlyShimmerBlock(
+                        width: double.infinity,
+                        height: double.infinity,
+                        borderRadius: 12,
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: colors.surfaceElevated,
+                        child: Icon(
+                          LucideIcons.image,
+                          size: 40,
+                          color: colors.textMuted,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Title + Points badge
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    reward.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: canAfford ? colors.accentSoft : Colors.red.shade50,
+                    borderRadius:
+                        BorderRadius.circular(AppDimensions.radiusPill),
+                  ),
+                  child: Text(
+                    '${reward.points} ${StringsCart.pointsSuffix}',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: canAfford ? colors.accent : Colors.red,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Divider
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Divider(
+              height: 0.5,
+              thickness: 0.5,
+              color: colors.border,
+            ),
+          ),
+
+          // Description
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Text(
+              reward.description,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.montserrat(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                color: colors.textSecondary,
+              ),
+            ),
+          ),
+
+          // Validity row
+          if (reward.deadline != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: Row(
+                children: [
+                  Icon(
+                    LucideIcons.calendar,
+                    size: 14,
+                    color: colors.textMuted,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${StringsCart.validityPrefix} ${reward.deadline!.day.toString().padLeft(2, '0')}/${reward.deadline!.month.toString().padLeft(2, '0')}/${reward.deadline!.year}',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: colors.textMuted,
                     ),
                   ),
                 ],
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: rewardsModel.rewardList.rewards!.isEmpty
-                  ? const Center(
-                      child: BondlyShimmerBlock(
-                          width: 200, height: 200, borderRadius: 12),
-                    )
-                  : Column(
-                      children: [
-                        SizedBox(
-                          height: 50,
-                          child: rewardsModel.rewardList.rewards!.isEmpty
-                              ? const Center(
-                                  child: BondlyShimmerBlock(
-                                      width: double.infinity,
-                                      height: 40,
-                                      borderRadius: 20),
-                                )
-                              : ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount:
-                                      rewardsModel.rewardCategories.length,
-                                  itemBuilder: (context, index) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          rewardsModel.filterByCategory(
-                                              rewardsModel
-                                                  .rewardCategories[index]);
-                                        },
-                                        child: Chip(
-                                          label: Text(
-                                              rewardsModel
-                                                  .rewardCategories[index],
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.copyWith(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .tertiary)),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        rewardsModel.busy
-                            ? const Expanded(
-                                child: Center(
-                                  child: BondlyShimmerBlock(
-                                      width: 200,
-                                      height: 200,
-                                      borderRadius: 12),
-                                ),
-                              )
-                            : Expanded(
-                                child: ListView.builder(
-                                    itemCount:
-                                        rewardsModel.rewardList.rewards?.length,
-                                    itemBuilder: (context, index) {
-                                      Reward reward = rewardsModel
-                                          .rewardList.rewards![index];
-                                      return Container(
-                                        margin:
-                                            const EdgeInsets.only(bottom: 10),
-                                        child: GoldBorderedContainer(
-                                          child: Column(
-                                            children: [
-                                              RewardCardHeader(
-                                                reward: reward,
-                                                size: size,
-                                                rewardsModel: rewardsModel,
-                                              ),
-                                              const SizedBox(
-                                                height: 10,
-                                              ),
-                                              RewardCardImage(reward: reward),
-                                              const SizedBox(
-                                                height: 10,
-                                              ),
-                                              RewardCardTitleSection(
-                                                  reward: reward),
-                                              const Divider(),
-                                              RewardDescriptionCardSection(
-                                                  reward: reward),
-                                              const Divider(),
-                                              RewardFooterCardSection(
-                                                  reward: reward),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }),
-                              ),
-                      ],
-                    ),
-            ));
-      }),
-    );
-  }
-}
-
-class RewardDescriptionCardSection extends StatelessWidget {
-  const RewardDescriptionCardSection({
-    super.key,
-    required this.reward,
-  });
-
-  final Reward reward;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        reward.description,
-        style: Theme.of(context).textTheme.bodyMedium,
-      ),
-    );
-  }
-}
-
-class RewardFooterCardSection extends StatelessWidget {
-  const RewardFooterCardSection({
-    super.key,
-    required this.reward,
-  });
-
-  final Reward reward;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "Vigencia",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          Text(
-            "${reward.deadline!.day}/${reward.deadline!.month}/${reward.deadline!.year}",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
         ],
       ),
     );
   }
-}
 
-class RewardCardTitleSection extends StatelessWidget {
-  const RewardCardTitleSection({
-    super.key,
-    required this.reward,
-  });
-
-  final Reward reward;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          " ${reward.name} ",
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(
-          width: 10,
-        ),
-        const SizedBox(
-          width: 5,
-        ),
-        Text(
-          "${reward.points} pts",
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-      ],
-    );
-  }
-}
-
-class RewardCardImage extends StatelessWidget {
-  const RewardCardImage({
-    super.key,
-    required this.reward,
-  });
-
-  final Reward reward;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => FullScreenImage(
-              image: reward.image,
-              tag: reward.id,
-            ),
+  Widget _buildSkeletonState(BondlyColorScheme colors) {
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.paddingScreen,
+        12,
+        AppDimensions.paddingScreen,
+        100,
+      ),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 3,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+          ),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BondlyShimmerBlock(
+                width: double.infinity,
+                height: 40,
+                borderRadius: 8,
+              ),
+              SizedBox(height: 12),
+              BondlyShimmerBlock(
+                width: double.infinity,
+                height: 160,
+                borderRadius: 12,
+              ),
+              SizedBox(height: 12),
+              BondlyShimmerBlock(
+                width: 200,
+                height: 16,
+                borderRadius: 8,
+              ),
+              SizedBox(height: 8),
+              BondlyShimmerBlock(
+                width: double.infinity,
+                height: 40,
+                borderRadius: 8,
+              ),
+            ],
           ),
         );
       },
-      child: Hero(
-        tag: reward.id,
-        child: AspectRatio(
-          aspectRatio: 1,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
-              image: DecorationImage(
-                image: CachedNetworkImageProvider(
-                  safeImageUrl(reward.imageUrl),
-                ),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
-}
 
-class RewardCardHeader extends StatelessWidget {
-  const RewardCardHeader({
-    super.key,
-    required this.reward,
-    required this.size,
-    required this.rewardsModel,
-  });
-
-  final Reward reward;
-  final Size size;
-  final MyRewardsViewModel rewardsModel;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Icon(
-            reward.enable == false
-                ? IconsaxOutline.lock
-                : IconsaxOutline.unlock,
-            color: Theme.of(context).colorScheme.tertiary),
-        SizedBox(width: size.width * .4),
-        //To be fixed, if item exist in cart, show the quantity and a + and - button to add or remove.
-        //If not, show a button to add to cart.
-        rewardsModel.getItemCount(reward.id) == 0
-            ? OutlinedButton(
-                onPressed: () {
-                  rewardsModel.cartEdited = true;
-                  rewardsModel.addToCart(reward.id);
-                },
-                child: const Text("Seleccionar"),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      rewardsModel.cartEdited = true;
-                      rewardsModel.removeFromCart(reward.id);
-                    },
-                    icon: Icon(
-                      IconsaxOutline.minus,
-                      color: context.themeData.textTheme.bodyMedium?.color,
+  Widget _buildCartFAB(
+    MyRewardsViewModel rewardsModel,
+    BondlyColorScheme colors,
+  ) {
+    return GestureDetector(
+      onTap: () async {
+        final navigator = GoRouter.of(context);
+        if (!rewardsModel.cartEdited) {
+          navigator.push(MyCartScreen.route);
+          return;
+        }
+        setState(() {
+          _isSendingCart = true;
+        });
+        await rewardsModel.sendItemsToCart();
+        if (!mounted) return;
+        setState(() {
+          _isSendingCart = false;
+        });
+        navigator.push(MyCartScreen.route);
+      },
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: AppDimensions.accentGradient(colors),
+          shape: BoxShape.circle,
+          boxShadow: AppDimensions.cardShadow(colors.textPrimary),
+        ),
+        child: Center(
+          child: _isSendingCart
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    const Icon(
+                      LucideIcons.shoppingCart,
+                      size: 24,
+                      color: Colors.white,
                     ),
-                  ),
-                  Text(
-                    '${rewardsModel.getItemCount(reward.id)}',
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      rewardsModel.cartEdited = true;
-                      rewardsModel.addToCart(reward.id);
-                    },
-                    icon: Icon(
-                      IconsaxOutline.add,
-                      color: context.themeData.textTheme.bodyMedium?.color,
-                    ),
-                  ),
-                ],
-              )
-      ],
+                    if (rewardsModel.cartItems.isNotEmpty)
+                      Positioned(
+                        top: -6,
+                        right: -8,
+                        child: Container(
+                          constraints: const BoxConstraints(
+                            minWidth: 18,
+                            minHeight: 18,
+                          ),
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: colors.accentGradientEnd,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${rewardsModel.cartItems.length}',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+        ),
+      ),
     );
   }
 }

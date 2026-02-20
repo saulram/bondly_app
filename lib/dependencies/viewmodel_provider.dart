@@ -41,6 +41,7 @@ import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.d
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/src/app_services.dart';
 import 'package:bondly_app/src/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ViewModelProvider {
   static void provide() {
@@ -56,6 +57,7 @@ class ViewModelProvider {
         logoutUseCase: getIt<LogoutUseCase>(),
         updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
         profileUseCase: getIt<UserProfileUseCase>(),
+        getAccountStatementUseCase: getIt<GetAccountStatementUseCase>(),
       ),
     );
 
@@ -106,6 +108,8 @@ class ViewModelProvider {
         getIt<PullCartItemUseCase>(),
         getIt<CheckOutCartUseCase>(),
         getIt<AppServices>(),
+        getIt<GetAccountStatementUseCase>(),
+        getIt<SharedPreferences>(),
       ),
     );
 
