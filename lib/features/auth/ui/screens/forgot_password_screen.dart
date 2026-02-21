@@ -1,13 +1,17 @@
+import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/constants.dart';
 import 'package:bondly_app/config/strings_forgot_password.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/auth/ui/screens/verify_reset_token_screen.dart';
 import 'package:bondly_app/features/auth/ui/states/forgot_password_ui_state.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/forgot_password_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
-import 'package:bondly_app/features/main/ui/extensions/device_scale.dart';
 import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   static const String route = "/forgotPassword";
@@ -23,11 +27,34 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final String _logoDarkImagePath = "assets/img_logo_dark.png";
 
   final ForgotPasswordViewModel model = getIt<ForgotPasswordViewModel>();
-  final emailController = TextEditingController();
+  final _emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final bondly = Theme.of(context).extension<BondlyColorScheme>()!;
+
     return Scaffold(
+      backgroundColor: bondly.bg,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: GestureDetector(
+          onTap: () => context.pop(),
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: bondly.surfaceElevated,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              LucideIcons.arrowLeft,
+              size: 18,
+              color: bondly.textPrimary,
+            ),
+          ),
+        ),
+      ),
       body: ModelProvider<ForgotPasswordViewModel>(
         model: model,
         child: ModelBuilder<ForgotPasswordViewModel>(
@@ -41,11 +68,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               case ForgotPasswordLoading _:
                 return ForgotPasswordSkeletonLoader(screenWidth: screenWidth);
               case ForgotPasswordSuccess _:
-                return _buildSuccessView(screenWidth);
+                return _buildSuccessView(bondly, screenWidth);
               case ForgotPasswordFailed error:
-                return _buildFormView(screenWidth, errorType: error.errorType);
+                return _buildFormView(
+                  bondly,
+                  screenWidth,
+                  errorType: error.errorType,
+                );
               default:
-                return _buildFormView(screenWidth);
+                return _buildFormView(bondly, screenWidth);
             }
           },
         ),
@@ -54,69 +85,145 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Widget _buildFormView(
+    BondlyColorScheme bondly,
     double screenWidth, {
     ForgotPasswordErrorType? errorType,
   }) {
+    String errorMessage = '';
+    switch (errorType) {
+      case ForgotPasswordErrorType.emptyEmail:
+        errorMessage = ForgotPasswordStrings.emailRequired;
+      case ForgotPasswordErrorType.invalidEmail:
+        errorMessage = ForgotPasswordStrings.invalidEmail;
+      case ForgotPasswordErrorType.connectionError:
+        errorMessage = ForgotPasswordStrings.connectionError;
+      case ForgotPasswordErrorType.unknownError:
+        errorMessage = ForgotPasswordStrings.unknownError;
+      default:
+        errorMessage = '';
+    }
+
     return Container(
-      height: MediaQuery.of(context).size.height,
       alignment: Alignment.center,
       child: SizedBox(
         width: screenWidth,
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildLogo(),
-              _buildTitle(),
-              _buildDescription(),
-              _buildEmailField(errorType),
-              _buildActions(),
-            ],
+          clipBehavior: Clip.hardEdge,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLogo(),
+                const SizedBox(height: 16),
+                _buildTitle(bondly),
+                const SizedBox(height: 12),
+                _buildDescription(bondly),
+                const SizedBox(height: 32),
+                _buildForm(bondly, errorMessage),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildSuccessView(double screenWidth) {
+  Widget _buildSuccessView(BondlyColorScheme bondly, double screenWidth) {
     return Container(
-      height: MediaQuery.of(context).size.height,
       alignment: Alignment.center,
       child: SizedBox(
         width: screenWidth,
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildLogo(),
-              _buildTitle(),
-              Container(
-                margin: EdgeInsets.symmetric(
-                  horizontal: 32.dp,
-                  vertical: 24.dp,
-                ),
-                padding: EdgeInsets.all(16.dp),
-                decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.green),
-                    SizedBox(width: 12.dp),
-                    Expanded(
-                      child: Text(
-                        ForgotPasswordStrings.successMessage,
-                        style: context.themeData.textTheme.bodyMedium,
+          clipBehavior: Clip.hardEdge,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLogo(),
+                const SizedBox(height: 16),
+                _buildTitle(bondly),
+                const SizedBox(height: 24),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        LucideIcons.checkCircle,
+                        color: Colors.green,
+                        size: 22,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          ForgotPasswordStrings.successMessage,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: bondly.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(height: 24),
+                _buildHaveCodeButton(bondly),
+                const SizedBox(height: 14),
+                _buildBackToLogin(bondly),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHaveCodeButton(BondlyColorScheme bondly) {
+    return Container(
+      width: double.infinity,
+      height: 52,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [bondly.accentGradientStart, bondly.accentGradientEnd],
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x307C3AED),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            model.navigation.push(
+              VerifyResetTokenScreen.route,
+              extra: {
+                VerifyResetTokenScreen.emailParam: _emailController.text,
+              },
+            );
+          },
+          child: Center(
+            child: Text(
+              ForgotPasswordStrings.haveCode,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: BondlyColors.white,
               ),
-              _buildBackToLoginButton(),
-            ],
+            ),
           ),
         ),
       ),
@@ -124,113 +231,177 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Widget _buildLogo() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 36.dp),
-      child: Image.asset(
-        context.isDarkMode ? _logoDarkImagePath : _logoImagePath,
+    return SizedBox(
+      width: 200,
+      height: 160,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Image.asset(
+          context.isDarkMode ? _logoDarkImagePath : _logoImagePath,
+          fit: BoxFit.contain,
+        ),
       ),
     );
   }
 
-  Widget _buildTitle() {
-    return Container(
-      margin: EdgeInsets.only(top: 48.dp, left: 24.dp, right: 24.dp),
-      child: Text(
-        ForgotPasswordStrings.title,
-        style: context.themeData.textTheme.titleLarge,
+  Widget _buildTitle(BondlyColorScheme bondly) {
+    return Text(
+      ForgotPasswordStrings.title,
+      style: GoogleFonts.inter(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: bondly.textPrimary,
       ),
+      textAlign: TextAlign.center,
     );
   }
 
-  Widget _buildDescription() {
-    return Container(
-      margin: EdgeInsets.only(top: 16.dp, left: 32.dp, right: 32.dp),
+  Widget _buildDescription(BondlyColorScheme bondly) {
+    return SizedBox(
+      width: double.infinity,
       child: Text(
         ForgotPasswordStrings.description,
-        style: context.themeData.textTheme.bodyMedium,
+        style: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: bondly.textSecondary,
+          height: 1.5,
+        ),
         textAlign: TextAlign.center,
       ),
     );
   }
 
-  Widget _buildEmailField(ForgotPasswordErrorType? errorType) {
-    String errorDescription;
-    switch (errorType) {
-      case ForgotPasswordErrorType.emptyEmail:
-        errorDescription = ForgotPasswordStrings.emailRequired;
-      case ForgotPasswordErrorType.invalidEmail:
-        errorDescription = ForgotPasswordStrings.invalidEmail;
-      case ForgotPasswordErrorType.connectionError:
-        errorDescription = ForgotPasswordStrings.connectionError;
-      case ForgotPasswordErrorType.unknownError:
-        errorDescription = ForgotPasswordStrings.unknownError;
-      default:
-        errorDescription = "";
-    }
-
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 32.dp, vertical: 36.dp),
-      child: Column(
-        children: [
-          TextFormField(
-            controller: emailController,
-            decoration: InputDecoration(
-              label: Text(
-                ForgotPasswordStrings.emailLabel,
-                style: context.themeData.textTheme.bodyMedium,
-              ),
-              prefixIcon: const Icon(Icons.email_outlined),
-            ),
-            keyboardType: TextInputType.emailAddress,
-            autocorrect: false,
-          ),
-          if (errorDescription.isNotEmpty)
-            Container(
-              width: double.infinity,
-              margin: EdgeInsets.only(top: 8.dp),
+  Widget _buildForm(BondlyColorScheme bondly, String errorMessage) {
+    return Column(
+      children: [
+        _buildEmailInput(bondly),
+        if (errorMessage.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
               child: Text(
-                errorDescription,
-                style: const TextStyle(color: Colors.red),
+                errorMessage,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: Colors.red,
+                ),
               ),
             ),
+          ),
+        const SizedBox(height: 14),
+        _buildSendButton(bondly),
+        const SizedBox(height: 14),
+        _buildBackToLogin(bondly),
+      ],
+    );
+  }
+
+  Widget _buildEmailInput(BondlyColorScheme bondly) {
+    return Container(
+      height: 52,
+      decoration: BoxDecoration(
+        color: bondly.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: bondly.border),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Icon(LucideIcons.mail, size: 20, color: bondly.textMuted),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              autocorrect: false,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: bondly.textPrimary,
+              ),
+              decoration: InputDecoration(
+                hintText: ForgotPasswordStrings.emailLabel,
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: bondly.textMuted,
+                ),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildActions() {
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          margin: EdgeInsets.symmetric(horizontal: 48.dp),
-          child: FilledButton(
-            onPressed: () {
-              model.onResetPassword(emailController.text);
-            },
-            child: const Text(ForgotPasswordStrings.sendButton),
+  Widget _buildSendButton(BondlyColorScheme bondly) {
+    return Container(
+      width: double.infinity,
+      height: 52,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [bondly.accentGradientStart, bondly.accentGradientEnd],
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x307C3AED),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            model.onResetPassword(_emailController.text);
+          },
+          child: Center(
+            child: Text(
+              ForgotPasswordStrings.sendButton,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: BondlyColors.white,
+              ),
+            ),
           ),
         ),
-        _buildBackToLoginButton(),
-      ],
+      ),
     );
   }
 
-  Widget _buildBackToLoginButton() {
-    return Container(
-      margin: EdgeInsets.only(top: 8.dp),
-      child: TextButton(
-        onPressed: () {
-          model.goBackToLogin();
-        },
-        child: const Text(ForgotPasswordStrings.backToLogin),
+  Widget _buildBackToLogin(BondlyColorScheme bondly) {
+    return GestureDetector(
+      onTap: () {
+        model.goBackToLogin();
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(
+          ForgotPasswordStrings.backToLogin,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: bondly.accent,
+          ),
+        ),
       ),
     );
   }
 
   @override
   void dispose() {
-    emailController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 }

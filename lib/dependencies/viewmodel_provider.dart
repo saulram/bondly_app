@@ -6,8 +6,12 @@ import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/forgot_password_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/reset_password_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/verify_reset_token_usecase.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/forgot_password_viewmodel.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
+import 'package:bondly_app/features/auth/ui/viewmodels/reset_password_viewmodel.dart';
+import 'package:bondly_app/features/auth/ui/viewmodels/verify_reset_token_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dart';
@@ -94,6 +98,19 @@ class ViewModelProvider {
     getIt.registerFactory<ForgotPasswordViewModel>(() {
       return ForgotPasswordViewModel(
         getIt<ForgotPasswordUseCase>(),
+      );
+    });
+
+    getIt.registerFactory<VerifyResetTokenViewModel>(() {
+      return VerifyResetTokenViewModel(
+        getIt<VerifyResetTokenUseCase>(),
+        getIt<ForgotPasswordUseCase>(),
+      );
+    });
+
+    getIt.registerFactory<ResetPasswordViewModel>(() {
+      return ResetPasswordViewModel(
+        getIt<ResetPasswordUseCase>(),
       );
     });
 

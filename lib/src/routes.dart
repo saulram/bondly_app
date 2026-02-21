@@ -1,5 +1,8 @@
 import 'package:bondly_app/features/auth/ui/screens/forgot_password_screen.dart';
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
+import 'package:bondly_app/features/auth/ui/screens/reset_password_confirmation_screen.dart';
+import 'package:bondly_app/features/auth/ui/screens/reset_password_screen.dart';
+import 'package:bondly_app/features/auth/ui/screens/verify_reset_token_screen.dart';
 import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
 import 'package:bondly_app/features/notifications/ui/screens/notifications_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/activity_detail_screen.dart';
@@ -31,6 +34,24 @@ class AppRouter {
       GoRoute(
           path: ForgotPasswordScreen.route,
           builder: (context, state) => const ForgotPasswordScreen()),
+      GoRoute(
+          path: VerifyResetTokenScreen.route,
+          builder: (context, state) {
+            var params = state.extra as Map<String, dynamic>? ?? {};
+            return VerifyResetTokenScreen(
+                email: params[VerifyResetTokenScreen.emailParam] ?? "");
+          }),
+      GoRoute(
+          path: ResetPasswordScreen.route,
+          builder: (context, state) {
+            var params = state.extra as Map<String, dynamic>? ?? {};
+            return ResetPasswordScreen(
+                token: params[ResetPasswordScreen.tokenParam] ?? "");
+          }),
+      GoRoute(
+          path: ResetPasswordConfirmationScreen.route,
+          builder: (context, state) =>
+              const ResetPasswordConfirmationScreen()),
       GoRoute(
           path: HomeScreen.route,
           builder: (context, state) => const HomeScreen()),

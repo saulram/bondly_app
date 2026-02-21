@@ -66,4 +66,17 @@ class SupabaseAuthRepository extends AuthRepository {
       return Result.error(PasswordResetException());
     }
   }
+
+  @override
+  Future<Result<bool, Exception>> verifyResetToken(String token) async {
+    // TODO: Implement Supabase token verification
+    return Result.error(InvalidTokenException());
+  }
+
+  @override
+  Future<Result<bool, Exception>> confirmResetPassword(
+      String token, String newPassword) async {
+    // TODO: Implement Supabase password reset confirmation
+    return Result.error(PasswordResetException());
+  }
 }

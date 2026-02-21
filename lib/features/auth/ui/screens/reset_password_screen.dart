@@ -1,49 +1,37 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/constants.dart';
-import 'package:bondly_app/config/strings_login.dart';
+import 'package:bondly_app/config/strings_reset_password.dart';
 import 'package:bondly_app/config/theme.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
-import 'package:bondly_app/features/auth/ui/screens/forgot_password_screen.dart';
-import 'package:bondly_app/features/auth/ui/states/login_ui_state.dart';
-import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
+import 'package:bondly_app/features/auth/ui/states/reset_password_ui_state.dart';
+import 'package:bondly_app/features/auth/ui/viewmodels/reset_password_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
-import 'package:bondly_app/features/main/ui/extensions/device_scale.dart';
-import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class LoginScreen extends StatefulWidget {
-  static const String route = "/loginScreen";
+class ResetPasswordScreen extends StatefulWidget {
+  static const String route = "/resetPassword";
+  static const String tokenParam = "token";
 
-  const LoginScreen({super.key});
+  const ResetPasswordScreen({super.key, this.token = ""});
+
+  final String token;
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final String _logoImagePath = "assets/img_logo.png";
   final String _logoDarkImagePath = "assets/img_logo_dark.png";
 
-  final LoginViewModel model = getIt<LoginViewModel>();
-
-  final _userController = TextEditingController();
+  final ResetPasswordViewModel model = getIt<ResetPasswordViewModel>();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
-
-  @override
-  void initState() {
-    super.initState();
-    model.load();
-  }
-
-  @override
-  void didChangeDependencies() {
-    DeviceScale().currentDeviceHeight = MediaQuery.of(context).size.height;
-    super.didChangeDependencies();
-  }
+  bool _obscureConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +39,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       backgroundColor: bondly.bg,
-      body: ModelProvider<LoginViewModel>(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: GestureDetector(
+          onTap: () => context.pop(),
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: bondly.surfaceElevated,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              LucideIcons.arrowLeft,
+              size: 18,
+              color: bondly.textPrimary,
+            ),
+          ),
+        ),
+      ),
+      body: ModelProvider<ResetPasswordViewModel>(
         model: model,
-        child: ModelBuilder<LoginViewModel>(
+        child: ModelBuilder<ResetPasswordViewModel>(
           builder: (context, viewModel, child) {
             var screenWidth =
                 MediaQuery.of(context).size.width > Constants.mobileBreakpoint
@@ -61,18 +69,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     : MediaQuery.of(context).size.width;
 
             switch (viewModel.state) {
-              case LoadingLogin _:
-                return LoginSkeletonLoader(screenWidth: screenWidth);
-              case SuccessLogin _:
-                return Container();
-              case FailedLogin error:
-                return _buildLoginView(
+              case ResetPasswordLoading _:
+                return _buildLoadingView(bondly, screenWidth);
+              case ResetPasswordFailed error:
+                return _buildFormView(
                   bondly,
                   screenWidth,
                   errorType: error.errorType,
                 );
               default:
-                return _buildLoginView(bondly, screenWidth);
+                return _buildFormView(bondly, screenWidth);
             }
           },
         ),
@@ -80,29 +86,38 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLoginView(
+  Widget _buildLoadingView(BondlyColorScheme bondly, double screenWidth) {
+    return Container(
+      alignment: Alignment.center,
+      child: SizedBox(
+        width: screenWidth,
+        child: const Center(child: CircularProgressIndicator()),
+      ),
+    );
+  }
+
+  Widget _buildFormView(
     BondlyColorScheme bondly,
     double screenWidth, {
-    LoginErrorType? errorType,
+    ResetPasswordErrorType? errorType,
   }) {
     String errorMessage = '';
     switch (errorType) {
-      case LoginErrorType.authError:
-        errorMessage = LoginStrings.invalidCredentials;
-      case LoginErrorType.connectionError:
-        errorMessage = LoginStrings.connectionError;
-      case LoginErrorType.unknownError:
-        errorMessage = LoginStrings.unknownError;
-      case LoginErrorType.defaultCompanyError:
-        errorMessage = LoginStrings.noCompanySelected;
+      case ResetPasswordErrorType.emptyPassword:
+        errorMessage = ResetPasswordStrings.emptyPassword;
+      case ResetPasswordErrorType.weakPassword:
+        errorMessage = ResetPasswordStrings.weakPassword;
+      case ResetPasswordErrorType.passwordsDoNotMatch:
+        errorMessage = ResetPasswordStrings.passwordsDoNotMatch;
+      case ResetPasswordErrorType.connectionError:
+        errorMessage = ResetPasswordStrings.connectionError;
+      case ResetPasswordErrorType.unknownError:
+        errorMessage = ResetPasswordStrings.unknownError;
       default:
         errorMessage = '';
     }
 
-    bool showInputError = errorType == LoginErrorType.invalidInputError;
-
     return Container(
-      height: MediaQuery.of(context).size.height,
       alignment: Alignment.center,
       child: SizedBox(
         width: screenWidth,
@@ -115,10 +130,29 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 _buildLogo(),
                 const SizedBox(height: 16),
-                _buildWelcomeText(bondly),
+                _buildTitle(bondly),
+                const SizedBox(height: 12),
+                _buildDescription(bondly),
                 const SizedBox(height: 32),
-                _buildForm(bondly, showInputError, errorMessage),
-                const SizedBox(height: 32),
+                _buildPasswordInput(bondly),
+                const SizedBox(height: 14),
+                _buildConfirmPasswordInput(bondly),
+                if (errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        errorMessage,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 24),
+                _buildResetButton(bondly),
               ],
             ),
           ),
@@ -141,9 +175,9 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildWelcomeText(BondlyColorScheme bondly) {
+  Widget _buildTitle(BondlyColorScheme bondly) {
     return Text(
-      LoginStrings.welcomeMessage,
+      ResetPasswordStrings.title,
       style: GoogleFonts.inter(
         fontSize: 24,
         fontWeight: FontWeight.w600,
@@ -153,77 +187,18 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildForm(
-    BondlyColorScheme bondly,
-    bool showInputError,
-    String errorMessage,
-  ) {
-    return Column(
-      children: [
-        _buildUserInput(bondly),
-        if (showInputError) _buildFieldError(),
-        const SizedBox(height: 14),
-        _buildPasswordInput(bondly),
-        if (showInputError) _buildFieldError(),
-        if (errorMessage.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 14),
-            child: Text(
-              errorMessage,
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                color: Colors.red,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        const SizedBox(height: 72),
-        _buildLoginButton(bondly),
-        const SizedBox(height: 14),
-        _buildForgotPassword(bondly),
-      ],
-    );
-  }
-
-  Widget _buildUserInput(BondlyColorScheme bondly) {
-    return Container(
-      height: 52,
-      decoration: BoxDecoration(
-        color: bondly.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: bondly.border),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Icon(LucideIcons.user, size: 20, color: bondly.textMuted),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: _userController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              maxLength: Constants.usernameMaxLength,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: bondly.textPrimary,
-              ),
-              decoration: InputDecoration(
-                hintText: LoginStrings.username,
-                hintStyle: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: bondly.textMuted,
-                ),
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-                counterText: '',
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
-              ),
-            ),
-          ),
-        ],
+  Widget _buildDescription(BondlyColorScheme bondly) {
+    return SizedBox(
+      width: double.infinity,
+      child: Text(
+        ResetPasswordStrings.description,
+        style: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+          color: bondly.textSecondary,
+          height: 1.5,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }
@@ -247,13 +222,12 @@ class _LoginScreenState extends State<LoginScreen> {
               obscureText: _obscurePassword,
               enableSuggestions: false,
               autocorrect: false,
-              maxLength: Constants.passwordMaxLength,
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: bondly.textPrimary,
               ),
               decoration: InputDecoration(
-                hintText: LoginStrings.password,
+                hintText: ResetPasswordStrings.passwordLabel,
                 hintStyle: GoogleFonts.inter(
                   fontSize: 14,
                   color: bondly.textMuted,
@@ -261,7 +235,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
-                counterText: '',
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
               ),
@@ -284,7 +257,61 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLoginButton(BondlyColorScheme bondly) {
+  Widget _buildConfirmPasswordInput(BondlyColorScheme bondly) {
+    return Container(
+      height: 52,
+      decoration: BoxDecoration(
+        color: bondly.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: bondly.border),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Icon(LucideIcons.lock, size: 20, color: bondly.textMuted),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: _confirmPasswordController,
+              obscureText: _obscureConfirmPassword,
+              enableSuggestions: false,
+              autocorrect: false,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: bondly.textPrimary,
+              ),
+              decoration: InputDecoration(
+                hintText: ResetPasswordStrings.confirmPasswordLabel,
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: bondly.textMuted,
+                ),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _obscureConfirmPassword = !_obscureConfirmPassword;
+              });
+            },
+            child: Icon(
+              _obscureConfirmPassword ? LucideIcons.eyeOff : LucideIcons.eye,
+              size: 20,
+              color: bondly.textMuted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResetButton(BondlyColorScheme bondly) {
     return Container(
       width: double.infinity,
       height: 52,
@@ -308,15 +335,15 @@ class _LoginScreenState extends State<LoginScreen> {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            model.onLoginAction(
-              _userController.text,
+            model.onResetPassword(
+              widget.token,
               _passwordController.text,
-              '',
+              _confirmPasswordController.text,
             );
           },
           child: Center(
             child: Text(
-              LoginStrings.enter,
+              ResetPasswordStrings.resetButton,
               style: GoogleFonts.inter(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
@@ -329,45 +356,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildForgotPassword(BondlyColorScheme bondly) {
-    return GestureDetector(
-      onTap: () {
-        model.navigation.push(ForgotPasswordScreen.route);
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Text(
-          LoginStrings.forgotPassword,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: bondly.accent,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFieldError() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          LoginStrings.required,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            color: Colors.red,
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   void dispose() {
-    _userController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 }

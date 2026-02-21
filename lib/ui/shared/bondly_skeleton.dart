@@ -160,52 +160,48 @@ class LoginSkeletonLoader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Logo placeholder
-                Center(
-                  child: BondlyShimmerBlock(
-                    width: screenWidth * 0.5,
-                    height: 80,
-                    borderRadius: 12,
-                  ),
-                ),
-                const SizedBox(height: 48),
-                // Title placeholder
-                const Center(
-                  child: BondlyShimmerBlock(width: 260, height: 20),
-                ),
-                const SizedBox(height: 36),
-                // Input field 1
-                const BondlyShimmerBlock(
-                  width: double.infinity,
-                  height: 56,
-                  borderRadius: 10,
-                ),
-                const SizedBox(height: 20),
-                // Input field 2
-                const BondlyShimmerBlock(
-                  width: double.infinity,
-                  height: 56,
-                  borderRadius: 10,
-                ),
-                const SizedBox(height: 20),
-                // Dropdown
-                const BondlyShimmerBlock(
-                  width: double.infinity,
-                  height: 56,
-                  borderRadius: 10,
-                ),
-                const SizedBox(height: 36),
-                // Button
                 const Center(
                   child: BondlyShimmerBlock(
-                    width: 250,
-                    height: 48,
-                    borderRadius: 10,
+                    width: 200,
+                    height: 160,
+                    borderRadius: 20,
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Text button
+                // Title placeholder
                 const Center(
-                  child: BondlyShimmerBlock(width: 180, height: 16),
+                  child: BondlyShimmerBlock(width: 220, height: 24),
+                ),
+                const SizedBox(height: 4),
+                // Subtitle placeholder
+                const Center(
+                  child: BondlyShimmerBlock(width: 200, height: 14),
+                ),
+                const SizedBox(height: 32),
+                // User input field
+                const BondlyShimmerBlock(
+                  width: double.infinity,
+                  height: 52,
+                  borderRadius: 16,
+                ),
+                const SizedBox(height: 14),
+                // Password input field
+                const BondlyShimmerBlock(
+                  width: double.infinity,
+                  height: 52,
+                  borderRadius: 16,
+                ),
+                const SizedBox(height: 14),
+                // Login button
+                const BondlyShimmerBlock(
+                  width: double.infinity,
+                  height: 52,
+                  borderRadius: 16,
+                ),
+                const SizedBox(height: 14),
+                // Forgot password link
+                const Center(
+                  child: BondlyShimmerBlock(width: 180, height: 14),
                 ),
               ],
             ),
@@ -224,7 +220,6 @@ class ForgotPasswordSkeletonLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height,
       alignment: Alignment.center,
       child: SizedBox(
         width: screenWidth,
@@ -235,48 +230,46 @@ class ForgotPasswordSkeletonLoader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Logo placeholder
-                Center(
+                const Center(
                   child: BondlyShimmerBlock(
-                    width: screenWidth * 0.5,
-                    height: 80,
-                    borderRadius: 12,
+                    width: 200,
+                    height: 160,
+                    borderRadius: 20,
                   ),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 16),
                 // Title placeholder
                 const Center(
-                  child: BondlyShimmerBlock(width: 200, height: 20),
+                  child: BondlyShimmerBlock(width: 220, height: 24),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 // Description placeholder (2 lines)
                 const BondlyShimmerBlock(
                   width: double.infinity,
                   height: 14,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 const Center(
                   child: BondlyShimmerBlock(width: 240, height: 14),
                 ),
-                const SizedBox(height: 36),
+                const SizedBox(height: 32),
                 // Email field
                 const BondlyShimmerBlock(
                   width: double.infinity,
-                  height: 56,
-                  borderRadius: 10,
+                  height: 52,
+                  borderRadius: 16,
                 ),
-                const SizedBox(height: 36),
-                // Button
-                const Center(
-                  child: BondlyShimmerBlock(
-                    width: 250,
-                    height: 48,
-                    borderRadius: 10,
-                  ),
+                const SizedBox(height: 14),
+                // Send button
+                const BondlyShimmerBlock(
+                  width: double.infinity,
+                  height: 52,
+                  borderRadius: 16,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 // Back link
                 const Center(
-                  child: BondlyShimmerBlock(width: 200, height: 16),
+                  child: BondlyShimmerBlock(width: 200, height: 14),
                 ),
               ],
             ),
