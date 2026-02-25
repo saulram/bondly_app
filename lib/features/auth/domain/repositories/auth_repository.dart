@@ -15,9 +15,18 @@ class TokenNotFoundException implements Exception {}
 
 class PasswordResetException implements Exception {}
 
+class InvalidTokenException implements Exception {}
+
+class ExpiredTokenException implements Exception {}
+
+class WeakPasswordException implements Exception {}
+
 abstract class AuthRepository {
   Future<Result<User, Exception>> doLogin(
       String user, String password, String company);
   Future<Result<List<String>, Exception>> getCompanies();
   Future<Result<bool, Exception>> resetPassword(String email);
+  Future<Result<bool, Exception>> verifyResetToken(String token);
+  Future<Result<bool, Exception>> confirmResetPassword(
+      String token, String newPassword);
 }

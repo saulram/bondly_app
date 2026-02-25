@@ -8,7 +8,9 @@ import 'package:bondly_app/features/auth/domain/usecases/login_state_usecase.dar
 import 'package:bondly_app/features/auth/domain/usecases/forgot_password_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/verify_reset_token_usecase.dart';
 import 'package:bondly_app/features/home/domain/repositories/banners_repository.dart';
 import 'package:bondly_app/features/home/domain/repositories/company_feeds_respository.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
@@ -53,6 +55,14 @@ class UseCaseProvider {
 
     getIt.registerSingleton<ForgotPasswordUseCase>(
       ForgotPasswordUseCase(getIt<AuthRepository>()),
+    );
+
+    getIt.registerSingleton<VerifyResetTokenUseCase>(
+      VerifyResetTokenUseCase(getIt<AuthRepository>()),
+    );
+
+    getIt.registerSingleton<ResetPasswordUseCase>(
+      ResetPasswordUseCase(getIt<AuthRepository>()),
     );
 
     getIt.registerSingleton<GetCompaniesUseCase>(

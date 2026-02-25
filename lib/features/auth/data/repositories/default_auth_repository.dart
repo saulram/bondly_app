@@ -37,4 +37,25 @@ class DefaultAuthRepository extends AuthRepository {
       return Result.error(PasswordResetException());
     }
   }
+
+  @override
+  Future<Result<bool, Exception>> verifyResetToken(String token) async {
+    try {
+      await _authAPI.verifyResetToken(token);
+      return Result.success(true);
+    } catch (exception) {
+      return Result.error(InvalidTokenException());
+    }
+  }
+
+  @override
+  Future<Result<bool, Exception>> confirmResetPassword(
+      String token, String newPassword) async {
+    try {
+      await _authAPI.confirmResetPassword(token, newPassword);
+      return Result.success(true);
+    } catch (exception) {
+      return Result.error(PasswordResetException());
+    }
+  }
 }

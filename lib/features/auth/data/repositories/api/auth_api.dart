@@ -52,4 +52,28 @@ class AuthAPI {
       throw PasswordResetException();
     }
   }
+
+  Future<void> verifyResetToken(String token) async {
+    try {
+      await _callsHandler.post(
+        path: "users/verify-reset-token/",
+        data: {"token": token},
+      );
+    } catch (exception) {
+      Logger().e(exception.toString());
+      throw InvalidTokenException();
+    }
+  }
+
+  Future<void> confirmResetPassword(String token, String newPassword) async {
+    try {
+      await _callsHandler.post(
+        path: "users/confirm-reset-password/",
+        data: {"token": token, "password": newPassword},
+      );
+    } catch (exception) {
+      Logger().e(exception.toString());
+      throw PasswordResetException();
+    }
+  }
 }
