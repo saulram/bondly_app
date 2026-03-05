@@ -40,6 +40,7 @@ DROP POLICY IF EXISTS "news_select_admin"               ON news;
 DROP POLICY IF EXISTS "news_insert_admin"               ON news;
 DROP POLICY IF EXISTS "news_update_admin"               ON news;
 DROP POLICY IF EXISTS "news_delete_admin"               ON news;
+DROP POLICY IF EXISTS "acknowledgment_recipients_select" ON acknowledgment_recipients;
 
 -- =============================================
 -- Single-tenant replacement policies
@@ -78,6 +79,17 @@ CREATE POLICY "badges_select_authenticated" ON badges
 -- ACKNOWLEDGMENTS: any authenticated user can read all
 CREATE POLICY "acknowledgments_select_authenticated" ON acknowledgments
     FOR SELECT USING (auth.uid() IS NOT NULL AND visible = TRUE);
+
+-- ACKNOWLEDGMENT RECIPIENTS: user can see own, or all if authenticated
+CREATE POLICY "acknowledgment_recipients_select_authenticated" ON acknowledgment_recipients
+    FOR SELECT
+    USING (
+        user_id = auth.uid() OR
+        EXISTS (
+            SELECT 1 FROM acknowledgments
+            WHERE acknowledgments.id = acknowledgment_recipients.acknowledgment_id
+        )
+    );
 
 -- REWARDS: any authenticated user can read enabled rewards
 CREATE POLICY "rewards_select_authenticated" ON rewards
