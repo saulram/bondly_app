@@ -51,6 +51,7 @@ import 'package:bondly_app/features/profile/domain/repositories/bondly_badges_re
 import 'package:bondly_app/features/profile/domain/repositories/cart_repository.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class RepositoryProvider {
   static void provide() {
@@ -94,14 +95,16 @@ class RepositoryProvider {
       );
     }
 
-    // Local cache always registered
-    getIt.registerSingletonWithDependencies<UsersRepository>(
-        () => DefaultUsersRepository(
-              getIt<UsersDao>(),
-              UserEntityMapper(),
-            ),
-        instanceName: DefaultUsersRepository.name,
-        dependsOn: [AppDatabase, UsersDao]);
+    // Local cache only available on non-web platforms
+    if (!kIsWeb) {
+      getIt.registerSingletonWithDependencies<UsersRepository>(
+          () => DefaultUsersRepository(
+                getIt<UsersDao>(),
+                UserEntityMapper(),
+              ),
+          instanceName: DefaultUsersRepository.name,
+          dependsOn: [AppDatabase, UsersDao]);
+    }
 
     // Conditional remote users repository (must be async to satisfy InitDependency in UseCaseProvider)
     if (BackendConfig.isSupabase) {

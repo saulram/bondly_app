@@ -48,6 +48,7 @@ import 'package:bondly_app/features/ai/domain/repositories/ai_repository.dart';
 import 'package:bondly_app/features/ai/domain/usecases/analyze_sentiment_usecase.dart';
 import 'package:bondly_app/features/ai/domain/usecases/get_reward_recommendations_usecase.dart';
 import 'package:bondly_app/features/ai/domain/usecases/personalize_feed_usecase.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -97,37 +98,60 @@ class UseCaseProvider {
     getIt.registerSingleton<GetCategoryBadgesUseCase>(
         GetCategoryBadgesUseCase(getIt<CompanyFeedsRepository>()));
 
-    getIt.registerSingletonWithDependencies(
-        () => UserUseCase(
-            getIt<UsersRepository>(instanceName: DefaultUsersRepository.name),
-            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
-        dependsOn: [
-          AppDatabase,
-          UsersDao,
-          InitDependency(UsersRepository,
-              instanceName: DefaultUsersRepository.name),
-          InitDependency(UsersRepository,
-              instanceName: RemoteUsersRepository.name)
-        ]);
+    if (kIsWeb) {
+      getIt.registerSingletonWithDependencies(
+          () => UserUseCase(
+              getIt<UsersRepository>(instanceName: RemoteUsersRepository.name),
+              getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
+          dependsOn: [
+            InitDependency(UsersRepository,
+                instanceName: RemoteUsersRepository.name)
+          ]);
+    } else {
+      getIt.registerSingletonWithDependencies(
+          () => UserUseCase(
+              getIt<UsersRepository>(instanceName: DefaultUsersRepository.name),
+              getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
+          dependsOn: [
+            AppDatabase,
+            UsersDao,
+            InitDependency(UsersRepository,
+                instanceName: DefaultUsersRepository.name),
+            InitDependency(UsersRepository,
+                instanceName: RemoteUsersRepository.name)
+          ]);
+    }
 
-    getIt.registerSingletonWithDependencies(
-        () => LogoutUseCase(
-            sharedPreferences: getIt<SharedPreferences>(),
-            usersRepository: getIt<UsersRepository>(
-                instanceName: DefaultUsersRepository.name)),
-        dependsOn: [
-          AppDatabase,
-          UsersDao,
-          InitDependency(UsersRepository,
-              instanceName: DefaultUsersRepository.name)
-        ]);
+    if (kIsWeb) {
+      getIt.registerSingletonWithDependencies(
+          () => LogoutUseCase(
+              sharedPreferences: getIt<SharedPreferences>(),
+              usersRepository: getIt<UsersRepository>(
+                  instanceName: RemoteUsersRepository.name)),
+          dependsOn: [
+            InitDependency(UsersRepository,
+                instanceName: RemoteUsersRepository.name)
+          ]);
+    } else {
+      getIt.registerSingletonWithDependencies(
+          () => LogoutUseCase(
+              sharedPreferences: getIt<SharedPreferences>(),
+              usersRepository: getIt<UsersRepository>(
+                  instanceName: DefaultUsersRepository.name)),
+          dependsOn: [
+            AppDatabase,
+            UsersDao,
+            InitDependency(UsersRepository,
+                instanceName: DefaultUsersRepository.name)
+          ]);
+    }
 
     getIt.registerSingletonWithDependencies(
         () => UpdateUserAvatarUseCase(
             getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
         dependsOn: [
-          AppDatabase,
-          UsersDao,
+          if (!kIsWeb) AppDatabase,
+          if (!kIsWeb) UsersDao,
           InitDependency(UsersRepository,
               instanceName: RemoteUsersRepository.name)
         ]);
@@ -181,8 +205,8 @@ class UseCaseProvider {
         () => UserProfileUseCase(
             getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
         dependsOn: [
-          AppDatabase,
-          UsersDao,
+          if (!kIsWeb) AppDatabase,
+          if (!kIsWeb) UsersDao,
           InitDependency(UsersRepository,
               instanceName: RemoteUsersRepository.name)
         ]);

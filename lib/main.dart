@@ -8,10 +8,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:url_strategy/url_strategy.dart';
-// ignore: depend_on_referenced_packages
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 Future<void> main() async {
+  // Must be called before WidgetsFlutterBinding.ensureInitialized()
+  usePathUrlStrategy();
   //we make sure that the WidgetsBinding is initialized before we initialize the DependencyManager
   WidgetsFlutterBinding.ensureInitialized();
   // Load environment variables
@@ -25,8 +26,6 @@ Future<void> main() async {
   await DependencyManager().initialize();
   // Here we make sure that all the models are ready before we continue
   await getIt.allReady();
-  // Here we set the URL strategy for our web app.
-  setPathUrlStrategy();
   // Here we run the app
   runApp(
     MultiProvider(
