@@ -35,16 +35,32 @@ class UserActivityItem {
   });
 
   factory UserActivityItem.fromSupabase(Map<String, dynamic> json) {
+    final title = json['title'] as String? ?? '';
     return UserActivityItem(
       id: json['id'] ?? '',
       userId: json['user_id'] ?? '',
       feedId: json['feed_id'] ?? '',
-      title: json['title'] ?? '',
+      title: title,
       content: json['content'] ?? '',
       read: json['read'] ?? false,
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
-      type: json['type'] ?? '',
+      type: _typeFromTitle(title),
     );
+  }
+
+  static String _typeFromTitle(String title) {
+    if (title.contains('reconocimiento') || title.contains('Reconocimiento')) {
+      return 'Reconocimientos';
+    } else if (title.contains('canje') || title.contains('Canje') || title.contains('recompensa')) {
+      return 'Recompensas';
+    } else if (title.contains('embajada') || title.contains('embajador')) {
+      return 'Embajadas';
+    } else if (title.contains('gusta') || title.contains('like')) {
+      return 'Me Gusta';
+    } else if (title.contains('comentario') || title.contains('comentaron')) {
+      return 'Comentario nuevo';
+    }
+    return title;
   }
 }
