@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION get_ranking(
   result_limit int DEFAULT 10
 )
 RETURNS TABLE (
-  position bigint,
+  "position" bigint,
   user_id uuid,
   complete_name text,
   avatar text,
@@ -26,7 +26,7 @@ BEGIN
 
   RETURN QUERY
   SELECT
-    ROW_NUMBER() OVER (ORDER BY COUNT(ar.id) DESC) AS position,
+    ROW_NUMBER() OVER (ORDER BY COUNT(ar.id) DESC) AS "position",
     u.id AS user_id,
     u.complete_name,
     u.avatar,
