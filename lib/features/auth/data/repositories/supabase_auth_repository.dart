@@ -15,10 +15,9 @@ class SupabaseAuthRepository extends AuthRepository {
     String company,
   ) async {
     try {
-      // Look up email via SECURITY DEFINER RPC (bypasses RLS for pre-auth lookup)
+      // Single-tenant: look up email by employee number only (no company filter)
       final email = await _provider.client.rpc('get_email_by_employee', params: {
         'p_employee_number': int.tryParse(user) ?? 0,
-        'p_company_name': company,
       });
 
       if (email == null || (email as String).isEmpty) {
@@ -50,20 +49,9 @@ class SupabaseAuthRepository extends AuthRepository {
 
   @override
   Future<Result<List<String>, Exception>> getCompanies() async {
-    try {
-      // Use SECURITY DEFINER RPC to bypass RLS for unauthenticated access
-      final response = await _provider.client.rpc('get_companies');
-
-      final companies = (response as List)
-          .map((row) => row['company_name'] as String?)
-          .where((name) => name != null && name.isNotEmpty)
-          .map((name) => name!)
-          .toList();
-
-      return Result.success(companies);
-    } catch (exception) {
-      return Result.error(InvalidLoginException());
-    }
+    // Single-tenant deployment: each Supabase instance belongs to one company.
+    // Company list is not needed — the login screen hides the dropdown for Supabase.
+    return Result.success([]);
   }
 
   @override

@@ -147,19 +147,12 @@ class SupabaseCompanyFeedsRepository extends CompanyFeedsRepository {
   @override
   Future<Result<List<User>, Exception>> getCompanyCollaborators() async {
     try {
-      final currentUserData = await _provider.client
-          .from('users')
-          .select('company_name')
-          .eq('id', _currentUserId!)
-          .single();
-
-      final companyName = currentUserData['company_name'] as String;
-
+      // Single-tenant: all users in this Supabase instance belong to the same company
       final response = await _provider.client
           .from('users')
           .select()
-          .eq('company_name', companyName)
-          .eq('visible', true);
+          .eq('visible', true)
+          .neq('id', _currentUserId!);
 
       final collaborators = (response as List)
           .map((row) => User.fromSupabase(row as Map<String, dynamic>))
