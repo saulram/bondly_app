@@ -133,6 +133,27 @@ class AppTheme extends ChangeNotifier {
           foregroundColor: bondly.accent,
         ),
       ),
+      navigationDrawerTheme: NavigationDrawerThemeData(
+        backgroundColor: bondly.surface,
+        elevation: 0,
+        indicatorColor: bondly.accentSoft,
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return IconThemeData(color: bondly.accent, size: 18);
+          }
+          return IconThemeData(color: bondly.textMuted, size: 18);
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: bondly.accent,
+            );
+          }
+          return GoogleFonts.inter(fontSize: 14, color: bondly.textMuted);
+        }),
+      ),
       dropdownMenuTheme: DropdownMenuThemeData(
         menuStyle: MenuStyle(
           backgroundColor: WidgetStateProperty.all<Color>(bondly.surface),
