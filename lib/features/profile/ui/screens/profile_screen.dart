@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/dimensions.dart';
@@ -33,7 +33,7 @@ class ProfileScreen extends StatefulWidget {
 
 class ProfileScreenState extends State<ProfileScreen> {
   final ProfileViewModel _model = getIt<ProfileViewModel>();
-  File? _image;
+  Uint8List? _imageBytes;
   final picker = ImagePicker();
 
   @override
@@ -44,7 +44,7 @@ class ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void dispose() {
-    _image = null;
+    _imageBytes = null;
     super.dispose();
   }
 
@@ -274,11 +274,11 @@ class ProfileScreenState extends State<ProfileScreen> {
                 onTap: () => displayAvatar(
                   image: safeImageUrl(avatarUrl, isAvatar: true),
                 ),
-                child: _image != null
+                child: _imageBytes != null
                     ? CircleAvatar(
                         radius: 44,
                         backgroundColor: colors.accentSoft,
-                        backgroundImage: FileImage(_image!),
+                        backgroundImage: MemoryImage(_imageBytes!),
                       )
                     : hasAvatar
                         ? Hero(
@@ -576,12 +576,13 @@ class ProfileScreenState extends State<ProfileScreen> {
       maxHeight: 1000,
     );
 
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-        _model.updateAvatar(_image!);
-      }
-    });
+    if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
+      setState(() {
+        _imageBytes = bytes;
+      });
+      _model.updateAvatar(bytes);
+    }
   }
 
   Future<void> getImageFromCamera() async {
@@ -592,12 +593,13 @@ class ProfileScreenState extends State<ProfileScreen> {
       maxHeight: 1000,
     );
 
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-        _model.updateAvatar(_image!);
-      }
-    });
+    if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
+      setState(() {
+        _imageBytes = bytes;
+      });
+      _model.updateAvatar(bytes);
+    }
   }
 
   Future<void> showOptions() async {
@@ -653,7 +655,7 @@ class ProfileScreenState extends State<ProfileScreen> {
           image: image,
           tag: 'AvatarWidget',
           isFile: image.isEmpty,
-          imageFile: _image,
+          imageBytes: _imageBytes,
         ),
       ),
     );

@@ -219,9 +219,6 @@ class MyRewardsViewModel extends NavigationModel {
       for (var reward in (rewards as RewardList).rewards ?? []) {
         _rewardPointsMap[reward.id] = reward.points;
       }
-
-      // Fetch AI recommendations after rewards are loaded
-      handleGetRecommendations();
     }, (error) {
       log.e(error);
     });
