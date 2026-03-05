@@ -1,5 +1,8 @@
 import 'package:bondly_app/config/backend_config.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/ai/data/api/gemini_service.dart';
+import 'package:bondly_app/features/ai/data/repositories/default_ai_repository.dart';
+import 'package:bondly_app/features/ai/domain/repositories/ai_repository.dart';
 import 'package:bondly_app/features/auth/data/mappers/user_entity_mapper.dart';
 import 'package:bondly_app/features/auth/data/repositories/supabase_auth_repository.dart';
 import 'package:bondly_app/features/auth/data/repositories/supabase_users_repository.dart';
@@ -160,6 +163,10 @@ class RepositoryProvider {
 
     getIt.registerSingleton<RankingRepository>(
       SupabaseRankingRepository(getIt<SupabaseClientProvider>()),
+    );
+
+    getIt.registerSingleton<AIRepository>(
+      DefaultAIRepository(getIt<GeminiService>()),
     );
   }
 }

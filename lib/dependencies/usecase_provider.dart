@@ -44,6 +44,10 @@ import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_u
 import 'package:bondly_app/features/profile/domain/usecases/user_profile_use_case.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
+import 'package:bondly_app/features/ai/domain/repositories/ai_repository.dart';
+import 'package:bondly_app/features/ai/domain/usecases/analyze_sentiment_usecase.dart';
+import 'package:bondly_app/features/ai/domain/usecases/get_reward_recommendations_usecase.dart';
+import 'package:bondly_app/features/ai/domain/usecases/personalize_feed_usecase.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

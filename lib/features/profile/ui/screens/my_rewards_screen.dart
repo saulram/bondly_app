@@ -3,6 +3,7 @@ import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_cart.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/ai/ui/widgets/ai_recommendation_card.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
 import 'package:bondly_app/features/profile/domain/models/cart_model.dart';
@@ -235,10 +236,109 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
         100,
       ),
       physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: rewards.length,
+      itemCount: rewards.length + 1, // +1 for AI recommendations header
       itemBuilder: (context, index) {
-        return _buildRewardCard(rewards[index], rewardsModel, colors);
+        if (index == 0) {
+          return _buildRecommendationsSection(rewardsModel, colors);
+        }
+        return _buildRewardCard(rewards[index - 1], rewardsModel, colors);
       },
+    );
+  }
+
+  Widget _buildRecommendationsSection(
+    MyRewardsViewModel rewardsModel,
+    BondlyColorScheme colors,
+  ) {
+    if (rewardsModel.loadingRecommendations) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colors.accentSoft,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colors.accent,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Generando recomendaciones...',
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                color: colors.accent,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (rewardsModel.recommendations.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Row(
+            children: [
+              Icon(
+                LucideIcons.sparkles,
+                size: 20,
+                color: colors.accent,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Recomendado para ti',
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: colors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Text(
+            'Basado en tu perfil y actividad',
+            style: GoogleFonts.montserrat(
+              fontSize: 12,
+              color: colors.textMuted,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 180,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: rewardsModel.recommendations.length,
+            itemBuilder: (context, index) {
+              final rec = rewardsModel.recommendations[index];
+              final reward = rewardsModel.getRewardById(rec.rewardId);
+              return AIRecommendationCard(
+                recommendation: rec,
+                reward: reward,
+                onAddToCart: reward != null
+                    ? () => _handleAddToCart(rewardsModel, reward.id)
+                    : null,
+              );
+            },
+          ),
+        ),
+        Divider(height: 24, color: colors.border),
+      ],
     );
   }
 

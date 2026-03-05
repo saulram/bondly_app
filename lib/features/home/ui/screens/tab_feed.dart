@@ -2,6 +2,7 @@ import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_home.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/ai/ui/widgets/feed_personalization_banner.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
@@ -84,6 +85,18 @@ class _FeedTabState extends State<FeedTab> {
               children: [
                 _buildSliderSection(),
                 const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.paddingScreen,
+                  ),
+                  child: FeedPersonalizationBanner(
+                    isPersonalized: model.isPersonalized,
+                    isLoading: model.personalizingFeed,
+                    onToggle: () {
+                      model.toggleFeedPersonalization();
+                    },
+                  ),
+                ),
               ],
             );
           }

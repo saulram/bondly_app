@@ -1,3 +1,4 @@
+import 'package:bondly_app/config/backend_config.dart';
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/constants.dart';
 import 'package:bondly_app/config/strings_login.dart';
@@ -32,6 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _userController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+
+  String _selectedCompany = "";
 
   @override
   void initState() {
@@ -165,6 +168,10 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 14),
         _buildPasswordInput(bondly),
         if (showInputError) _buildFieldError(),
+        if (BackendConfig.isApi) ...[
+          const SizedBox(height: 14),
+          _buildCompanyPicker(bondly),
+        ],
         if (errorMessage.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 14),
@@ -284,6 +291,62 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildCompanyPicker(BondlyColorScheme bondly) {
+    return Container(
+      height: 52,
+      decoration: BoxDecoration(
+        color: bondly.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: bondly.border),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Icon(LucideIcons.building2, size: 20, color: bondly.textMuted),
+          const SizedBox(width: 12),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedCompany.isEmpty ? null : _selectedCompany,
+                hint: Text(
+                  LoginStrings.selectYourCompany,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: bondly.textMuted,
+                  ),
+                ),
+                isExpanded: true,
+                icon: Icon(
+                  LucideIcons.chevronDown,
+                  size: 18,
+                  color: bondly.textMuted,
+                ),
+                dropdownColor: bondly.surfaceElevated,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: bondly.textPrimary,
+                ),
+                items: model.companies
+                    .where((c) => c != LoginStrings.selectYourCompany)
+                    .map((company) {
+                  return DropdownMenuItem<String>(
+                    value: company,
+                    child: Text(company),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedCompany = value ?? "";
+                  });
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLoginButton(BondlyColorScheme bondly) {
     return Container(
       width: double.infinity,
@@ -311,7 +374,7 @@ class _LoginScreenState extends State<LoginScreen> {
             model.onLoginAction(
               _userController.text,
               _passwordController.text,
-              '',
+              _selectedCompany,
             );
           },
           child: Center(

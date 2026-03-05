@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:bondly_app/config/strings_cart.dart';
+import 'package:bondly_app/features/ai/domain/models/reward_recommendation.dart';
+import 'package:bondly_app/features/ai/domain/usecases/get_reward_recommendations_usecase.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/screens/home_screen.dart';
 import 'package:bondly_app/features/profile/domain/models/account_statement_model.dart';
@@ -29,6 +31,7 @@ class MyRewardsViewModel extends NavigationModel {
   final PushCartItemUseCase _pushCartItemUseCase;
   final PullCartItemUseCase _pullCartItemUseCase;
   final CheckOutCartUseCase _checkOutCartUseCase;
+  final GetRewardRecommendationsUseCase _getRewardRecommendationsUseCase;
   final GetAccountStatementUseCase _getAccountStatementUseCase;
   final SharedPreferences _sharedPreferences;
 
@@ -45,6 +48,7 @@ class MyRewardsViewModel extends NavigationModel {
       this._pullCartItemUseCase,
       this._checkOutCartUseCase,
       this.snackBarService,
+      this._getRewardRecommendationsUseCase,
       this._getAccountStatementUseCase,
       this._sharedPreferences) {
     log.i("MyRewardsViewModel Created");
@@ -215,6 +219,9 @@ class MyRewardsViewModel extends NavigationModel {
       for (var reward in (rewards as RewardList).rewards ?? []) {
         _rewardPointsMap[reward.id] = reward.points;
       }
+
+      // Fetch AI recommendations after rewards are loaded
+      handleGetRecommendations();
     }, (error) {
       log.e(error);
     });
@@ -374,5 +381,66 @@ class MyRewardsViewModel extends NavigationModel {
   void dispose() {
     log.i("MyRewardsViewModel Disposed");
     super.dispose();
+  }
+
+  // ================================
+  // AI: Reward Recommendations
+  // ================================
+
+  List<RewardRecommendation> _recommendations = [];
+  List<RewardRecommendation> get recommendations => _recommendations;
+
+  bool _loadingRecommendations = false;
+  bool get loadingRecommendations => _loadingRecommendations;
+
+  /// User profile data set externally before fetching recommendations.
+  Map<String, dynamic>? userProfileForAI;
+
+  Future<void> handleGetRecommendations() async {
+    if (_rewardList.rewards == null || _rewardList.rewards!.isEmpty) return;
+
+    _loadingRecommendations = true;
+    notifyListeners();
+
+    final availableRewards = _rewardList.rewards!.map((r) {
+      return {
+        'id': r.id,
+        'name': r.name,
+        'description': r.description,
+        'points': r.points,
+        'category': r.category,
+        'likesCount': r.likes.length,
+      };
+    }).toList();
+
+    final userProfile = userProfileForAI ?? {
+      'name': 'Usuario',
+      'availablePoints': 0,
+      'monthlyPoints': 0,
+      'company': '',
+    };
+
+    final result = await _getRewardRecommendationsUseCase.invoke(
+      userProfile: userProfile,
+      availableRewards: availableRewards,
+    );
+
+    result.when((recs) {
+      _recommendations = recs;
+      log.i("MyRewardsViewModel### Recommendations: ${recs.length}");
+    }, (error) {
+      log.e("Recommendations error: $error");
+    });
+
+    _loadingRecommendations = false;
+    notifyListeners();
+  }
+
+  Reward? getRewardById(String id) {
+    try {
+      return _rewardList.rewards?.firstWhere((r) => r.id == id);
+    } catch (_) {
+      return null;
+    }
   }
 }
