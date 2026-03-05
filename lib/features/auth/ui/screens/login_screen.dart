@@ -103,6 +103,12 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     bool showInputError = errorType == LoginErrorType.invalidInputError;
+    final isDesktop =
+        MediaQuery.of(context).size.width > Constants.desktopBreakpoint;
+
+    if (isDesktop) {
+      return _buildDesktopLoginLayout(bondly, showInputError, errorMessage);
+    }
 
     return Container(
       height: MediaQuery.of(context).size.height,
@@ -130,6 +136,81 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildDesktopLoginLayout(
+    BondlyColorScheme bondly,
+    bool showInputError,
+    String errorMessage,
+  ) {
+    return Row(
+      children: [
+        // Left info panel
+        Flexible(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Container(
+              decoration: BoxDecoration(
+                color: bondly.surface,
+                border: Border(right: BorderSide(color: bondly.border)),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(48),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildLogo(),
+                      const SizedBox(height: 24),
+                      _buildWelcomeText(bondly),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Tu plataforma de reconocimientos',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          color: bondly.textSecondary,
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 3,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Right form panel
+        Expanded(
+          child: Container(
+            color: bondly.bg,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: Card(
+                  elevation: 8,
+                  shadowColor: bondly.accent.withValues(alpha: 0.15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  color: bondly.surface,
+                  child: Padding(
+                    padding: const EdgeInsets.all(40),
+                    child: SingleChildScrollView(
+                      child: _buildForm(bondly, showInputError, errorMessage),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildLogo() {
     return SizedBox(
       width: 200,
@@ -153,6 +234,9 @@ class _LoginScreenState extends State<LoginScreen> {
         color: bondly.textPrimary,
       ),
       textAlign: TextAlign.center,
+      softWrap: true,
+      overflow: TextOverflow.ellipsis,
+      maxLines: 3,
     );
   }
 

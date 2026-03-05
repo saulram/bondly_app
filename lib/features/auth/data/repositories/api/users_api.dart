@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:bondly_app/features/auth/data/repositories/api/mappers/user_activity_response_mapper.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/models/user_activity_response.dart';
@@ -26,12 +26,12 @@ class UsersAPI {
     }
   }
 
-  Future<void> updateAvatar(String id, File avatar) async {
+  Future<void> updateAvatar(String id, Uint8List bytes) async {
     try {
       await _callsHandler.sendMultipart(
           method: Methods.PUT.name,
           path: "users/uploadAvatar/$id",
-          file: avatar);
+          bytes: bytes);
     } catch (exception) {
       Logger().e(exception.toString());
       throw NoConnectionException();

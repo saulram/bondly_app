@@ -40,7 +40,11 @@ class LoginViewModel extends NavigationModel {
       }
 
       _loginStateUseCase.update(user.token);
-      _userUseCase.update(user);
+      // On Supabase, _repository.clear() = signOut(). Skip the local-cache
+      // update entirely to avoid logging the user out right after login.
+      if (!BackendConfig.isSupabase) {
+        _userUseCase.update(user);
+      }
       _tokenHandler.save(user.token!);
 
       state = SuccessLogin();
