@@ -2,7 +2,7 @@
 
 import "dart:async";
 import "dart:convert";
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:bondly_app/config/environment.dart';
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
@@ -202,13 +202,14 @@ class ApiCallsHandler extends CallsHandler {
   Future<void> sendMultipart(
       {required String method,
       required String path,
-      required File file,
+      required Uint8List bytes,
       String? name,
+      String filename = 'image',
       Map<String, String>? extraHeader}) async {
     var request = http.MultipartRequest(method, _bondlyUri(path));
     final httpFile = http.MultipartFile.fromBytes(
-        name ?? 'image', file.readAsBytesSync(),
-        filename: "image");
+        name ?? 'image', bytes,
+        filename: filename);
 
     request.headers.addAll({"Authorization": sessionTokenHandler.get()!});
     request.files.add(httpFile);
@@ -276,9 +277,9 @@ class ApiCallsHandler extends CallsHandler {
       throwOnFailureCode(response);
       return response;
     } on http.ClientException catch (e) {
-      throw SocketException("ClientException has occurred: $e");
-    } on IOException catch (e) {
-      throw SocketException("IOException has occurred: $e");
+      throw Exception("ClientException has occurred: $e");
+    } catch (e) {
+      throw Exception("Network error: $e");
     }
   }
 }
