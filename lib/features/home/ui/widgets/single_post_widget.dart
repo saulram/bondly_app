@@ -12,6 +12,7 @@ import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:moment_dart/moment_dart.dart';
 
@@ -31,13 +32,6 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   @override
   void initState() {
     super.initState();
-    // Trigger sentiment analysis for this post
-    if (widget.post.id != null) {
-      getIt<HomeViewModel>().analyzeFeedSentiment(
-        widget.post.id!,
-        widget.post.body,
-      );
-    }
   }
 
   @override
@@ -214,12 +208,13 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
 
   Widget _buildActions(BuildContext context) {
     final homeModel = getIt<HomeViewModel>();
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     final sentiment = homeModel.getSentiment(widget.post.id ?? '');
     final isAnalyzing = homeModel.isAnalyzingSentiment(widget.post.id ?? '');
 
     return Row(
       children: [
-        // AI Sentiment badge
+        // AI Sentiment: tap-to-analyze button → spinner → badge
         if (sentiment != null)
           SentimentBadge(sentiment: sentiment)
         else if (isAnalyzing)
@@ -227,6 +222,39 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
             width: 14,
             height: 14,
             child: CircularProgressIndicator(strokeWidth: 1.5),
+          )
+        else
+          GestureDetector(
+            onTap: () {
+              if (widget.post.id != null) {
+                homeModel.analyzeFeedSentiment(
+                  widget.post.id!,
+                  widget.post.body,
+                );
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: colors.accentSoft,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.auto_awesome, size: 14, color: colors.accent),
+                  const SizedBox(width: 4),
+                  Text(
+                    'IA',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: colors.accent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         const Expanded(child: SizedBox()),
         _buildLike(),

@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,14 +9,14 @@ class FullScreenImage extends StatefulWidget {
   final String image;
   final String tag;
   final bool isFile;
-  final File? imageFile;
+  final Uint8List? imageBytes;
 
   const FullScreenImage(
       {super.key,
       required this.image,
       required this.tag,
       this.isFile = false,
-      this.imageFile});
+      this.imageBytes});
 
   @override
   State<FullScreenImage> createState() => _FullScreenImageState();
@@ -35,7 +35,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
               minScale: 1,
               maxScale: 1.8,
               child: widget.isFile
-                  ? Image.file(widget.imageFile!)
+                  ? Image.memory(widget.imageBytes!)
                   : CachedNetworkImage(
                       imageUrl: safeImageUrl(widget.image),
                       fit: BoxFit.contain,

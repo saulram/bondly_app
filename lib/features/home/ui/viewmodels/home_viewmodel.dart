@@ -132,8 +132,17 @@ class HomeViewModel extends NavigationModel {
         duration: const Duration(milliseconds: 500), curve: Curves.ease);
   }
 
+  /// Immediately switches to the given tab without animation.
+  /// Used by the desktop sidebar for instant nav highlight updates.
+  void jumpToTab(int index) {
+    _currentIndex = index;
+    notifyListeners();
+    pageController.jumpToPage(index);
+  }
+
   /// Handles page change.
   void onPageChanged(int index) {
+    if (_currentIndex == index) return;
     _currentIndex = index;
     notifyListeners();
   }
@@ -159,9 +168,10 @@ class HomeViewModel extends NavigationModel {
       _banners = banners;
 
       log.i("HomeViewModel### Get Banners Success");
-      List<String> uris = _banners!.banners!.map((banner) {
-        return banner.image!;
-      }).toList();
+      List<String> uris = _banners!.banners!
+          .where((banner) => banner.image != null)
+          .map((banner) => banner.image!)
+          .toList();
       bannersList = uris;
     }, (error) {
       log.e(error.toString());
@@ -558,7 +568,8 @@ class HomeViewModel extends NavigationModel {
       reordered.addAll(feedMap.values);
       _feeds = CompanyFeed(data: reordered, success: _feeds.success);
 
-      log.i("HomeViewModel### Feed personalized with ${orderedIds.length} items");
+      log.i(
+          "HomeViewModel### Feed personalized with ${orderedIds.length} items");
     }, (error) {
       log.e("Feed personalization failed: $error");
     });
@@ -576,7 +587,8 @@ class HomeViewModel extends NavigationModel {
 
   final Set<String> _analyzingFeedIds = {};
 
-  bool isAnalyzingSentiment(String feedId) => _analyzingFeedIds.contains(feedId);
+  bool isAnalyzingSentiment(String feedId) =>
+      _analyzingFeedIds.contains(feedId);
 
   Future<void> analyzeFeedSentiment(String feedId, String text) async {
     if (_sentimentCache.containsKey(feedId) ||
