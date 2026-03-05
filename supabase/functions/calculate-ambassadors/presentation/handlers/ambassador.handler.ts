@@ -13,6 +13,8 @@ import { createClient } from "@supabase/supabase-js";
 
 export class AmbassadorHandler {
   async handle(req: Request): Promise<Response> {
+    HttpResponse.setOrigin(req);
+
     if (HttpRequest.isPreflight(req)) {
       return HttpResponse.cors();
     }

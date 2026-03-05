@@ -3,20 +3,53 @@
  * Presentation layer response handling
  */
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const ALLOWED_ORIGINS = [
+  "https://bondly-app.vercel.app",
+];
+
+/**
+ * Check if an origin is allowed for CORS.
+ * Allows: production Vercel URL, Vercel preview deploys, and localhost for dev.
+ */
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  if (/^https:\/\/bondly-app-.+\.vercel\.app$/.test(origin)) return true;
+  if (/^http:\/\/localhost(:\d+)?$/.test(origin)) return true;
+  return false;
+}
 
 export class HttpResponse {
+  private static _origin: string | null = null;
+
+  /**
+   * Set the request origin for CORS headers.
+   * Call at the start of each request handler.
+   */
+  static setOrigin(req: Request): void {
+    this._origin = req.headers.get("origin");
+  }
+
+  private static get corsHeaders(): Record<string, string> {
+    const origin = isAllowedOrigin(this._origin)
+      ? this._origin!
+      : ALLOWED_ORIGINS[0];
+
+    return {
+      "Access-Control-Allow-Origin": origin,
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+      "Vary": "Origin",
+    };
+  }
+
   /**
    * Handle CORS preflight request
    */
   static cors(): Response {
     return new Response(null, {
       status: 204,
-      headers: CORS_HEADERS,
+      headers: this.corsHeaders,
     });
   }
 
@@ -27,7 +60,7 @@ export class HttpResponse {
     return new Response(JSON.stringify(data), {
       status,
       headers: {
-        ...CORS_HEADERS,
+        ...this.corsHeaders,
         "Content-Type": "application/json",
       },
     });
@@ -88,7 +121,7 @@ export class HttpResponse {
   static csv(content: string, filename: string): Response {
     return new Response(content, {
       headers: {
-        ...CORS_HEADERS,
+        ...this.corsHeaders,
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": `attachment; filename="${filename}"`,
       },
