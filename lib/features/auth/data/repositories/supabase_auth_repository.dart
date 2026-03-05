@@ -15,8 +15,18 @@ class SupabaseAuthRepository extends AuthRepository {
     String company,
   ) async {
     try {
+      // Look up email via SECURITY DEFINER RPC (bypasses RLS for pre-auth lookup)
+      final email = await _provider.client.rpc('get_email_by_employee', params: {
+        'p_employee_number': int.tryParse(user) ?? 0,
+        'p_company_name': company,
+      });
+
+      if (email == null || (email as String).isEmpty) {
+        return Result.error(InvalidLoginException());
+      }
+
       final response = await _provider.client.auth.signInWithPassword(
-        email: user,
+        email: email,
         password: password,
       );
 
@@ -41,14 +51,13 @@ class SupabaseAuthRepository extends AuthRepository {
   @override
   Future<Result<List<String>, Exception>> getCompanies() async {
     try {
-      final response =
-          await _provider.client.from('users').select('company_name');
+      // Use SECURITY DEFINER RPC to bypass RLS for unauthenticated access
+      final response = await _provider.client.rpc('get_companies');
 
       final companies = (response as List)
           .map((row) => row['company_name'] as String?)
           .where((name) => name != null && name.isNotEmpty)
           .map((name) => name!)
-          .toSet()
           .toList();
 
       return Result.success(companies);
