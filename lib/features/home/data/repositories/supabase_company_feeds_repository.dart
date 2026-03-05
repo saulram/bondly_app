@@ -178,28 +178,16 @@ class SupabaseCompanyFeedsRepository extends CompanyFeedsRepository {
     List<String> recipients,
   ) async {
     try {
-      final ackResponse = await _provider.client
-          .from('acknowledgments')
-          .insert({
-            'sender_id': _currentUserId,
-            'badge_id': badgeId,
-            'message': message,
-          })
-          .select()
-          .single();
+      final result = await _provider.client.rpc('create_acknowledgment', params: {
+        'p_badge_id': badgeId,
+        'p_recipients': recipients,
+        'p_message': message,
+      });
 
-      final ackId = ackResponse['id'];
-
-      final recipientRows = recipients
-          .map((recipientId) => {
-                'acknowledgment_id': ackId,
-                'recipient_id': recipientId,
-              })
-          .toList();
-
-      await _provider.client
-          .from('acknowledgment_recipients')
-          .insert(recipientRows);
+      final success = result['success'] as bool? ?? false;
+      if (!success) {
+        return Result.error(Exception(result['message'] ?? 'Error al crear reconocimiento'));
+      }
 
       return Result.success(true);
     } catch (exception) {

@@ -18,10 +18,21 @@ class SupabaseAccountStatementRepository extends AccountStatementRepository {
           .select('*, statement_transactions(*)')
           .eq('user_id', _currentUserId!)
           .order('created_at', ascending: false)
-          .limit(1)
-          .single();
+          .limit(1);
 
-      return Result.success(AccountStatement.fromSupabase(response));
+      if ((response as List).isEmpty) {
+        // Return an empty statement when no data exists yet
+        return Result.success(AccountStatement(
+          user: _currentUserId,
+          date: DateTime.now(),
+          transactions: [],
+          balance: 0,
+          description: 'Sin movimientos',
+          id: '',
+        ));
+      }
+
+      return Result.success(AccountStatement.fromSupabase(response.first));
     } catch (exception) {
       return Result.error(exception as Exception);
     }

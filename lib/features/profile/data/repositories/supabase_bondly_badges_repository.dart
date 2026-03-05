@@ -13,14 +13,14 @@ class SupabaseBondlyBadgesRepository extends BondlyBadgesRepository {
   @override
   Future<Result<BondlyBadges, Exception>> getBondlyBadges() async {
     try {
-      // Get ambassador badges (embassys)
+      // Get ambassador badges from ambassadors table
       final embassyResponse = await _provider.client
-          .from('badge_reports')
-          .select('*, badge:badges(*), category:badge_categories(*)')
-          .eq('receiver_id', _currentUserId!)
-          .eq('type', 'embassy');
+          .from('ambassadors')
+          .select('*, badge:badges(*)')
+          .eq('user_id', _currentUserId!)
+          .eq('visible', true);
 
-      final embassyItems = _groupBadgeReports(embassyResponse as List);
+      final embassyItems = _groupByBadge(embassyResponse as List, 'badge');
       final embassys = Embassys(
         count: embassyItems.length,
         embassys: embassyItems
@@ -32,14 +32,13 @@ class SupabaseBondlyBadgesRepository extends BondlyBadgesRepository {
             .toList(),
       );
 
-      // Get my badges
+      // Get my received badges from badge_reports
       final myBadgesResponse = await _provider.client
           .from('badge_reports')
-          .select('*, badge:badges(*), category:badge_categories(*)')
-          .eq('receiver_id', _currentUserId!)
-          .eq('type', 'badge');
+          .select('*, badge:badges(*)')
+          .eq('receiver_id', _currentUserId!);
 
-      final myBadgeItems = _groupBadgeReports(myBadgesResponse as List);
+      final myBadgeItems = _groupByBadge(myBadgesResponse as List, 'badge');
       final myBadges = MyBadges(
         count: myBadgeItems.length,
         myBadges: myBadgeItems
@@ -82,10 +81,10 @@ class SupabaseBondlyBadgesRepository extends BondlyBadgesRepository {
     }
   }
 
-  List<Map<String, dynamic>> _groupBadgeReports(List reports) {
+  List<Map<String, dynamic>> _groupByBadge(List rows, String badgeKey) {
     final Map<String, Map<String, dynamic>> grouped = {};
-    for (final report in reports) {
-      final badge = report['badge'] as Map<String, dynamic>?;
+    for (final row in rows) {
+      final badge = row[badgeKey] as Map<String, dynamic>?;
       if (badge == null) continue;
       final badgeId = badge['id'] as String;
       if (grouped.containsKey(badgeId)) {

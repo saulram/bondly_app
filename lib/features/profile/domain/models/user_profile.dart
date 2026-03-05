@@ -30,8 +30,8 @@ class UserProfile {
       json['company_name'] ?? '',
       profileData['job_position'] ?? '',
       profileData['location'] ?? '',
-      profileData['dob'] != null
-          ? DateTime.parse(profileData['dob'])
+      profileData['b_day'] != null
+          ? DateTime.parse(profileData['b_day'])
           : DateTime.now(),
       profileData['id'] ?? json['id'] ?? '',
     );
