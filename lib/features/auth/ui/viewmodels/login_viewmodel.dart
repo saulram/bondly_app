@@ -1,3 +1,4 @@
+import 'package:bondly_app/config/backend_config.dart';
 import 'package:bondly_app/config/strings_login.dart';
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
@@ -67,6 +68,9 @@ class LoginViewModel extends NavigationModel {
   }
 
   Future<void> load() async {
+    // Supabase mode is single-tenant (one instance per company) — no company list needed
+    if (BackendConfig.isSupabase) return;
+
     if (companies.isNotEmpty) {
       return;
     }
