@@ -15,6 +15,7 @@ import 'package:bondly_app/features/profile/ui/screens/profile_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/shopping_cart_screen.dart';
 import 'package:bondly_app/features/ranking/ui/screens/ranking_screen.dart';
 import 'package:bondly_app/features/start/ui/screens/start_screen.dart';
+import 'package:bondly_app/ui/shared/desktop_shell.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
@@ -52,46 +53,54 @@ class AppRouter {
           path: ResetPasswordConfirmationScreen.route,
           builder: (context, state) =>
               const ResetPasswordConfirmationScreen()),
-      GoRoute(
-          path: HomeScreen.route,
-          builder: (context, state) => const HomeScreen()),
-      GoRoute(
-          path: ProfileScreen.route,
-          builder: (context, state) => const ProfileScreen()),
-      GoRoute(
-          path: NotificationsScreen.route,
-          builder: (context, state) => const NotificationsScreen()),
-      GoRoute(
-          path: MyActivityScreen.route,
-          builder: (context, state) => const MyActivityScreen()),
-      GoRoute(
-        path: MyRewardsScreen.route,
-        builder: (context, state) => const MyRewardsScreen(),
+      ShellRoute(
+        builder: (context, state, child) => DesktopShell(
+          currentRoute: state.uri.path,
+          child: child,
+        ),
+        routes: [
+          GoRoute(
+              path: HomeScreen.route,
+              builder: (context, state) => const HomeScreen()),
+          GoRoute(
+              path: ProfileScreen.route,
+              builder: (context, state) => const ProfileScreen()),
+          GoRoute(
+              path: NotificationsScreen.route,
+              builder: (context, state) => const NotificationsScreen()),
+          GoRoute(
+              path: MyActivityScreen.route,
+              builder: (context, state) => const MyActivityScreen()),
+          GoRoute(
+            path: MyRewardsScreen.route,
+            builder: (context, state) => const MyRewardsScreen(),
+          ),
+          GoRoute(
+              path: MyCartScreen.route,
+              builder: (context, state) => const MyCartScreen()),
+          GoRoute(
+              path: MonthlyBalanceScreen.route,
+              builder: (context, state) => const MonthlyBalanceScreen()),
+          GoRoute(
+              path: MyBadgesScreen.route,
+              builder: (context, state) => const MyBadgesScreen()),
+          GoRoute(
+              path: RankingScreen.route,
+              builder: (context, state) => const RankingScreen()),
+          GoRoute(
+              path: MyDataScreen.route,
+              builder: (context, state) => const MyDataScreen()),
+          GoRoute(
+              path: ActivityDetailScreen.route,
+              builder: (context, state) {
+                var params = state.extra as Map<String, dynamic>;
+                return ActivityDetailScreen(
+                    activityId: params[ActivityDetailScreen.idParam] ?? "",
+                    feedId: params[ActivityDetailScreen.feedIdParam] ?? "",
+                    isRead: params[ActivityDetailScreen.readParam] ?? false);
+              }),
+        ],
       ),
-      GoRoute(
-          path: MyCartScreen.route,
-          builder: (context, state) => const MyCartScreen()),
-      GoRoute(
-          path: MonthlyBalanceScreen.route,
-          builder: (context, state) => const MonthlyBalanceScreen()),
-      GoRoute(
-          path: MyBadgesScreen.route,
-          builder: (context, state) => const MyBadgesScreen()),
-      GoRoute(
-          path: RankingScreen.route,
-          builder: (context, state) => const RankingScreen()),
-      GoRoute(
-          path: MyDataScreen.route,
-          builder: (context, state) => const MyDataScreen()),
-      GoRoute(
-          path: ActivityDetailScreen.route,
-          builder: (context, state) {
-            var params = state.extra as Map<String, dynamic>;
-            return ActivityDetailScreen(
-                activityId: params[ActivityDetailScreen.idParam] ?? "",
-                feedId: params[ActivityDetailScreen.feedIdParam] ?? "",
-                isRead: params[ActivityDetailScreen.readParam] ?? false);
-          })
     ],
   );
 }

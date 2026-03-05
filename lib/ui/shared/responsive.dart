@@ -51,7 +51,7 @@ class Responsive extends StatefulWidget {
       {super.key,
       this.mobile,
       this.tablet,
-      this.breakpointM = Constants.tabletBreakPooint,
+      this.breakpointM = Constants.tabletBreakpoint,
       this.breakpointS = Constants.mobileBreakpoint,
       required this.desktop});
 
@@ -79,9 +79,9 @@ class _ResponsiveState extends State<Responsive> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      if (constraints.maxWidth < breakpointM!) {
+      if (constraints.maxWidth < breakpointS!) {
         return mobile ?? tablet ?? desktop;
-      } else if (constraints.maxWidth < breakpointS!) {
+      } else if (constraints.maxWidth < breakpointM!) {
         return tablet ?? desktop;
       } else {
         return desktop;
