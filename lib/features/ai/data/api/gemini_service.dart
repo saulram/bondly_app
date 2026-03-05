@@ -1,41 +1,44 @@
 import 'dart:convert';
 
-import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:logger/logger.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class GeminiService {
-  final String apiKey;
-  late final GenerativeModel _model;
   final Logger _log = Logger(printer: PrettyPrinter(methodCount: 0));
 
-  GeminiService({required this.apiKey}) {
-    _model = GenerativeModel(
-      model: 'gemini-3-flash-preview',
-      apiKey: apiKey,
-      generationConfig: GenerationConfig(
-        temperature: 0.4,
-        maxOutputTokens: 2048,
-        responseMimeType: 'application/json',
-      ),
-    );
-  }
+  GeminiService();
 
   Future<Map<String, dynamic>> generateJsonResponse(String prompt) async {
     try {
-      _log.i('Gemini request initiated');
-      final content = [Content.text(prompt)];
-      final response = await _model.generateContent(content);
-      final text = response.text;
+      _log.i('Gemini request initiated (via Edge Function)');
 
-      if (text == null || text.isEmpty) {
-        throw GeminiServiceException('Empty response from Gemini');
+      final response = await Supabase.instance.client.functions.invoke(
+        'gemini',
+        body: {'prompt': prompt},
+      );
+
+      final dynamic data = response.data;
+      if (data == null) {
+        throw GeminiServiceException(
+            'Empty response from Gemini Edge Function');
       }
 
       _log.i('Gemini response received');
-      return json.decode(text) as Map<String, dynamic>;
-    } on GenerativeAIException catch (e) {
-      _log.e('Gemini API error: ${e.message}');
-      throw GeminiServiceException('Gemini API error: ${e.message}');
+
+      // The edge function should return JSON parsed by the supabase client
+      // If it returned a raw string, we might need to jsonDecode.
+      // Let's handle both cases.
+      if (data is Map<String, dynamic>) {
+        return data;
+      } else if (data is String) {
+        return json.decode(data) as Map<String, dynamic>;
+      } else {
+        throw GeminiServiceException(
+            'Unexpected response format from Gemini Edge Function');
+      }
+    } on FunctionException catch (e) {
+      _log.e('Supabase Edge Function error: ${e.toString()}');
+      throw GeminiServiceException('Edge Function error: ${e.toString()}');
     } catch (e) {
       _log.e('Gemini service error: $e');
       throw GeminiServiceException('Failed to process Gemini response: $e');

@@ -3,14 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('GeminiService', () {
-    test('constructor creates instance with provided API key', () {
-      final service = GeminiService(apiKey: 'test-api-key');
-      expect(service.apiKey, 'test-api-key');
-    });
-
-    test('constructor creates instance with empty API key', () {
-      final service = GeminiService(apiKey: '');
-      expect(service.apiKey, '');
+    test('instantiates correctly', () {
+      final service = GeminiService();
+      expect(service, isNotNull);
     });
   });
 
@@ -39,8 +34,7 @@ void main() {
     test('handles message with special characters', () {
       final exception =
           GeminiServiceException('Error: código 400 - "bad request"');
-      expect(
-          exception.message, 'Error: código 400 - "bad request"');
+      expect(exception.message, 'Error: código 400 - "bad request"');
     });
   });
 }
