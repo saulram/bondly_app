@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/features/home/ui/widgets/user_profile_bottom_sheet.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -25,51 +26,65 @@ class _PostMentionsWidgetState extends State<PostMentionsWidget> {
     final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     List<TextSpan> textSpans = [];
 
-    RegExp webRegex = RegExp(r"\@\[([^\]]+)\]\(([a-f0-9]+)\)");
+    // Web format: @[userName](userId) — userId can be hex or UUID with dashes
+    RegExp webRegex = RegExp(r"\@\[([^\]]+)\]\(([a-f0-9\-]+)\)");
+    // Mobile format: @[__userId__](__userName__)
     RegExp mobileRegex =
-        RegExp(r"\@\[(__)([a-f0-9]+)(__)\]\((__)([^\]]+)(__)\)");
+        RegExp(r"\@\[(__)([a-f0-9\-]+)(__)\]\((__)([^\]]+)(__)\)");
+
+    // Collect all matches from both formats with their positions
+    List<_MentionMatch> allMatches = [];
+
+    for (Match match in webRegex.allMatches(text)) {
+      // Skip if this is actually a mobile format match (contains __)
+      if (mobileRegex.hasMatch(text.substring(match.start, match.end))) {
+        continue;
+      }
+      allMatches.add(_MentionMatch(
+        start: match.start,
+        end: match.end,
+        userName: match.group(1)!,
+        userId: match.group(2)!,
+      ));
+    }
+
+    for (Match match in mobileRegex.allMatches(text)) {
+      allMatches.add(_MentionMatch(
+        start: match.start,
+        end: match.end,
+        userName: match.group(5)!,
+        userId: match.group(2)!,
+      ));
+    }
+
+    // Sort by position in the text
+    allMatches.sort((a, b) => a.start.compareTo(b.start));
 
     int currentIndex = 0;
 
-    // Función para procesar las coincidencias
-    void processMatch(Match match, bool isMobileFormat) {
-      String userName, userId;
-
-      if (isMobileFormat) {
-        userId = match.group(2)!;
-        userName = match.group(5)!;
-      } else {
-        userName = match.group(1)!;
-        userId = match.group(2)!;
-      }
-
+    for (final mention in allMatches) {
       // Add the text before the mention
-      if (match.start > currentIndex) {
-        String beforeMention = text.substring(currentIndex, match.start);
+      if (mention.start > currentIndex) {
+        String beforeMention = text.substring(currentIndex, mention.start);
         textSpans.add(TextSpan(text: beforeMention, style: widget.style));
       }
 
-      // Add the mention
+      // Add the mention as a styled, tappable span
+      final userId = mention.userId;
+      final userName = mention.userName;
       textSpans.add(TextSpan(
         text: "@$userName",
-        style: widget.style?.copyWith(color: colors.accent),
+        style: widget.style?.copyWith(
+          color: colors.accent,
+          fontWeight: FontWeight.w600,
+        ),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
-            debugPrint("Mention tapped: $userId");
+            showUserProfileBottomSheet(context, userId, userName);
           },
       ));
 
-      currentIndex = match.end;
-    }
-
-    // Procesar las coincidencias del formato web
-    for (Match match in webRegex.allMatches(text)) {
-      processMatch(match, false);
-    }
-
-    // Procesar las coincidencias del formato móvil
-    for (Match match in mobileRegex.allMatches(text)) {
-      processMatch(match, true);
+      currentIndex = mention.end;
     }
 
     // Add the remaining text
@@ -82,4 +97,18 @@ class _PostMentionsWidgetState extends State<PostMentionsWidget> {
       text: TextSpan(children: textSpans),
     );
   }
+}
+
+class _MentionMatch {
+  final int start;
+  final int end;
+  final String userName;
+  final String userId;
+
+  _MentionMatch({
+    required this.start,
+    required this.end,
+    required this.userName,
+    required this.userId,
+  });
 }
