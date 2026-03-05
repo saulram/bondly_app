@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/constants.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/screens/ambassadors_tab.dart';
@@ -75,11 +76,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ),
-                    // Bottom Tab Bar
-                    BondlyBottomTabBar(
-                      currentIndex: model.currentIndex,
-                      onTap: model.onTabTapped,
-                    ),
+                    // Bottom Tab Bar (hidden on desktop — sidebar handles navigation)
+                    if (MediaQuery.of(context).size.width <=
+                        Constants.desktopBreakpoint)
+                      BondlyBottomTabBar(
+                        currentIndex: model.currentIndex,
+                        onTap: model.onTabTapped,
+                      ),
                   ],
                 ),
               ),
