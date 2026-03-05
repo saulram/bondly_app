@@ -103,6 +103,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         errorMessage = '';
     }
 
+    final isDesktop =
+        MediaQuery.of(context).size.width > Constants.desktopBreakpoint;
+
+    if (isDesktop) {
+      return _buildDesktopLayout(bondly, errorMessage);
+    }
+
     return Container(
       alignment: Alignment.center,
       child: SizedBox(
@@ -126,6 +133,66 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDesktopLayout(BondlyColorScheme bondly, String errorMessage) {
+    return Row(
+      children: [
+        // Left info panel
+        Flexible(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Container(
+              decoration: BoxDecoration(
+                color: bondly.surface,
+                border: Border(right: BorderSide(color: bondly.border)),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(48),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildLogo(),
+                      const SizedBox(height: 24),
+                      _buildTitle(bondly),
+                      const SizedBox(height: 12),
+                      _buildDescription(bondly),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Right form panel
+        Expanded(
+          child: Container(
+            color: bondly.bg,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: Card(
+                  elevation: 8,
+                  shadowColor: bondly.accent.withValues(alpha: 0.15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  color: bondly.surface,
+                  child: Padding(
+                    padding: const EdgeInsets.all(40),
+                    child: SingleChildScrollView(
+                      child: _buildForm(bondly, errorMessage),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -253,22 +320,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         color: bondly.textPrimary,
       ),
       textAlign: TextAlign.center,
+      softWrap: true,
+      overflow: TextOverflow.ellipsis,
+      maxLines: 3,
     );
   }
 
   Widget _buildDescription(BondlyColorScheme bondly) {
-    return SizedBox(
-      width: double.infinity,
-      child: Text(
-        ForgotPasswordStrings.description,
-        style: GoogleFonts.inter(
-          fontSize: 14,
-          fontWeight: FontWeight.normal,
-          color: bondly.textSecondary,
-          height: 1.5,
-        ),
-        textAlign: TextAlign.center,
+    return Text(
+      ForgotPasswordStrings.description,
+      style: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+        color: bondly.textSecondary,
+        height: 1.5,
       ),
+      textAlign: TextAlign.center,
+      softWrap: true,
     );
   }
 
