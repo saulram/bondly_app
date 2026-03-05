@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/constants.dart';
 import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_cart.dart';
 import 'package:bondly_app/config/strings_profile.dart';
@@ -228,6 +229,32 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
       );
     }
 
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth =
+            constraints.maxWidth - (AppDimensions.paddingScreen * 2);
+        final crossAxisCount =
+            availableWidth >= Constants.rewardsGridThreeColumns
+                ? 3
+                : availableWidth >= Constants.rewardsGridTwoColumns
+                    ? 2
+                    : 1;
+
+        if (crossAxisCount == 1) {
+          return _buildRewardsListView(rewards, rewardsModel, colors);
+        }
+        return _buildRewardsGridView(
+          rewards, rewardsModel, colors, crossAxisCount, availableWidth,
+        );
+      },
+    );
+  }
+
+  Widget _buildRewardsListView(
+    List<Reward> rewards,
+    MyRewardsViewModel rewardsModel,
+    BondlyColorScheme colors,
+  ) {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(
         AppDimensions.paddingScreen,
@@ -236,13 +263,52 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
         100,
       ),
       physics: const AlwaysScrollableScrollPhysics(),
-      itemCount: rewards.length + 1, // +1 for AI recommendations header
+      itemCount: rewards.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {
           return _buildRecommendationsSection(rewardsModel, colors);
         }
-        return _buildRewardCard(rewards[index - 1], rewardsModel, colors);
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: _buildRewardCard(rewards[index - 1], rewardsModel, colors),
+        );
       },
+    );
+  }
+
+  Widget _buildRewardsGridView(
+    List<Reward> rewards,
+    MyRewardsViewModel rewardsModel,
+    BondlyColorScheme colors,
+    int crossAxisCount,
+    double availableWidth,
+  ) {
+    final totalSpacing = 16.0 * (crossAxisCount - 1);
+    final cardWidth = (availableWidth - totalSpacing) / crossAxisCount;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.paddingScreen,
+        12,
+        AppDimensions.paddingScreen,
+        100,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildRecommendationsSection(rewardsModel, colors),
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: rewards.map((reward) {
+              return SizedBox(
+                width: cardWidth,
+                child: _buildRewardCard(reward, rewardsModel, colors),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -282,7 +348,47 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
     }
 
     if (rewardsModel.recommendations.isEmpty) {
-      return const SizedBox.shrink();
+      return GestureDetector(
+        onTap: () => rewardsModel.handleGetRecommendations(),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colors.accentSoft,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.auto_awesome, size: 18, color: colors.accent),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Recomendaciones IA',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: colors.accent,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Toca para generar sugerencias personalizadas',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 11,
+                        color: colors.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(LucideIcons.chevronRight, size: 20, color: colors.accent),
+            ],
+          ),
+        ),
+      );
     }
 
     return Column(
@@ -364,7 +470,6 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
     final canAfford = rewardsModel.canAffordItem(reward.id);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: colors.surface,
         border: Border.all(color: colors.border, width: 1),

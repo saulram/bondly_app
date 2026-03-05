@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/users_repository.dart';
@@ -67,12 +67,12 @@ class ProfileViewModel extends NavigationModel {
     navigation.go(LoginScreen.route);
   }
 
-  Future<void> updateAvatar(File file) async {
+  Future<void> updateAvatar(Uint8List bytes) async {
     busy = true;
     notifyListeners();
 
     try {
-      await updateUserUseCase.invoke(user?.id ?? "", file);
+      await updateUserUseCase.invoke(user?.id ?? "", bytes);
       load(remote: true);
     } catch (exception) {
       if (exception is UserUpdateException) {
