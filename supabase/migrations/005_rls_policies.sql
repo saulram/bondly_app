@@ -115,28 +115,28 @@ CREATE POLICY "user_balances_select_own" ON user_balances
     USING (user_id = auth.uid() OR public.is_admin());
 
 -- =============================================
--- User Logs Policies (Public access for logging)
+-- User Logs Policies
 -- =============================================
 
-CREATE POLICY "user_logs_select_all" ON user_logs
+CREATE POLICY "user_logs_select_own" ON user_logs
     FOR SELECT
-    USING (TRUE);
+    USING (user_id = auth.uid() OR public.is_admin());
 
-CREATE POLICY "user_logs_insert_all" ON user_logs
+CREATE POLICY "user_logs_insert_own" ON user_logs
     FOR INSERT
-    WITH CHECK (TRUE);
+    WITH CHECK (user_id = auth.uid());
 
 -- =============================================
--- User Notifications Policies (Public access)
+-- User Notifications Policies
 -- =============================================
 
 CREATE POLICY "user_notifications_select_own" ON user_notifications
     FOR SELECT
-    USING (user_id = auth.uid() OR TRUE);
+    USING (user_id = auth.uid());
 
 CREATE POLICY "user_notifications_insert" ON user_notifications
     FOR INSERT
-    WITH CHECK (TRUE);
+    WITH CHECK (user_id = auth.uid() OR public.is_admin());
 
 CREATE POLICY "user_notifications_update_own" ON user_notifications
     FOR UPDATE
@@ -214,7 +214,7 @@ CREATE POLICY "badge_reports_select_admin" ON badge_reports
 
 CREATE POLICY "badge_reports_insert" ON badge_reports
     FOR INSERT
-    WITH CHECK (TRUE);  -- Via function SECURITY DEFINER
+    WITH CHECK (sender_id = auth.uid() OR public.is_admin());  -- Normal flow via SECURITY DEFINER
 
 -- =============================================
 -- Acknowledgments Policies
@@ -249,7 +249,13 @@ CREATE POLICY "acknowledgment_recipients_select" ON acknowledgment_recipients
 
 CREATE POLICY "acknowledgment_recipients_insert" ON acknowledgment_recipients
     FOR INSERT
-    WITH CHECK (TRUE);  -- Via function SECURITY DEFINER
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM acknowledgments
+            WHERE acknowledgments.id = acknowledgment_recipients.acknowledgment_id
+            AND acknowledgments.sender_id = auth.uid()
+        ) OR public.is_admin()
+    );  -- Normal flow via SECURITY DEFINER
 
 -- =============================================
 -- Rewards Policies
@@ -352,7 +358,7 @@ CREATE POLICY "exchanges_select_own" ON exchanges
 
 CREATE POLICY "exchanges_insert" ON exchanges
     FOR INSERT
-    WITH CHECK (TRUE);  -- Via function SECURITY DEFINER
+    WITH CHECK (user_id = auth.uid());  -- Normal flow via SECURITY DEFINER
 
 CREATE POLICY "exchanges_update_admin" ON exchanges
     FOR UPDATE
@@ -368,7 +374,7 @@ CREATE POLICY "account_feeds_select_account" ON account_feeds
 
 CREATE POLICY "account_feeds_insert" ON account_feeds
     FOR INSERT
-    WITH CHECK (TRUE);  -- Via function SECURITY DEFINER
+    WITH CHECK (sender_id = auth.uid() OR public.is_admin());  -- Normal flow via SECURITY DEFINER
 
 CREATE POLICY "account_feeds_update_admin" ON account_feeds
     FOR UPDATE
@@ -422,7 +428,7 @@ CREATE POLICY "activities_select_own" ON activities
 
 CREATE POLICY "activities_insert" ON activities
     FOR INSERT
-    WITH CHECK (TRUE);  -- Via function SECURITY DEFINER
+    WITH CHECK (user_id = auth.uid() OR public.is_admin());  -- Normal flow via SECURITY DEFINER
 
 CREATE POLICY "activities_update_own" ON activities
     FOR UPDATE

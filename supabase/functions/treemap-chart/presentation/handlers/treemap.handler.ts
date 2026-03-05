@@ -16,6 +16,8 @@ import { createClient } from "@supabase/supabase-js";
 
 export class TreemapHandler {
   async handle(req: Request): Promise<Response> {
+    HttpResponse.setOrigin(req);
+
     // Handle CORS preflight
     if (HttpRequest.isPreflight(req)) {
       return HttpResponse.cors();
