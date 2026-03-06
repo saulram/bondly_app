@@ -7,6 +7,7 @@ class Constants {
   static const double tabletBreakpoint = 800;
   static const double desktopBreakpoint = 800;
   static const double sidebarWidth = 280;
+  static const double adminSidebarWidth = 240;
   static const double boxedCenteredContentWidth = 500;
   static const double rewardsGridTwoColumns = 600;
   static const double rewardsGridThreeColumns = 1000;

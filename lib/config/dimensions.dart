@@ -23,6 +23,7 @@ class AppDimensions {
   static const double radiusPost = 20;
   static const double radiusPill = 12;
   static const double paddingScreen = 20;
+  static const double paddingCard = 16;
 
   // Elevation / Shadows
   static List<BoxShadow> cardShadow(Color shadowColor) => [
