@@ -10,12 +10,16 @@ class BondlyHeader extends StatelessWidget {
   final String? avatarUrl;
   final VoidCallback? onAvatarTap;
   final VoidCallback? onNotificationTap;
+  final VoidCallback? onAdminTap;
+  final bool showAdminButton;
 
   const BondlyHeader({
     super.key,
     this.avatarUrl,
     this.onAvatarTap,
     this.onNotificationTap,
+    this.onAdminTap,
+    this.showAdminButton = false,
   });
 
   @override
@@ -60,6 +64,15 @@ class BondlyHeader extends StatelessWidget {
             ),
           ),
           const Spacer(),
+          // Admin panel button (only for admins/superAdmins)
+          if (showAdminButton) ...[
+            IconButtonCircular(
+              icon: LucideIcons.shieldCheck,
+              size: 40,
+              onTap: onAdminTap,
+            ),
+            const SizedBox(width: 4),
+          ],
           // Notification button
           IconButtonCircular(
             icon: LucideIcons.bell,

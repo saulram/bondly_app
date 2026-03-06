@@ -123,6 +123,9 @@ class User {
     );
   }
 
+  bool get isAdmin => role == 'admin' || role == 'superAdmin';
+  bool get isSuperAdmin => role == 'superAdmin';
+
   factory User.fromSupabase(Map<String, dynamic> json) {
     return User(
       id: json['id'],

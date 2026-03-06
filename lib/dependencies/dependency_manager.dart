@@ -1,3 +1,6 @@
+import 'package:bondly_app/dependencies/admin_repository_provider.dart';
+import 'package:bondly_app/dependencies/admin_usecase_provider.dart';
+import 'package:bondly_app/dependencies/admin_viewmodel_provider.dart';
 import 'package:bondly_app/dependencies/api_provider.dart';
 import 'package:bondly_app/dependencies/handlers_provider.dart';
 import 'package:bondly_app/dependencies/repository_provider.dart';
@@ -19,6 +22,9 @@ class DependencyManager {
     RepositoryProvider.provide();
     UseCaseProvider.provide();
     ViewModelProvider.provide();
+    AdminRepositoryProvider.provide();
+    AdminUseCaseProvider.provide();
+    AdminViewModelProvider.provide();
     ServiceProvider.provide();
     await getIt.allReady();
   }
