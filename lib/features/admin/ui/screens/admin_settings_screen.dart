@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/constants.dart';
 import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_admin.dart';
 import 'package:bondly_app/features/admin/domain/models/admin_module.dart';
@@ -34,13 +35,20 @@ class AdminSettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             LayoutBuilder(builder: (context, constraints) {
-              final columns = constraints.maxWidth > 600 ? 3 : 1;
-              return GridView.count(
+              final isMobile =
+                  constraints.maxWidth <= Constants.mobileBreakpoint;
+              final columns =
+                  constraints.maxWidth > Constants.desktopBreakpoint ? 3 : 2;
+              return GridView(
                 shrinkWrap: true,
-                crossAxisCount: columns,
-                mainAxisSpacing: AppDimensions.paddingCard,
-                crossAxisSpacing: AppDimensions.paddingCard,
-                childAspectRatio: 2.5,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: columns,
+                  mainAxisSpacing: AppDimensions.paddingCard,
+                  crossAxisSpacing: AppDimensions.paddingCard,
+                  childAspectRatio: isMobile ? 1.15 : 2.5,
+                  mainAxisExtent: isMobile ? 132 : null,
+                ),
                 children: [
                   AdminQuickActionCard(
                     icon: LucideIcons.mapPin,
@@ -52,8 +60,7 @@ class AdminSettingsScreen extends StatelessWidget {
                     icon: LucideIcons.shieldCheck,
                     label: StringsAdmin.permissionsTitle,
                     color: Colors.purple,
-                    onTap: () =>
-                        context.go('/admin/settings/permissions'),
+                    onTap: () => context.go('/admin/settings/permissions'),
                   ),
                 ],
               );

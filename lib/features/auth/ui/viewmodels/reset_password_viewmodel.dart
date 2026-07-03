@@ -32,6 +32,9 @@ class ResetPasswordViewModel extends NavigationModel {
           WeakPasswordException() => ResetPasswordErrorType.weakPassword,
           PasswordMismatchException() =>
             ResetPasswordErrorType.passwordsDoNotMatch,
+          SamePasswordException() => ResetPasswordErrorType.samePassword,
+          TokenNotFoundException() =>
+            ResetPasswordErrorType.missingRecoverySession,
           NoConnectionException() => ResetPasswordErrorType.connectionError,
           _ => ResetPasswordErrorType.unknownError,
         };

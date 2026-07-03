@@ -16,6 +16,8 @@ enum ResetPasswordErrorType {
   emptyPassword,
   weakPassword,
   passwordsDoNotMatch,
+  samePassword,
+  missingRecoverySession,
   connectionError,
   unknownError,
 }

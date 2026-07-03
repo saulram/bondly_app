@@ -109,6 +109,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         errorMessage = ResetPasswordStrings.weakPassword;
       case ResetPasswordErrorType.passwordsDoNotMatch:
         errorMessage = ResetPasswordStrings.passwordsDoNotMatch;
+      case ResetPasswordErrorType.samePassword:
+        errorMessage = ResetPasswordStrings.samePassword;
+      case ResetPasswordErrorType.missingRecoverySession:
+        errorMessage = ResetPasswordStrings.missingRecoverySession;
       case ResetPasswordErrorType.connectionError:
         errorMessage = ResetPasswordStrings.connectionError;
       case ResetPasswordErrorType.unknownError:

@@ -21,8 +21,7 @@ class VerifyResetTokenScreen extends StatefulWidget {
   final String email;
 
   @override
-  State<VerifyResetTokenScreen> createState() =>
-      _VerifyResetTokenScreenState();
+  State<VerifyResetTokenScreen> createState() => _VerifyResetTokenScreenState();
 }
 
 class _VerifyResetTokenScreenState extends State<VerifyResetTokenScreen> {
@@ -34,8 +33,7 @@ class _VerifyResetTokenScreenState extends State<VerifyResetTokenScreen> {
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
-  String get _token =>
-      _digitControllers.map((c) => c.text).join();
+  String get _token => _digitControllers.map((c) => c.text).join();
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +111,8 @@ class _VerifyResetTokenScreenState extends State<VerifyResetTokenScreen> {
         errorMessage = VerifyResetTokenStrings.invalidToken;
       case VerifyResetTokenErrorType.expiredToken:
         errorMessage = VerifyResetTokenStrings.expiredToken;
+      case VerifyResetTokenErrorType.tooManyAttempts:
+        errorMessage = VerifyResetTokenStrings.tooManyAttempts;
       case VerifyResetTokenErrorType.connectionError:
         errorMessage = VerifyResetTokenStrings.connectionError;
       case VerifyResetTokenErrorType.unknownError:
@@ -276,7 +276,7 @@ class _VerifyResetTokenScreenState extends State<VerifyResetTokenScreen> {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            model.onVerifyToken(_token);
+            model.onVerifyToken(_token, email: widget.email);
           },
           child: Center(
             child: Text(

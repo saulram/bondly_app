@@ -8,6 +8,8 @@ class VerifyResetTokenStrings {
   static const String expiredToken =
       "El código ha expirado, solicita uno nuevo";
   static const String emptyToken = "Ingresa el código completo";
+  static const String tooManyAttempts =
+      "Has intentado demasiadas veces. Intenta de nuevo más tarde";
   static const String connectionError =
       "Error de conexión, por favor reintente más tarde";
   static const String unknownError = "Sucedió un error, por favor reintente";

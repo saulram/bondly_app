@@ -39,7 +39,10 @@ class DefaultAuthRepository extends AuthRepository {
   }
 
   @override
-  Future<Result<bool, Exception>> verifyResetToken(String token) async {
+  Future<Result<bool, Exception>> verifyResetToken(
+    String token, {
+    String? email,
+  }) async {
     try {
       await _authAPI.verifyResetToken(token);
       return Result.success(true);

@@ -16,6 +16,7 @@ enum VerifyResetTokenErrorType {
   emptyToken,
   invalidToken,
   expiredToken,
+  tooManyAttempts,
   connectionError,
   unknownError,
 }

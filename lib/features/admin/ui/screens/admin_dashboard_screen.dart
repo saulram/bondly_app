@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/constants.dart';
 import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_admin.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
@@ -101,12 +102,16 @@ class _DashboardContent extends StatelessWidget {
           const SizedBox(height: 20),
           // Stats grid
           LayoutBuilder(builder: (context, constraints) {
-            final columns = constraints.maxWidth > 800
-                ? 4
-                : constraints.maxWidth > 500
-                    ? 2
-                    : 1;
-            return _StatsGrid(stats: stats, columns: columns);
+            final isMobile = constraints.maxWidth <= Constants.mobileBreakpoint;
+            final columns =
+                constraints.maxWidth > Constants.desktopBreakpoint ? 4 : 2;
+            final childAspectRatio = isMobile ? 0.95 : 1.6;
+            return _StatsGrid(
+              stats: stats,
+              columns: columns,
+              childAspectRatio: childAspectRatio,
+              mainAxisExtent: isMobile ? 164 : null,
+            );
           }),
           const SizedBox(height: 28),
           // Quick Actions
@@ -119,7 +124,7 @@ class _DashboardContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _QuickActionsRow(context: context),
+          const _QuickActionsGrid(),
           const SizedBox(height: 28),
           // Charts row
           LayoutBuilder(builder: (context, constraints) {
@@ -129,14 +134,12 @@ class _DashboardContent extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 3,
-                    child: _TrendsCard(
-                        trends: trends, colors: colors),
+                    child: _TrendsCard(trends: trends, colors: colors),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     flex: 2,
-                    child:
-                        _BadgeUsageCard(badges: badgeStats, colors: colors),
+                    child: _BadgeUsageCard(badges: badgeStats, colors: colors),
                   ),
                 ],
               );
@@ -158,8 +161,15 @@ class _DashboardContent extends StatelessWidget {
 class _StatsGrid extends StatelessWidget {
   final DashboardStats stats;
   final int columns;
+  final double childAspectRatio;
+  final double? mainAxisExtent;
 
-  const _StatsGrid({required this.stats, required this.columns});
+  const _StatsGrid({
+    required this.stats,
+    required this.columns,
+    required this.childAspectRatio,
+    this.mainAxisExtent,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +225,8 @@ class _StatsGrid extends StatelessWidget {
         crossAxisCount: columns,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 1.6,
+        childAspectRatio: childAspectRatio,
+        mainAxisExtent: mainAxisExtent,
       ),
       itemCount: cards.length,
       itemBuilder: (context, i) => cards[i],
@@ -229,51 +240,58 @@ class _StatsGrid extends StatelessWidget {
   }
 }
 
-class _QuickActionsRow extends StatelessWidget {
-  final BuildContext context;
-
-  const _QuickActionsRow({required this.context});
+class _QuickActionsGrid extends StatelessWidget {
+  const _QuickActionsGrid();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: AdminQuickActionCard(
-            icon: LucideIcons.userPlus,
-            label: StringsAdmin.quickAddUser,
-            color: Colors.blue,
-            onTap: () {},
+    final cards = [
+      AdminQuickActionCard(
+        icon: LucideIcons.userPlus,
+        label: StringsAdmin.quickAddUser,
+        color: Colors.blue,
+        onTap: () {},
+      ),
+      AdminQuickActionCard(
+        icon: LucideIcons.award,
+        label: StringsAdmin.quickCreateBadge,
+        color: Colors.purple,
+        onTap: () {},
+      ),
+      AdminQuickActionCard(
+        icon: LucideIcons.gift,
+        label: StringsAdmin.quickNewReward,
+        color: Colors.teal,
+        onTap: () {},
+      ),
+      AdminQuickActionCard(
+        icon: LucideIcons.barChart2,
+        label: StringsAdmin.quickViewReports,
+        color: Colors.orange,
+        onTap: () {},
+      ),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth <= Constants.mobileBreakpoint;
+        final columns =
+            constraints.maxWidth > Constants.desktopBreakpoint ? 4 : 2;
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: isMobile ? 1.15 : 1.6,
+            mainAxisExtent: isMobile ? 132 : null,
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: AdminQuickActionCard(
-            icon: LucideIcons.award,
-            label: StringsAdmin.quickCreateBadge,
-            color: Colors.purple,
-            onTap: () {},
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: AdminQuickActionCard(
-            icon: LucideIcons.gift,
-            label: StringsAdmin.quickNewReward,
-            color: Colors.teal,
-            onTap: () {},
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: AdminQuickActionCard(
-            icon: LucideIcons.barChart2,
-            label: StringsAdmin.quickViewReports,
-            color: Colors.orange,
-            onTap: () {},
-          ),
-        ),
-      ],
+          itemCount: cards.length,
+          itemBuilder: (context, i) => cards[i],
+        );
+      },
     );
   }
 }

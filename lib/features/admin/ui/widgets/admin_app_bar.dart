@@ -10,12 +10,16 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AdminShellViewModel viewModel;
   final List<String> breadcrumbs;
   final VoidCallback? onMenuTap;
+  final bool includeTopSafeArea;
+  final bool showBack;
 
   const AdminAppBar({
     super.key,
     required this.viewModel,
     this.breadcrumbs = const [],
     this.onMenuTap,
+    this.includeTopSafeArea = false,
+    this.showBack = true,
   });
 
   @override
@@ -25,116 +29,126 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     final isSuperAdmin = viewModel.isSuperAdmin;
+    final topPadding =
+        includeTopSafeArea ? MediaQuery.paddingOf(context).top : 0.0;
 
     return Container(
-      height: 60,
+      height: preferredSize.height + topPadding,
       decoration: BoxDecoration(
         color: colors.surface,
         border: Border(bottom: BorderSide(color: colors.border)),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          if (onMenuTap != null)
-            IconButton(
-              icon: Icon(LucideIcons.menu, color: colors.textSecondary),
-              onPressed: onMenuTap,
-            ),
-          // Breadcrumbs
-          if (breadcrumbs.isNotEmpty)
-            Expanded(
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => context.go('/admin'),
-                    child: Text(
-                      StringsAdmin.adminPanelTitle,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 13,
-                        color: colors.textMuted,
+      child: Padding(
+        padding: EdgeInsets.only(top: topPadding),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              if (onMenuTap != null)
+                IconButton(
+                  icon: Icon(LucideIcons.menu, color: colors.textSecondary),
+                  onPressed: onMenuTap,
+                ),
+              // Breadcrumbs
+              if (breadcrumbs.isNotEmpty)
+                Expanded(
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => showBack ? context.go('/homeScreen') : null,
+                        child: Text(
+                          StringsAdmin.adminPanelTitle,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 13,
+                            color: colors.textMuted,
+                          ),
+                        ),
                       ),
+                      for (int i = 0; i < breadcrumbs.length; i++) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: Icon(LucideIcons.chevronRight,
+                              size: 14, color: colors.textMuted),
+                        ),
+                        Text(
+                          breadcrumbs[i],
+                          style: GoogleFonts.montserrat(
+                            fontSize: 13,
+                            fontWeight: i == breadcrumbs.length - 1
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                            color: i == breadcrumbs.length - 1
+                                ? colors.textPrimary
+                                : colors.textMuted,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                )
+              else
+                Expanded(
+                  child: Text(
+                    StringsAdmin.adminPanelTitle,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textPrimary,
                     ),
                   ),
-                  for (int i = 0; i < breadcrumbs.length; i++) ...[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: Icon(LucideIcons.chevronRight,
-                          size: 14, color: colors.textMuted),
+                ),
+              // Back to app (text link on desktop)
+              if (showBack) ...[
+                TextButton.icon(
+                  onPressed: () => context.go('/homeScreen'),
+                  icon: Icon(LucideIcons.arrowLeft,
+                      size: 14, color: colors.textMuted),
+                  label: Text(
+                    StringsAdmin.backToApp,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 13,
+                      color: colors.textMuted,
                     ),
-                    Text(
-                      breadcrumbs[i],
-                      style: GoogleFonts.montserrat(
-                        fontSize: 13,
-                        fontWeight: i == breadcrumbs.length - 1
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                        color: i == breadcrumbs.length - 1
-                            ? colors.textPrimary
-                            : colors.textMuted,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            )
-          else
-            Expanded(
-              child: Text(
-                StringsAdmin.adminPanelTitle,
-                style: GoogleFonts.montserrat(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: colors.textPrimary,
+                  ),
+                ),
+              ],
+              const SizedBox(width: 12),
+              // Role badge
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isSuperAdmin
+                      ? Colors.purple.withValues(alpha: 0.12)
+                      : colors.accentSoft,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  isSuperAdmin
+                      ? StringsAdmin.superAdminBadge
+                      : StringsAdmin.adminBadge,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isSuperAdmin ? Colors.purple : colors.accent,
+                  ),
                 ),
               ),
-            ),
-          // Back to app (text link on desktop)
-          TextButton.icon(
-            onPressed: () => context.go('/homeScreen'),
-            icon: Icon(LucideIcons.arrowLeft,
-                size: 14, color: colors.textMuted),
-            label: Text(
-              StringsAdmin.backToApp,
-              style: GoogleFonts.montserrat(
-                fontSize: 13,
-                color: colors.textMuted,
+              const SizedBox(width: 12),
+              // Avatar
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: colors.accentSoft,
+                backgroundImage: viewModel.userAvatar != null
+                    ? NetworkImage(viewModel.userAvatar!)
+                    : null,
+                child: viewModel.userAvatar == null
+                    ? Icon(LucideIcons.user, size: 16, color: colors.accent)
+                    : null,
               ),
-            ),
+            ],
           ),
-          const SizedBox(width: 12),
-          // Role badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: isSuperAdmin
-                  ? Colors.purple.withOpacity(0.12)
-                  : colors.accentSoft,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              isSuperAdmin
-                  ? StringsAdmin.superAdminBadge
-                  : StringsAdmin.adminBadge,
-              style: GoogleFonts.montserrat(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: isSuperAdmin ? Colors.purple : colors.accent,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Avatar
-          CircleAvatar(
-            radius: 18,
-            backgroundColor: colors.accentSoft,
-            backgroundImage: viewModel.userAvatar != null
-                ? NetworkImage(viewModel.userAvatar!)
-                : null,
-            child: viewModel.userAvatar == null
-                ? Icon(LucideIcons.user, size: 16, color: colors.accent)
-                : null,
-          ),
-        ],
+        ),
       ),
     );
   }

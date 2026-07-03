@@ -84,10 +84,11 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
                 appBar: AdminAppBar(
                   viewModel: vm,
                   breadcrumbs: widget.breadcrumbs,
-                  onMenuTap: () =>
-                      _scaffoldKey.currentState?.openDrawer(),
+                  includeTopSafeArea: true,
+                  showBack: false,
+                  onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
                 ),
-                body: widget.child,
+                body: SafeArea(top: false, child: widget.child),
               );
             },
           );

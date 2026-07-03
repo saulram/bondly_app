@@ -95,6 +95,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         errorMessage = ForgotPasswordStrings.emailRequired;
       case ForgotPasswordErrorType.invalidEmail:
         errorMessage = ForgotPasswordStrings.invalidEmail;
+      case ForgotPasswordErrorType.tooManyAttempts:
+        errorMessage = ForgotPasswordStrings.tooManyAttempts;
       case ForgotPasswordErrorType.connectionError:
         errorMessage = ForgotPasswordStrings.connectionError;
       case ForgotPasswordErrorType.unknownError:

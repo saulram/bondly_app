@@ -6,6 +6,10 @@ class ResetPasswordStrings {
   static const String confirmPasswordLabel = "Confirmar contraseña";
   static const String resetButton = "Restablecer contraseña";
   static const String passwordsDoNotMatch = "Las contraseñas no coinciden";
+  static const String samePassword =
+      "La nueva contraseña no puede ser igual a la anterior";
+  static const String missingRecoverySession =
+      "Tu sesión de recuperación expiró. Solicita un código nuevo";
   static const String weakPassword =
       "La contraseña debe tener al menos 8 caracteres";
   static const String emptyPassword = "* Este campo es requerido";

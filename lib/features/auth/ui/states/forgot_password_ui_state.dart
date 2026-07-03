@@ -15,6 +15,7 @@ class ForgotPasswordFailed extends ForgotPasswordUIState {
 enum ForgotPasswordErrorType {
   emptyEmail,
   invalidEmail,
+  tooManyAttempts,
   connectionError,
   unknownError,
 }
