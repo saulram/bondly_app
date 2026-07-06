@@ -11,7 +11,7 @@ import 'package:bondly_app/ui/shared/info_card.dart';
 import 'package:bondly_app/ui/shared/slider_banner_card.dart';
 import 'package:flutter/material.dart' hide Badge;
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum RecognizeStep { selectBadge, selectPerson, writeMessage }
 

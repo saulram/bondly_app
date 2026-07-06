@@ -7,7 +7,7 @@ import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.d
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
 import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -49,7 +49,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  icon: const Icon(IconsaxOutline.close_circle)),
+                  icon: const Icon(LucideIcons.xCircle)),
             ],
           ),
           const SizedBox(
@@ -175,7 +175,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
                     rewardsModel.userCart.rewards.length, rewardsModel);
               },
               tooltip: "Cart",
-              icon: const Icon(IconsaxOutline.money),
+              icon: const Icon(LucideIcons.wallet),
               label: const Text(StringsCart.confirm),
             ),
             child: Container(
@@ -341,7 +341,7 @@ class CartItemTile extends StatelessWidget {
         child: Row(
           children: [
             GestureDetector(
-              child: const Icon(IconsaxOutline.minus),
+              child: const Icon(LucideIcons.minus),
               onTap: () {
                 model.pullItem(item.reward.id);
               },
@@ -353,7 +353,7 @@ class CartItemTile extends StatelessWidget {
               style: Theme.of(context).textTheme.bodySmall,
             ),
             GestureDetector(
-              child: const Icon(IconsaxOutline.add),
+              child: const Icon(LucideIcons.plus),
               onTap: () {
                 model.pushItem(item.reward.id);
               },

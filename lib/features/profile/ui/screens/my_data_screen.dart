@@ -2,7 +2,7 @@ import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +81,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
               ),
               IconButton(
                 icon: Icon(
-                  IconsaxOutline.arrow_left,
+                  LucideIcons.arrowLeft,
                   color: theme.colorScheme.onPrimary,
                 ),
                 onPressed: () => context.pop(),
@@ -174,7 +174,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
           StringsProfile.fullName,
           style: theme.textTheme.bodyMedium,
         ),
-        prefixIcon: const Icon(IconsaxBold.user),
+        prefixIcon: const Icon(LucideIcons.user),
       ),
     );
   }
@@ -187,7 +187,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
           StringsProfile.location,
           style: theme.textTheme.bodyMedium,
         ),
-        prefixIcon: const Icon(IconsaxBold.location),
+        prefixIcon: const Icon(LucideIcons.mapPin),
       ),
     );
   }
@@ -215,7 +215,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
             StringsProfile.dob,
             style: theme.textTheme.bodyMedium,
           ),
-          prefixIcon: const Icon(IconsaxBold.cake),
+          prefixIcon: const Icon(LucideIcons.cake),
         ));
   }
 
@@ -227,7 +227,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
           StringsProfile.jobTitle,
           style: theme.textTheme.bodyMedium,
         ),
-        prefixIcon: const Icon(IconsaxBold.briefcase),
+        prefixIcon: const Icon(LucideIcons.briefcase),
       ),
     );
   }

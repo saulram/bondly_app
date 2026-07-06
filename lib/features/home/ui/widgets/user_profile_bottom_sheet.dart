@@ -6,7 +6,7 @@ import 'package:bondly_app/features/profile/domain/usecases/user_profile_use_cas
 import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 void showUserProfileBottomSheet(
   BuildContext context,

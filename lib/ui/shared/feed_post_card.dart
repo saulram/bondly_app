@@ -3,10 +3,9 @@ import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_home.dart';
 import 'package:bondly_app/ui/shared/badge_icon_button.dart';
 import 'package:bondly_app/ui/shared/tag_pill.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
 /// Data for a single comment preview shown inside the expanded post card.
 class FeedCommentData {
@@ -301,7 +300,7 @@ class FeedPostCard extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(
-                      isLiked ? IconsaxBold.heart : LucideIcons.heart,
+                      isLiked ? LucideIcons.heart : LucideIcons.heart,
                       size: 18,
                       color: isLiked ? colors.likeColor : colors.textMuted,
                     ),

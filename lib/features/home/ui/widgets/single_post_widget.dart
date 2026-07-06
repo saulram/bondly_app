@@ -10,7 +10,7 @@ import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
 import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
@@ -279,8 +279,8 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
           children: [
             Icon(
               widget.post.isLiked == true
-                  ? IconsaxBold.heart
-                  : IconsaxOutline.heart,
+                  ? LucideIcons.heart
+                  : LucideIcons.heart,
               color: widget.post.isLiked == true
                   ? colors.likeColor
                   : colors.textMuted,
@@ -320,7 +320,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
       },
       child: Row(
         children: [
-          Icon(IconsaxOutline.message, color: colors.accent),
+          Icon(LucideIcons.messageCircle, color: colors.accent),
           const SizedBox(width: 5),
           Text(
             widget.post.comments.length.toString(),

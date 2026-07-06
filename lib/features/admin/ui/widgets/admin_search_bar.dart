@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:bondly_app/config/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AdminSearchBar extends StatefulWidget {
   final String hint;

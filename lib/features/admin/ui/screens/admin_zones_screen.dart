@@ -10,7 +10,7 @@ import 'package:bondly_app/features/admin/ui/widgets/admin_status_badge.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AdminZonesScreen extends StatefulWidget {
   static const String route = '/admin/settings/zones';

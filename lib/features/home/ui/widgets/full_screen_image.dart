@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 
 class FullScreenImage extends StatefulWidget {
@@ -53,7 +53,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
                     borderRadius:
                         const BorderRadius.all(Radius.circular(24.0))),
                 child: IconButton(
-                  icon: Icon(IconsaxOutline.arrow_left,
+                  icon: Icon(LucideIcons.arrowLeft,
                       color: Theme.of(context).textTheme.bodyLarge?.color ??
                           Colors.white),
                   onPressed: () {

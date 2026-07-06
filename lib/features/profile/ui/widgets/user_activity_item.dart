@@ -3,7 +3,7 @@ import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/features/home/ui/widgets/post_mentions_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class UserActivityItemWidget extends StatelessWidget {
   final String id;

@@ -8,7 +8,7 @@ import 'package:bondly_app/features/profile/ui/viewmodels/bondly_badges_viewmode
 import 'package:bondly_app/features/profile/ui/widgets/badges_grid.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
 import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 
 class MyBadgesScreen extends StatefulWidget {
@@ -155,7 +155,7 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
       },
       child: Chip(
         elevation: 1,
-        avatar: Icon(IconsaxOutline.award,
+        avatar: Icon(LucideIcons.award,
             color: Theme.of(context).scaffoldBackgroundColor),
         label: Text(label,
             textAlign: TextAlign.center,

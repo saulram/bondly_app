@@ -4,7 +4,7 @@ import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/domain/models/account_statement_model.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/account_statement_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -85,8 +85,8 @@ class MonthlyBalanceScreen extends StatelessWidget {
     return ListTile(
       leading: Icon(
         !isPositive
-            ? IconsaxOutline.arrow_circle_up
-            : IconsaxOutline.arrow_circle_down,
+            ? LucideIcons.arrowUpCircle
+            : LucideIcons.arrowDownCircle,
         color: isPositive ? colors.gold : colors.likeColor,
       ),
       title: Text(

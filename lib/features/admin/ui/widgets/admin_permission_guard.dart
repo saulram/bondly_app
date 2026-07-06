@@ -4,7 +4,7 @@ import 'package:bondly_app/features/admin/ui/viewmodels/admin_shell_viewmodel.da
 import 'package:bondly_app/features/admin/ui/widgets/admin_empty_state.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AdminPermissionGuard extends StatelessWidget {
   final AdminModule module;

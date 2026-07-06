@@ -4,7 +4,7 @@ import 'package:bondly_app/config/strings_main.dart';
 import 'package:bondly_app/ui/shared/icon_button_circular.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class BondlyHeader extends StatelessWidget {
   final String? avatarUrl;

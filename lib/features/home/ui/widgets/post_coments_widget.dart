@@ -3,7 +3,7 @@ import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/ui/shared/bondly_loading_button.dart';
 import 'package:bondly_app/src/network_image_helpers.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:moment_dart/moment_dart.dart';
 
@@ -83,7 +83,7 @@ class _PostCommentsWidgetState extends State<PostCommentsWidget> {
             _handleCreateComment();
           },
           icon: Icon(
-            IconsaxOutline.arrow_right,
+            LucideIcons.arrowRight,
             color: Theme.of(context).unselectedWidgetColor,
           ),
         ),
