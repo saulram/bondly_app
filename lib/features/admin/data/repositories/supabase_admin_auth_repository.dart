@@ -18,6 +18,7 @@ class SupabaseAdminAuthRepository implements AdminAuthRepository {
       final List<dynamic> data = response as List<dynamic>;
       final permissions = data
           .map((e) => AdminModule.fromString(e['permission'] as String))
+          .whereType<AdminModule>()
           .toList();
       return Result.success(permissions);
     } catch (e) {

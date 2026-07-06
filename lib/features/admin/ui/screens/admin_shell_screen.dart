@@ -5,6 +5,7 @@ import 'package:bondly_app/features/admin/ui/widgets/admin_app_bar.dart';
 import 'package:bondly_app/features/admin/ui/widgets/admin_sidebar.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AdminShellScreen extends StatefulWidget {
   static const String route = '/admin';
@@ -40,7 +41,7 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
       child: ModelBuilder<AdminShellViewModel>(
         builder: (context, vm, _) {
           final currentRoute =
-              ModalRoute.of(context)?.settings.name ?? '/admin';
+              GoRouterState.of(context).uri.path;
 
           return LayoutBuilder(
             builder: (context, constraints) {

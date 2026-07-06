@@ -54,4 +54,18 @@ class SupabaseAdminExchangesRepository {
       return Result.error(Exception(e.toString()));
     }
   }
+
+  Future<Result<Map<String, int>, Exception>> getExchangeStats() async {
+    try {
+      final response = await _supabase.client.from('exchanges').select('status');
+      final counts = <String, int>{};
+      for (final row in response as List) {
+        final status = row['status'] as String? ?? 'Desconocido';
+        counts[status] = (counts[status] ?? 0) + 1;
+      }
+      return Result.success(counts);
+    } catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
+  }
 }

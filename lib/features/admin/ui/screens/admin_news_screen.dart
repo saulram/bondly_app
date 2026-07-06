@@ -72,7 +72,7 @@ class _AdminNewsScreenState extends State<AdminNewsScreen> {
                           ? AdminEmptyState(
                               icon: LucideIcons.alertCircle,
                               message: vm.error!,
-                              ctaLabel: 'Reintentar',
+                              ctaLabel: StringsAdmin.retry,
                               onCta: vm.load)
                           : vm.news.isEmpty
                               ? AdminEmptyState(
@@ -111,7 +111,7 @@ class _AdminNewsScreenState extends State<AdminNewsScreen> {
           style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
         ),
         content: SizedBox(
-          width: 500,
+          width: (MediaQuery.of(context).size.width - 32).clamp(0.0, 500.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

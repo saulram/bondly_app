@@ -38,7 +38,7 @@ class AdminQuickActionCard extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: c.withOpacity(0.12),
+                color: c.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: c, size: 24),

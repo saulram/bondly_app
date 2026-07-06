@@ -92,7 +92,7 @@ class _AdminBadgesScreenState extends State<AdminBadgesScreen>
                           ? AdminEmptyState(
                               icon: LucideIcons.alertCircle,
                               message: vm.error!,
-                              ctaLabel: 'Reintentar',
+                              ctaLabel: StringsAdmin.retry,
                               onCta: vm.load)
                           : TabBarView(
                               controller: _tab,
@@ -147,7 +147,7 @@ class _AdminBadgesScreenState extends State<AdminBadgesScreen>
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: selectedCategory,
+                  initialValue: selectedCategory,
                   decoration: InputDecoration(
                       labelText: StringsAdmin.badgeCategory,
                       border: const OutlineInputBorder()),

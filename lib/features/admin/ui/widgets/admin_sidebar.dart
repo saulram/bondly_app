@@ -72,6 +72,12 @@ const _navItems = [
     module: AdminModule.manageAmbassadors,
   ),
   _NavItem(
+    label: StringsAdmin.navFeeds,
+    icon: LucideIcons.messageSquare,
+    route: '/admin/feeds',
+    module: AdminModule.manageFeeds,
+  ),
+  _NavItem(
     label: StringsAdmin.navReports,
     icon: LucideIcons.barChart2,
     route: '/admin/reports',
@@ -190,34 +196,52 @@ class _NavTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
+    return Tooltip(
+      message: item.label,
+      waitDuration: const Duration(milliseconds: 600),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         margin: const EdgeInsets.symmetric(vertical: 2),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected ? colors.accentSoft : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
+          border: isSelected
+              ? Border(
+                  left: BorderSide(color: colors.accent, width: 3),
+                )
+              : null,
         ),
-        child: Row(
-          children: [
-            Icon(
-              item.icon,
-              size: 18,
-              color: isSelected ? colors.accent : colors.textMuted,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              item.label,
-              style: GoogleFonts.montserrat(
-                fontSize: 14,
-                fontWeight:
-                    isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected ? colors.accent : colors.textSecondary,
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: onTap,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                  isSelected ? 9 : 12, 10, 12, 10),
+              child: Row(
+                children: [
+                  Icon(
+                    item.icon,
+                    size: 18,
+                    color: isSelected ? colors.accent : colors.textMuted,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    item.label,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                      color:
+                          isSelected ? colors.accent : colors.textSecondary,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

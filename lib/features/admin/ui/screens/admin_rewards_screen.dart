@@ -72,7 +72,7 @@ class _AdminRewardsScreenState extends State<AdminRewardsScreen> {
                           ? AdminEmptyState(
                               icon: LucideIcons.alertCircle,
                               message: vm.error!,
-                              ctaLabel: 'Reintentar',
+                              ctaLabel: StringsAdmin.retry,
                               onCta: vm.load)
                           : vm.rewards.isEmpty
                               ? AdminEmptyState(

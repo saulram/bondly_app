@@ -72,7 +72,7 @@ class _AdminBannersScreenState extends State<AdminBannersScreen> {
                           ? AdminEmptyState(
                               icon: LucideIcons.alertCircle,
                               message: vm.error!,
-                              ctaLabel: 'Reintentar',
+                              ctaLabel: StringsAdmin.retry,
                               onCta: vm.load)
                           : vm.banners.isEmpty
                               ? AdminEmptyState(
@@ -272,7 +272,7 @@ class _BannerCard extends StatelessWidget {
                 Switch(
                   value: banner.isActive,
                   onChanged: (_) => vm.toggleActive(banner),
-                  activeColor: colors.accent,
+                  activeThumbColor: colors.accent,
                 ),
                 IconButton(
                   icon: Icon(LucideIcons.pencil,

@@ -6,15 +6,18 @@ enum AdminModule {
   manageAmbassadors('manage_ambassadors'),
   viewReports('view_reports'),
   manageZones('manage_zones'),
-  manageSettings('manage_settings');
+  manageSettings('manage_settings'),
+  manageFeeds('manage_feeds');
 
   final String value;
   const AdminModule(this.value);
 
-  static AdminModule fromString(String value) {
-    return AdminModule.values.firstWhere(
-      (m) => m.value == value,
-      orElse: () => AdminModule.manageUsers,
-    );
+  /// Returns null for unknown permission strings — callers must skip them
+  /// instead of silently granting a default module.
+  static AdminModule? fromString(String value) {
+    for (final m in AdminModule.values) {
+      if (m.value == value) return m;
+    }
+    return null;
   }
 }

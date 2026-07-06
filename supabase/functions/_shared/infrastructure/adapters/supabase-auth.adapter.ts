@@ -26,11 +26,19 @@ export class SupabaseAuthAdapter implements IAuthPort {
 
     const metadata = user.user_metadata as UserMetadata;
 
+    // Role comes from public.users (source of truth) — JWT metadata goes
+    // stale when the admin panel changes a user's role.
+    const { data: dbUser } = await this.client
+      .from("users")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
     return {
       id: user.id,
       email: user.email ?? "",
       metadata: {
-        role: metadata?.role ?? "client",
+        role: dbUser?.role ?? metadata?.role ?? "client",
         company_name: metadata?.company_name,
         account_number: metadata?.account_number,
         account_type: metadata?.account_type,

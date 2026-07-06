@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_ambassadors_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_badges_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_banners_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_dashboard_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_exchanges_screen.dart';
+import 'package:bondly_app/features/admin/ui/screens/admin_feeds_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_news_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_permissions_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_reports_screen.dart';
@@ -41,6 +43,7 @@ List<String> _adminBreadcrumbs(String path) {
   if (path.startsWith('/admin/exchanges')) return ['Canjes'];
   if (path.startsWith('/admin/banners')) return ['Banners'];
   if (path.startsWith('/admin/news')) return ['Noticias'];
+  if (path.startsWith('/admin/feeds')) return ['Moderación'];
   if (path.startsWith('/admin/ambassadors')) return ['Embajadores'];
   if (path.startsWith('/admin/reports')) return ['Reportes'];
   if (path == '/admin/settings/zones') return ['Configuración', 'Zonas'];
@@ -49,6 +52,16 @@ List<String> _adminBreadcrumbs(String path) {
   }
   if (path.startsWith('/admin/settings')) return ['Configuración'];
   return [];
+}
+
+CustomTransitionPage<void> _fadePage(GoRouterState state, Widget child) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 200),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(opacity: animation, child: child),
+  );
 }
 
 class AppRouter {
@@ -102,51 +115,68 @@ class AppRouter {
         routes: [
           GoRoute(
             path: '/admin',
-            builder: (context, state) => const AdminDashboardScreen(),
+            pageBuilder: (context, state) => _fadePage(
+                state, const AdminDashboardScreen()),
           ),
           GoRoute(
             path: AdminUsersScreen.route,
-            builder: (context, state) => const AdminUsersScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminUsersScreen()),
           ),
           GoRoute(
             path: AdminBadgesScreen.route,
-            builder: (context, state) => const AdminBadgesScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminBadgesScreen()),
           ),
           GoRoute(
             path: AdminRewardsScreen.route,
-            builder: (context, state) => const AdminRewardsScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminRewardsScreen()),
           ),
           GoRoute(
             path: AdminExchangesScreen.route,
-            builder: (context, state) => const AdminExchangesScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminExchangesScreen()),
           ),
           GoRoute(
             path: AdminBannersScreen.route,
-            builder: (context, state) => const AdminBannersScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminBannersScreen()),
           ),
           GoRoute(
             path: AdminNewsScreen.route,
-            builder: (context, state) => const AdminNewsScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminNewsScreen()),
           ),
           GoRoute(
             path: AdminAmbassadorsScreen.route,
-            builder: (context, state) => const AdminAmbassadorsScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminAmbassadorsScreen()),
+          ),
+          GoRoute(
+            path: AdminFeedsScreen.route,
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminFeedsScreen()),
           ),
           GoRoute(
             path: AdminReportsScreen.route,
-            builder: (context, state) => const AdminReportsScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminReportsScreen()),
           ),
           GoRoute(
             path: AdminSettingsScreen.route,
-            builder: (context, state) => const AdminSettingsScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminSettingsScreen()),
           ),
           GoRoute(
             path: AdminZonesScreen.route,
-            builder: (context, state) => const AdminZonesScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminZonesScreen()),
           ),
           GoRoute(
             path: AdminPermissionsScreen.route,
-            builder: (context, state) => const AdminPermissionsScreen(),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminPermissionsScreen()),
           ),
         ],
       ),

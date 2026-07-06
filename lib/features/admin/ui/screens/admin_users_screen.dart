@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/constants.dart';
 import 'package:bondly_app/config/strings_admin.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/admin/domain/models/admin_module.dart';
@@ -36,6 +37,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<BondlyColorScheme>()!;
+    final isNarrow =
+        MediaQuery.of(context).size.width < Constants.mobileBreakpoint;
 
     return AdminPermissionGuard(
       module: AdminModule.manageUsers,
@@ -65,48 +68,73 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                         style: GoogleFonts.montserrat(
                             fontSize: 13, color: colors.textMuted),
                       ),
+                    const SizedBox(width: 8),
+                    FilledButton.icon(
+                      onPressed: () => _showInviteDialog(context, vm, colors),
+                      icon: const Icon(LucideIcons.userPlus, size: 16),
+                      label: isNarrow
+                          ? const SizedBox.shrink()
+                          : const Text(StringsAdmin.inviteUser),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                // Search + filters
-                Row(
-                  children: [
-                    Expanded(
-                      child: AdminSearchBar(
-                        hint: StringsAdmin.searchUsers,
-                        onChanged: vm.onSearch,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    _FilterDropdown(
-                      value: vm.roleFilter,
-                      hint: StringsAdmin.filterByRole,
-                      items: const {
-                        'client': StringsAdmin.roleClient,
-                        'admin': StringsAdmin.roleAdmin,
-                        'superAdmin': StringsAdmin.roleSuperAdmin,
-                      },
-                      onChanged: vm.setRoleFilter,
-                      colors: colors,
-                    ),
-                    const SizedBox(width: 8),
-                    _FilterDropdown(
-                      value: vm.activeFilter == null
-                          ? null
-                          : vm.activeFilter!
-                              ? 'true'
-                              : 'false',
-                      hint: StringsAdmin.filterByStatus,
-                      items: const {
-                        'true': StringsAdmin.filterActive,
-                        'false': StringsAdmin.filterInactive,
-                      },
-                      onChanged: (v) => vm.setActiveFilter(
-                          v == null ? null : v == 'true'),
-                      colors: colors,
-                    ),
-                  ],
-                ),
+                // Search + filters (dropdowns built once, laid out per width)
+                Builder(builder: (context) {
+                  final searchBar = AdminSearchBar(
+                    hint: StringsAdmin.searchUsers,
+                    onChanged: vm.onSearch,
+                  );
+                  final roleDropdown = _FilterDropdown(
+                    value: vm.roleFilter,
+                    hint: StringsAdmin.filterByRole,
+                    items: const {
+                      'client': StringsAdmin.roleClient,
+                      'admin': StringsAdmin.roleAdmin,
+                      'superAdmin': StringsAdmin.roleSuperAdmin,
+                    },
+                    onChanged: vm.setRoleFilter,
+                    colors: colors,
+                  );
+                  final statusDropdown = _FilterDropdown(
+                    value: vm.activeFilter == null
+                        ? null
+                        : vm.activeFilter!
+                            ? 'true'
+                            : 'false',
+                    hint: StringsAdmin.filterByStatus,
+                    items: const {
+                      'true': StringsAdmin.filterActive,
+                      'false': StringsAdmin.filterInactive,
+                    },
+                    onChanged: (v) =>
+                        vm.setActiveFilter(v == null ? null : v == 'true'),
+                    colors: colors,
+                  );
+                  return isNarrow
+                      ? Column(
+                          children: [
+                            searchBar,
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Expanded(child: roleDropdown),
+                                const SizedBox(width: 8),
+                                Expanded(child: statusDropdown),
+                              ],
+                            ),
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            Expanded(child: searchBar),
+                            const SizedBox(width: 8),
+                            roleDropdown,
+                            const SizedBox(width: 8),
+                            statusDropdown,
+                          ],
+                        );
+                }),
                 const SizedBox(height: 16),
                 // Table
                 Expanded(
@@ -116,7 +144,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                           ? AdminEmptyState(
                               icon: LucideIcons.alertCircle,
                               message: vm.error!,
-                              ctaLabel: 'Reintentar',
+                              ctaLabel: StringsAdmin.retry,
                               onCta: vm.load,
                             )
                           : vm.result.items.isEmpty
@@ -124,7 +152,11 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                                   icon: LucideIcons.users,
                                   message: StringsAdmin.noUsersFound,
                                 )
-                              : _UsersTable(vm: vm, colors: colors),
+                              : _UsersTable(
+                                  vm: vm,
+                                  colors: colors,
+                                  showHeader: !isNarrow,
+                                ),
                 ),
                 // Pagination
                 if (!vm.isLoading && vm.result.totalPages > 1)
@@ -132,6 +164,97 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showInviteDialog(
+      BuildContext context, AdminUsersViewModel vm, BondlyColorScheme colors) {
+    final emailCtrl = TextEditingController();
+    final nameCtrl = TextEditingController();
+    final pointsCtrl = TextEditingController(text: '0');
+    String selectedRole = 'client';
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: colors.surface,
+          title: Text(
+            StringsAdmin.inviteUserTitle,
+            style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+          ),
+          content: SizedBox(
+            width: (MediaQuery.of(context).size.width - 32).clamp(0.0, 480.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: StringsAdmin.inviteUserEmail,
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: InputDecoration(
+                    labelText: StringsAdmin.inviteUserName,
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  initialValue: selectedRole,
+                  decoration: InputDecoration(
+                    labelText: StringsAdmin.inviteUserRole,
+                    border: const OutlineInputBorder(),
+                  ),
+                  dropdownColor: colors.surface,
+                  items: const [
+                    DropdownMenuItem(
+                        value: 'client', child: Text(StringsAdmin.roleClient)),
+                    DropdownMenuItem(
+                        value: 'admin', child: Text(StringsAdmin.roleAdmin)),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) setDialogState(() => selectedRole = v);
+                  },
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: pointsCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: StringsAdmin.inviteUserPoints,
+                    border: const OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text(StringsAdmin.cancel),
+            ),
+            FilledButton(
+              onPressed: () async {
+                if (emailCtrl.text.isEmpty) return;
+                final ok = await vm.inviteUser(
+                  email: emailCtrl.text.trim(),
+                  completeName: nameCtrl.text.trim(),
+                  role: selectedRole,
+                  monthlyPoints: int.tryParse(pointsCtrl.text) ?? 0,
+                );
+                if (ok && ctx.mounted) Navigator.pop(ctx);
+              },
+              child: const Text(StringsAdmin.inviteUser),
+            ),
+          ],
         ),
       ),
     );
@@ -177,7 +300,7 @@ class _FilterDropdown extends StatelessWidget {
           items: [
             DropdownMenuItem(
               value: null,
-              child: Text('Todos',
+              child: Text(StringsAdmin.all,
                   style: GoogleFonts.montserrat(
                       fontSize: 13, color: colors.textMuted)),
             ),
@@ -195,16 +318,19 @@ class _FilterDropdown extends StatelessWidget {
 class _UsersTable extends StatelessWidget {
   final AdminUsersViewModel vm;
   final BondlyColorScheme colors;
+  final bool showHeader;
 
-  const _UsersTable({required this.vm, required this.colors});
+  const _UsersTable(
+      {required this.vm, required this.colors, this.showHeader = true});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Column headers
-        _TableHeader(colors: colors),
-        const SizedBox(height: 4),
+        if (showHeader) ...[
+          _TableHeader(colors: colors),
+          const SizedBox(height: 4),
+        ],
         Expanded(
           child: ListView.separated(
             itemCount: vm.result.items.length,
@@ -419,6 +545,25 @@ class _UserRow extends StatelessWidget {
               },
             ),
             ListTile(
+              leading: Icon(LucideIcons.coins, color: colors.accent, size: 20),
+              title: Text(StringsAdmin.adjustPoints,
+                  style: GoogleFonts.montserrat(fontSize: 14)),
+              onTap: () {
+                Navigator.pop(context);
+                _showAdjustPointsDialog(context, user, vm, colors);
+              },
+            ),
+            ListTile(
+              leading:
+                  Icon(LucideIcons.mapPin, color: colors.accent, size: 20),
+              title: Text(StringsAdmin.assignZones,
+                  style: GoogleFonts.montserrat(fontSize: 14)),
+              onTap: () {
+                Navigator.pop(context);
+                _showAssignZonesDialog(context, user, vm, colors);
+              },
+            ),
+            ListTile(
               leading: Icon(
                   user.isActive ? LucideIcons.userX : LucideIcons.userCheck,
                   color: user.isActive ? Colors.red : Colors.green,
@@ -432,6 +577,129 @@ class _UserRow extends StatelessWidget {
                 Navigator.pop(context);
                 vm.toggleActive(user);
               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAdjustPointsDialog(BuildContext context, AdminUser user,
+      AdminUsersViewModel vm, BondlyColorScheme colors) async {
+    final points = await vm.getUserPoints(user.id);
+    if (points == null || !context.mounted) return;
+
+    final toGiveCtrl =
+        TextEditingController(text: points['to_give'].toString());
+    final earnedCtrl =
+        TextEditingController(text: points['earned'].toString());
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: colors.surface,
+        title: Text(
+          '${StringsAdmin.adjustPoints} — ${user.completeName ?? user.email}',
+          style: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        content: SizedBox(
+          width: (MediaQuery.of(context).size.width - 32).clamp(0.0, 400.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: toGiveCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: StringsAdmin.pointsToGive,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: earnedCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: StringsAdmin.pointsEarned,
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(StringsAdmin.cancel),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final ok = await vm.updateUserPoints(
+                userId: user.id,
+                toGive: int.tryParse(toGiveCtrl.text) ?? points['to_give']!,
+                earned: int.tryParse(earnedCtrl.text) ?? points['earned']!,
+              );
+              if (ok && ctx.mounted) Navigator.pop(ctx);
+            },
+            child: const Text(StringsAdmin.save),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAssignZonesDialog(BuildContext context, AdminUser user,
+      AdminUsersViewModel vm, BondlyColorScheme colors) async {
+    final (zones, selected) = await vm.getZonesForUser(user.id);
+    if (!context.mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: colors.surface,
+          title: Text(
+            '${StringsAdmin.assignZones} — ${user.completeName ?? user.email}',
+            style:
+                GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          content: SizedBox(
+            width: (MediaQuery.of(context).size.width - 32).clamp(0.0, 400.0),
+            child: zones.isEmpty
+                ? const Text(StringsAdmin.noZonesAvailable)
+                : SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: zones
+                          .map((z) => CheckboxListTile(
+                                dense: true,
+                                title: Text(z.name,
+                                    style:
+                                        GoogleFonts.montserrat(fontSize: 14)),
+                                value: selected.contains(z.id),
+                                onChanged: (checked) => setDialogState(() {
+                                  if (checked == true) {
+                                    selected.add(z.id);
+                                  } else {
+                                    selected.remove(z.id);
+                                  }
+                                }),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text(StringsAdmin.cancel),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final ok = await vm.setUserZones(user.id, selected);
+                if (ok && ctx.mounted) Navigator.pop(ctx);
+              },
+              child: const Text(StringsAdmin.save),
             ),
           ],
         ),

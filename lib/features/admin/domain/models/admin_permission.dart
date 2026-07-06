@@ -19,7 +19,9 @@ class AdminPermission {
     return AdminPermission(
       id: json['id'] as String,
       userId: json['user_id'] as String,
-      permission: AdminModule.fromString(json['permission'] as String),
+      permission: AdminModule.fromString(json['permission'] as String) ??
+          (throw FormatException(
+              'Unknown admin permission: ${json['permission']}')),
       grantedBy: json['granted_by'] as String?,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)

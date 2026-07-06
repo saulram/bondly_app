@@ -18,45 +18,30 @@ class SupabaseAdminUsersRepository {
     try {
       final offset = (page - 1) * pageSize;
 
-      // Build data query
-      var dataQuery = _supabase.client.from('users').select();
+      var query = _supabase.client.from('users').select();
       if (search != null && search.isNotEmpty) {
-        dataQuery = dataQuery.or(
-            'complete_name.ilike.%$search%,email.ilike.%$search%');
+        query =
+            query.or('complete_name.ilike.%$search%,email.ilike.%$search%');
       }
       if (role != null && role.isNotEmpty) {
-        dataQuery = dataQuery.eq('role', role);
+        query = query.eq('role', role);
       }
       if (isActive != null) {
-        dataQuery = dataQuery.eq('is_active', isActive);
+        query = query.eq('is_active', isActive);
       }
 
-      final dataResponse = await dataQuery
+      // Single request: rows + exact total count
+      final response = await query
           .order('created_at', ascending: false)
-          .range(offset, offset + pageSize - 1);
+          .range(offset, offset + pageSize - 1)
+          .count();
 
-      // Build count query (same filters, no range)
-      var countQuery = _supabase.client.from('users').select();
-      if (search != null && search.isNotEmpty) {
-        countQuery = countQuery.or(
-            'complete_name.ilike.%$search%,email.ilike.%$search%');
-      }
-      if (role != null && role.isNotEmpty) {
-        countQuery = countQuery.eq('role', role);
-      }
-      if (isActive != null) {
-        countQuery = countQuery.eq('is_active', isActive);
-      }
-      final countResponse = await countQuery.count();
-
-      final items = (dataResponse as List)
-          .map((e) => AdminUser.fromJson(e as Map<String, dynamic>))
-          .toList();
-      final total = countResponse.count;
+      final items =
+          response.data.map((e) => AdminUser.fromJson(e)).toList();
 
       return Result.success(PaginatedResult(
         items: items,
-        total: total,
+        total: response.count,
         page: page,
         pageSize: pageSize,
       ));
@@ -83,6 +68,96 @@ class SupabaseAdminUsersRepository {
       await _supabase.client
           .from('users')
           .update({'role': role}).eq('id', userId);
+      return const Result.success(null);
+    } catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
+  }
+
+  Future<Result<String, Exception>> createUser({
+    required String email,
+    required String completeName,
+    required String role,
+    required int monthlyPoints,
+  }) async {
+    try {
+      final response = await _supabase.client.functions.invoke(
+        'admin-create-user',
+        body: {
+          'email': email,
+          'complete_name': completeName,
+          'role': role,
+          'monthly_points': monthlyPoints,
+        },
+      );
+      final data = response.data as Map<String, dynamic>;
+      if (data['success'] != true) {
+        return Result.error(Exception(data['message'] ?? 'Error al crear usuario'));
+      }
+      return Result.success(data['data']['user_id'] as String);
+    } catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
+  }
+
+  Future<Result<Map<String, int>, Exception>> getUserPoints(
+      String userId) async {
+    try {
+      final row = await _supabase.client
+          .from('user_points')
+          .select('to_give, earned')
+          .eq('user_id', userId)
+          .maybeSingle();
+      return Result.success({
+        'to_give': (row?['to_give'] as int?) ?? 0,
+        'earned': (row?['earned'] as int?) ?? 0,
+      });
+    } catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
+  }
+
+  Future<Result<void, Exception>> updateUserPoints({
+    required String userId,
+    required int toGive,
+    required int earned,
+  }) async {
+    try {
+      // Row always exists (created by on_auth_user_created trigger);
+      // user_points has no INSERT policy, so upsert would fail RLS.
+      await _supabase.client
+          .from('user_points')
+          .update({'to_give': toGive, 'earned': earned})
+          .eq('user_id', userId);
+      return const Result.success(null);
+    } catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
+  }
+
+  Future<Result<Set<String>, Exception>> getUserZones(String userId) async {
+    try {
+      final response = await _supabase.client
+          .from('user_zones')
+          .select('zone_id')
+          .eq('user_id', userId);
+      return Result.success((response as List)
+          .map((e) => e['zone_id'] as String)
+          .toSet());
+    } catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
+  }
+
+  Future<Result<void, Exception>> setUserZones(
+      String userId, Set<String> zoneIds) async {
+    try {
+      await _supabase.client.from('user_zones').delete().eq('user_id', userId);
+      if (zoneIds.isNotEmpty) {
+        await _supabase.client.from('user_zones').insert(zoneIds
+            .map((z) => {'user_id': userId, 'zone_id': z})
+            .toList());
+      }
       return const Result.success(null);
     } catch (e) {
       return Result.error(Exception(e.toString()));

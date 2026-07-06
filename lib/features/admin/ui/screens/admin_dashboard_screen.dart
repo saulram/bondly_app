@@ -46,7 +46,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             AdminDashboardError(message: final msg) => AdminEmptyState(
                 icon: LucideIcons.alertCircle,
                 message: msg,
-                ctaLabel: 'Reintentar',
+                ctaLabel: StringsAdmin.retry,
                 onCta: vm.load,
               ),
             AdminDashboardLoaded(
@@ -236,42 +236,33 @@ class _QuickActionsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
       children: [
-        Expanded(
-          child: AdminQuickActionCard(
-            icon: LucideIcons.userPlus,
-            label: StringsAdmin.quickAddUser,
-            color: Colors.blue,
-            onTap: () {},
-          ),
+        AdminQuickActionCard(
+          icon: LucideIcons.userPlus,
+          label: StringsAdmin.quickAddUser,
+          color: Colors.blue,
+          onTap: () {},
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: AdminQuickActionCard(
-            icon: LucideIcons.award,
-            label: StringsAdmin.quickCreateBadge,
-            color: Colors.purple,
-            onTap: () {},
-          ),
+        AdminQuickActionCard(
+          icon: LucideIcons.award,
+          label: StringsAdmin.quickCreateBadge,
+          color: Colors.purple,
+          onTap: () {},
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: AdminQuickActionCard(
-            icon: LucideIcons.gift,
-            label: StringsAdmin.quickNewReward,
-            color: Colors.teal,
-            onTap: () {},
-          ),
+        AdminQuickActionCard(
+          icon: LucideIcons.gift,
+          label: StringsAdmin.quickNewReward,
+          color: Colors.teal,
+          onTap: () {},
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: AdminQuickActionCard(
-            icon: LucideIcons.barChart2,
-            label: StringsAdmin.quickViewReports,
-            color: Colors.orange,
-            onTap: () {},
-          ),
+        AdminQuickActionCard(
+          icon: LucideIcons.barChart2,
+          label: StringsAdmin.quickViewReports,
+          color: Colors.orange,
+          onTap: () {},
         ),
       ],
     );

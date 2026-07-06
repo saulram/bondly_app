@@ -1,7 +1,6 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_admin.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
-import 'package:bondly_app/features/admin/domain/models/admin_exchange.dart';
 import 'package:bondly_app/features/admin/domain/models/admin_module.dart';
 import 'package:bondly_app/features/admin/ui/viewmodels/admin_exchanges_viewmodel.dart';
 import 'package:bondly_app/features/admin/ui/widgets/admin_empty_state.dart';
@@ -78,7 +77,7 @@ class _AdminExchangesScreenState extends State<AdminExchangesScreen> {
                           ? AdminEmptyState(
                               icon: LucideIcons.alertCircle,
                               message: vm.error!,
-                              ctaLabel: 'Reintentar',
+                              ctaLabel: StringsAdmin.retry,
                               onCta: vm.load)
                           : vm.exchanges.isEmpty
                               ? AdminEmptyState(
@@ -130,7 +129,7 @@ class _StatusFilter extends StatelessWidget {
           items: [
             DropdownMenuItem(
               value: null,
-              child: Text('Todos',
+              child: Text(StringsAdmin.all,
                   style: GoogleFonts.montserrat(
                       fontSize: 13, color: colors.textMuted)),
             ),

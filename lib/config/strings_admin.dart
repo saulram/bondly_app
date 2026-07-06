@@ -138,12 +138,45 @@ class StringsAdmin {
   static const String settingsTitle = 'Configuración';
   static const String zonesTitle = 'Zonas';
   static const String permissionsTitle = 'Permisos de Administradores';
-  static const String addZone = 'Nueva Zona';
   static const String editZone = 'Editar Zona';
   static const String zoneName = 'Nombre de la zona';
   static const String zoneDescription = 'Descripción';
-  static const String zoneParent = 'Zona padre';
   static const String noZonesFound = 'No hay zonas configuradas';
+
+  // Invite user
+  static const String inviteUser = 'Invitar Usuario';
+  static const String inviteUserTitle = 'Invitar Nuevo Usuario';
+  static const String inviteUserEmail = 'Correo electrónico';
+  static const String inviteUserName = 'Nombre completo';
+  static const String inviteUserRole = 'Rol';
+  static const String inviteUserPoints = 'Puntos mensuales';
+
+  // Ambassadors
+  static const String recalculateAmbassadors = 'Recalcular';
+  static const String noAmbassadorsFound = 'No hay embajadores este período';
+  static const String ambassadorVisible = 'Visible';
+  static const String ambassadorHidden = 'Oculto';
+  static const String confirmRecalculate =
+      '¿Recalcular embajadores del mes actual? Esto reemplazará los datos existentes.';
+
+  // Reports
+  static const String reportsTabTrends = 'Reconocimientos';
+  static const String reportsTabBadgeUsage = 'Insignias';
+  static const String reportsTabExchanges = 'Canjes';
+  static const String totalRecognitions = 'Total Reconocimientos';
+  static const String avgPerMonth = 'Promedio / Mes';
+  static const String peakMonth = 'Mes Pico';
+  static const String monthsLabel = 'meses';
+
+  // Zones
+  static const String newZone = 'Nueva Zona';
+  static const String zoneUsers = 'usuarios';
+  static const String parentZone = 'Zona padre (opcional)';
+
+  // Permissions
+  static const String permissionsSubtitle =
+      'Gestiona los permisos de cada administrador';
+  static const String allPermissions = 'Todos los permisos (Super Admin)';
 
   // Common actions
   static const String save = 'Guardar';
@@ -154,6 +187,8 @@ class StringsAdmin {
   static const String yes = 'Sí';
   static const String no = 'No';
   static const String search = 'Buscar';
+  static const String retry = 'Reintentar';
+  static const String all = 'Todos';
   static const String loading = 'Cargando...';
   static const String errorGeneric = 'Ocurrió un error. Intenta de nuevo.';
   static const String successSave = 'Guardado correctamente';
@@ -174,4 +209,33 @@ class StringsAdmin {
   static const String uploadImage = 'Subir imagen';
   static const String changeImage = 'Cambiar imagen';
   static const String imagePlaceholder = 'Sin imagen';
+
+  // Feeds / moderación
+  static const String navFeeds = 'Moderación';
+  static const String feedsTitle = 'Moderación de Publicaciones';
+  static const String searchFeeds = 'Buscar en publicaciones...';
+  static const String filterByType = 'Tipo';
+  static const String feedTypeRecognition = 'Reconocimiento';
+  static const String feedTypeExchange = 'Canje';
+  static const String feedTypeComment = 'Comentario';
+  static const String feedTypeReward = 'Recompensa';
+  static const String noFeedsFound = 'No se encontraron publicaciones';
+  static const String hideFeed = 'Ocultar publicación';
+  static const String showFeed = 'Mostrar publicación';
+  static const String deleteFeed = 'Eliminar publicación';
+  static const String confirmDeleteFeed =
+      'Se eliminará la publicación y sus comentarios. Esta acción no se puede deshacer.';
+  static const String viewComments = 'Ver comentarios';
+  static const String commentsTitle = 'Comentarios';
+  static const String noComments = 'Sin comentarios';
+  static const String deleteComment = 'Eliminar comentario';
+  static const String highlightFeed = 'Destacar';
+  static const String unhighlightFeed = 'Quitar destacado';
+
+  // Users: puntos y zonas
+  static const String adjustPoints = 'Ajustar puntos';
+  static const String pointsToGive = 'Puntos por regalar';
+  static const String pointsEarned = 'Puntos ganados';
+  static const String assignZones = 'Asignar zonas';
+  static const String noZonesAvailable = 'No hay zonas creadas';
 }

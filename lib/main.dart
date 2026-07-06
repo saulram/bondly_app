@@ -6,6 +6,7 @@ import 'package:bondly_app/features/main/ui/viewmodels/app_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
   usePathUrlStrategy();
   //we make sure that the WidgetsBinding is initialized before we initialize the DependencyManager
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('es');
   // Load environment variables
   await dotenv.load(fileName: ".env");
   // Initialize Supabase

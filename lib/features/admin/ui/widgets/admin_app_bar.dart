@@ -107,7 +107,7 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: isSuperAdmin
-                  ? Colors.purple.withOpacity(0.12)
+                  ? Colors.purple.withValues(alpha: 0.12)
                   : colors.accentSoft,
               borderRadius: BorderRadius.circular(20),
             ),
