@@ -323,7 +323,7 @@ class CartItemTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
           image: DecorationImage(
             image:
-                CachedNetworkImageProvider(safeImageUrl(item.reward.imageUrl)),
+                CachedNetworkImageProvider(safeImageUrl(item.reward.image)),
             fit: BoxFit.cover,
           ),
         ),

@@ -600,7 +600,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                   child: AspectRatio(
                     aspectRatio: 16 / 10,
                     child: CachedNetworkImage(
-                      imageUrl: safeImageUrl(reward.imageUrl),
+                      imageUrl: safeImageUrl(reward.image),
                       fit: BoxFit.cover,
                       placeholder: (context, url) =>
                           const BondlyShimmerBlock(
