@@ -39,9 +39,4 @@ class AccountStatementViewModel extends NavigationModel {
       logger.e(e);
     }
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }

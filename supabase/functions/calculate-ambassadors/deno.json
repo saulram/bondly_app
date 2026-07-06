@@ -1,0 +1,13 @@
+{
+  "name": "calculate-ambassadors",
+  "version": "1.0.0",
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.47.10",
+    "../_shared/": "../_shared/"
+  },
+  "exports": { ".": "./index.ts" },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true
+  }
+}

@@ -5,13 +5,12 @@ import 'package:bondly_app/src/api_calls_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HandlersProvider {
-  static provide() {
+  static void provide() {
     getIt.registerSingleton<SessionTokenHandler>(
-      AuthSessionTokenHandler(getIt<SharedPreferences>())
-    );
+        AuthSessionTokenHandler(getIt<SharedPreferences>()));
 
     getIt.registerSingleton<ApiCallsHandler>(
-      //TO-DO: Fetch these values from right place
+        //TO-DO: Fetch these values from right place
         ApiCallsHandler(
             appVersion: "1",
             buildNumber: "1",

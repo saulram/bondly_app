@@ -1,4 +1,5 @@
 import 'package:bondly_app/config/colors.dart';
+import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -6,7 +7,8 @@ import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart
 import 'package:bondly_app/features/profile/ui/viewmodels/bondly_badges_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/badges_grid.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 
 class MyBadgesScreen extends StatefulWidget {
@@ -39,7 +41,7 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
             child: Column(
               children: [
                 _buildHeaderCard(Theme.of(context)),
-                SizedBox(
+                const SizedBox(
                   height: 15,
                 ),
                 SizedBox(
@@ -48,17 +50,17 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
                   children: [
                     _tabSwitcher(
                         () => viewModel.scrollController.animateToPage(0,
-                            duration: Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 500),
                             curve: Curves.easeIn),
                         "Embajadas"),
                     _tabSwitcher(
                         () => viewModel.scrollController.animateToPage(1,
-                            duration: Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 500),
                             curve: Curves.easeIn),
                         "Mis Insignias"),
                     _tabSwitcher(
                         () => viewModel.scrollController.animateToPage(2,
-                            duration: Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 500),
                             curve: Curves.easeIn),
                         "Insignias"),
                   ],
@@ -70,37 +72,29 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
                   flex: 1,
                   child: viewModel.busy
                       ? const Center(
-                          child: CircularProgressIndicator.adaptive())
+                          child: BondlyShimmerBlock(
+                              width: 200, height: 200, borderRadius: 12))
                       : PageView(
                           controller: viewModel.scrollController,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GoldBorderedContainer(
-                                child: BadgesGrid(
-                                    size: size,
-                                    embassys: viewModel.bondlyBadges.embassys,
-                                    type: BadgeType.embassys),
+                            _buildBadgePage(
+                              child: BadgesGrid(
+                                  size: size,
+                                  embassys: viewModel.bondlyBadges.embassys,
+                                  type: BadgeType.embassys),
+                            ),
+                            _buildBadgePage(
+                              child: BadgesGrid(
+                                size: size,
+                                myBadges: viewModel.bondlyBadges.myBadges,
+                                type: BadgeType.myBadges,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GoldBorderedContainer(
-                                child: BadgesGrid(
-                                  size: size,
-                                  myBadges: viewModel.bondlyBadges.myBadges,
-                                  type: BadgeType.myBadges,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GoldBorderedContainer(
-                                child: BadgesGrid(
-                                  size: size,
-                                  categories: viewModel.bondlyBadges.categories,
-                                  type: BadgeType.categories,
-                                ),
+                            _buildBadgePage(
+                              child: BadgesGrid(
+                                size: size,
+                                categories: viewModel.bondlyBadges.categories,
+                                type: BadgeType.categories,
                               ),
                             ),
                           ],
@@ -115,6 +109,7 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
   }
 
   Widget _buildHeaderCard(ThemeData theme) {
+    final colors = theme.extension<BondlyColorScheme>()!;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
@@ -123,29 +118,32 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
         right: 12.0,
       ),
       decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.secondaryColor,
-              theme.primaryColor,
-            ],
-          ),
+          gradient: AppDimensions.accentGradient(colors),
           borderRadius: const BorderRadius.all(Radius.circular(20.0))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "Insignas Bondly",
-            style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+            style:
+                theme.textTheme.titleLarge!.copyWith(color: BondlyColors.white),
           ),
           const SizedBox(height: 12.0),
           Text(
             StringsProfile.bondlyBadgesSubHeader,
-            style: theme.textTheme.labelLarge!
-                .copyWith(height: 1.4, fontSize: 16.0, color: Colors.white),
+            style: theme.textTheme.labelLarge!.copyWith(
+                height: 1.4, fontSize: 16.0, color: BondlyColors.white),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildBadgePage({required Widget child}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GoldBorderedContainer(
+        child: child,
       ),
     );
   }
@@ -157,7 +155,7 @@ class _MyBadgesScreenState extends State<MyBadgesScreen> {
       },
       child: Chip(
         elevation: 1,
-        avatar: Icon(IconsaxOutline.award,
+        avatar: Icon(LucideIcons.award,
             color: Theme.of(context).scaffoldBackgroundColor),
         label: Text(label,
             textAlign: TextAlign.center,

@@ -2,7 +2,7 @@ import 'package:bondly_app/config/strings_home.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_app_bar.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 
 class ScaffoldLayout extends StatelessWidget {
@@ -12,12 +12,11 @@ class ScaffoldLayout extends StatelessWidget {
   final VoidCallback? afterProfileCall;
 
   const ScaffoldLayout(
-      {Key? key,
+      {super.key,
       required this.body,
       this.enableBottomNavBar = false,
       this.avatar,
-      this.afterProfileCall})
-      : super(key: key);
+      this.afterProfileCall});
 
   @override
   Widget build(BuildContext context) {
@@ -52,15 +51,15 @@ class ScaffoldLayout extends StatelessWidget {
       },
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(IconsaxOutline.archive_book),
+          icon: Icon(LucideIcons.bookMarked),
           label: StringsHome.tabFeed,
         ),
         BottomNavigationBarItem(
-          icon: Icon(IconsaxOutline.add_square),
+          icon: Icon(LucideIcons.plusSquare),
           label: StringsHome.tabRecognize,
         ),
         BottomNavigationBarItem(
-          icon: Icon(IconsaxOutline.medal),
+          icon: Icon(LucideIcons.medal),
           label: StringsHome.tabBadges,
         ),
       ],

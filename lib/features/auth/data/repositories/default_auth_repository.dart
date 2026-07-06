@@ -10,10 +10,7 @@ class DefaultAuthRepository extends AuthRepository {
 
   @override
   Future<Result<User, Exception>> doLogin(
-      String user,
-      String password,
-      String company
-  ) async {
+      String user, String password, String company) async {
     try {
       User userDetails = await _authAPI.attemptLogin(user, password, company);
       return Result.success(userDetails);
@@ -28,6 +25,37 @@ class DefaultAuthRepository extends AuthRepository {
       return Result.success(await _authAPI.getCompanies());
     } catch (exception) {
       return Result.error(InvalidLoginException());
+    }
+  }
+
+  @override
+  Future<Result<bool, Exception>> resetPassword(String email) async {
+    try {
+      await _authAPI.resetPassword(email);
+      return Result.success(true);
+    } catch (exception) {
+      return Result.error(PasswordResetException());
+    }
+  }
+
+  @override
+  Future<Result<bool, Exception>> verifyResetToken(String token) async {
+    try {
+      await _authAPI.verifyResetToken(token);
+      return Result.success(true);
+    } catch (exception) {
+      return Result.error(InvalidTokenException());
+    }
+  }
+
+  @override
+  Future<Result<bool, Exception>> confirmResetPassword(
+      String token, String newPassword) async {
+    try {
+      await _authAPI.confirmResetPassword(token, newPassword);
+      return Result.success(true);
+    } catch (exception) {
+      return Result.error(PasswordResetException());
     }
   }
 }

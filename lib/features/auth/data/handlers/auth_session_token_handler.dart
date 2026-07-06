@@ -6,9 +6,7 @@ class AuthSessionTokenHandler extends SessionTokenHandler {
 
   final SharedPreferences _preferences;
 
-  AuthSessionTokenHandler(
-    this._preferences
-  );
+  AuthSessionTokenHandler(this._preferences);
 
   @override
   void save(String token) {

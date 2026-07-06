@@ -13,7 +13,7 @@ class CategoriesAPI {
     lineLength: 220,
     colors: true,
     printEmojis: true,
-    printTime: false,
+    dateTimeFormat: DateTimeFormat.none,
   ));
 
   CategoriesAPI(this._callsHandler);

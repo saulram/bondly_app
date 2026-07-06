@@ -93,6 +93,16 @@ class Category {
                 json["categoryBadges"].map((x) => Badge.fromJson(x))),
       );
 
+  factory Category.fromSupabase(Map<String, dynamic> json) => Category(
+        id: json["id"],
+        name: json["name"],
+        account: json["account"],
+        description: json["description"],
+        imageUrl: json["image_url"],
+        type: json["type"],
+        visible: json["visible"],
+      );
+
   Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,

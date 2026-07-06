@@ -1,0 +1,12 @@
+{
+  "name": "area-chart",
+  "version": "1.0.0",
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.47.10"
+  },
+  "exports": { ".": "./index.ts" },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true
+  }
+}

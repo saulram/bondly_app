@@ -1,3 +1,6 @@
+import 'package:bondly_app/dependencies/admin_repository_provider.dart';
+import 'package:bondly_app/dependencies/admin_usecase_provider.dart';
+import 'package:bondly_app/dependencies/admin_viewmodel_provider.dart';
 import 'package:bondly_app/dependencies/api_provider.dart';
 import 'package:bondly_app/dependencies/handlers_provider.dart';
 import 'package:bondly_app/dependencies/repository_provider.dart';
@@ -5,18 +8,23 @@ import 'package:bondly_app/dependencies/service_provider.dart';
 import 'package:bondly_app/dependencies/storage_objects_provider.dart';
 import 'package:bondly_app/dependencies/usecase_provider.dart';
 import 'package:bondly_app/dependencies/viewmodel_provider.dart';
+import 'package:bondly_app/src/supabase_client_provider.dart';
 import 'package:get_it/get_it.dart';
 
 GetIt getIt = GetIt.I;
 
 class DependencyManager {
   Future<void> initialize() async {
+    getIt.registerSingleton<SupabaseClientProvider>(SupabaseClientProvider());
     await StorageObjectsProvider.provide();
     HandlersProvider.provide();
     APIProvider.provide();
     RepositoryProvider.provide();
     UseCaseProvider.provide();
     ViewModelProvider.provide();
+    AdminRepositoryProvider.provide();
+    AdminUseCaseProvider.provide();
+    AdminViewModelProvider.provide();
     ServiceProvider.provide();
     await getIt.allReady();
   }

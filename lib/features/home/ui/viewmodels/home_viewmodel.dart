@@ -1,3 +1,7 @@
+import 'package:bondly_app/features/ai/domain/models/feed_insight.dart';
+import 'package:bondly_app/features/ai/domain/models/sentiment_result.dart';
+import 'package:bondly_app/features/ai/domain/usecases/analyze_sentiment_usecase.dart';
+import 'package:bondly_app/features/ai/domain/usecases/personalize_feed_usecase.dart';
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
@@ -20,6 +24,9 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_collaborato
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
+import 'package:bondly_app/config/backend_config.dart';
+import 'package:bondly_app/features/ranking/domain/models/ranked_user.dart';
+import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -44,6 +51,11 @@ class HomeViewModel extends NavigationModel {
   final CreateAcknowledgmentUseCase _createAcknowledgmentUseCase;
   final GetCompanyAnnouncementsUseCase _getCompanyAnnouncementsUseCase;
   final GetUserEmbassysUseCase _getUserEmbassysUseCase;
+  final GetRankingUseCase _getRankingUseCase;
+
+  /// AI Use Cases
+  final PersonalizeFeedUseCase _personalizeFeedUseCase;
+  final AnalyzeSentimentUseCase _analyzeSentimentUseCase;
 
   final GlobalKey<FlutterMentionsState> mentionsKey =
       GlobalKey<FlutterMentionsState>();
@@ -65,7 +77,10 @@ class HomeViewModel extends NavigationModel {
       this._getCompanyCollaboratorsUseCase,
       this._createAcknowledgmentUseCase,
       this._getCompanyAnnouncementsUseCase,
-      this._getUserEmbassysUseCase) {
+      this._getUserEmbassysUseCase,
+      this._getRankingUseCase,
+      this._personalizeFeedUseCase,
+      this._analyzeSentimentUseCase) {
     log.i("HomeViewModel created");
   }
 
@@ -97,6 +112,7 @@ class HomeViewModel extends NavigationModel {
       getCompanyCategories(),
       getCompanyCollaborators(),
       handleGetAnnounceMents(),
+      getRanking(),
     ]);
   }
 
@@ -116,8 +132,17 @@ class HomeViewModel extends NavigationModel {
         duration: const Duration(milliseconds: 500), curve: Curves.ease);
   }
 
+  /// Immediately switches to the given tab without animation.
+  /// Used by the desktop sidebar for instant nav highlight updates.
+  void jumpToTab(int index) {
+    _currentIndex = index;
+    notifyListeners();
+    pageController.jumpToPage(index);
+  }
+
   /// Handles page change.
   void onPageChanged(int index) {
+    if (_currentIndex == index) return;
     _currentIndex = index;
     notifyListeners();
   }
@@ -143,9 +168,10 @@ class HomeViewModel extends NavigationModel {
       _banners = banners;
 
       log.i("HomeViewModel### Get Banners Success");
-      List<String> uris = _banners!.banners!.map((banner) {
-        return banner.image!;
-      }).toList();
+      List<String> uris = _banners!.banners!
+          .where((banner) => banner.image != null)
+          .map((banner) => banner.image!)
+          .toList();
       bannersList = uris;
     }, (error) {
       log.e(error.toString());
@@ -188,7 +214,7 @@ class HomeViewModel extends NavigationModel {
     final Result<FeedData, Exception> result =
         await _createFeedCommentUseCase.invoke(feedId, message);
     result.when((feedUpdated) {
-      log.i("HomeViewModel### Comment: ${feedUpdated}");
+      log.i("HomeViewModel### Comment: $feedUpdated");
       getCompanyFeeds();
     }, (error) {
       log.e(error.toString());
@@ -310,8 +336,7 @@ class HomeViewModel extends NavigationModel {
             return {
               "id": collaborator.id ?? "No Name",
               "display": collaborator.completeName ?? "No Name",
-              "avatar": collaborator.avatar ??
-                  "https://api.minimalavatars.com/avatar/random/png",
+              "avatar": collaborator.avatar ?? "",
               "user_id": collaborator.id ?? "No Id"
             };
           })
@@ -369,6 +394,33 @@ class HomeViewModel extends NavigationModel {
     }
   }
 
+  /// Returns `null` on success, or the error message on failure.
+  Future<String?> submitAcknowledgmentDirect(String message) async {
+    if (selectedBadge == null ||
+        message.trim().isEmpty ||
+        collaboratorsIds.isEmpty) {
+      return 'Datos incompletos';
+    }
+    creatingAcknowledgment = true;
+    final result = await _createAcknowledgmentUseCase.invoke(
+      selectedBadge!.id!,
+      message.trim(),
+      collaboratorsIds,
+    );
+    String? errorMessage;
+    result.when((s) {
+      getCompanyFeeds();
+      collaboratorsIds = [];
+      selectedCategory = null;
+      selectedBadge = null;
+    }, (error) {
+      log.e(error.toString());
+      errorMessage = error.toString();
+    });
+    creatingAcknowledgment = false;
+    return errorMessage;
+  }
+
   CarouselSliderController carouselController = CarouselSliderController();
 
   List<Announcement> _announcements = [];
@@ -422,4 +474,142 @@ class HomeViewModel extends NavigationModel {
       }
     });
   }
+
+  // ─── Ranking ──────────────────────────────────────────────────────────
+
+  bool get isRankingEnabled => !BackendConfig.isApi;
+
+  List<RankedUser> _rankingUsers = [];
+  List<RankedUser> get rankingUsers => _rankingUsers;
+  set rankingUsers(List<RankedUser> data) {
+    _rankingUsers = data;
+    notifyListeners();
+  }
+
+  Future<void> getRanking() async {
+    if (!isRankingEnabled) return;
+
+    log.i("Get Ranking for home podium");
+    final result = await _getRankingUseCase.invoke(period: 'month', limit: 3);
+    result.when((users) {
+      log.i("HomeViewModel### Ranking: ${users.length} users");
+      rankingUsers = users;
+    }, (error) {
+      log.e("HomeViewModel### Ranking Error: $error");
+    });
+  }
+
+  // ========================
+  // AI: Feed Personalization
+  // ========================
+
+  bool _isPersonalized = false;
+  bool get isPersonalized => _isPersonalized;
+
+  bool _personalizingFeed = false;
+  bool get personalizingFeed => _personalizingFeed;
+
+  PersonalizedFeedResult? _feedPersonalization;
+  PersonalizedFeedResult? get feedPersonalization => _feedPersonalization;
+
+  Future<void> toggleFeedPersonalization() async {
+    if (_isPersonalized) {
+      _isPersonalized = false;
+      _feedPersonalization = null;
+      // Re-sort chronologically
+      _feeds.data.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      notifyListeners();
+      return;
+    }
+
+    _personalizingFeed = true;
+    notifyListeners();
+
+    final feedItems = _feeds.data.map((f) {
+      return {
+        'id': f.id,
+        'header': f.header,
+        'body': f.body,
+        'type': f.type,
+        'likesCount': f.likes.length,
+        'commentsCount': f.comments.length,
+        'senderName': f.sender.completeName,
+      };
+    }).toList();
+
+    final userProfile = {
+      'name': user?.completeName ?? '',
+      'monthlyPoints': user?.monthlyPoints ?? 0,
+      'pointsReceived': user?.pointsReceived ?? 0,
+      'company': user?.companyName ?? '',
+    };
+
+    final result = await _personalizeFeedUseCase.invoke(
+      userId: user?.id ?? '',
+      feedItems: feedItems,
+      userProfile: userProfile,
+    );
+
+    result.when((personalization) {
+      _feedPersonalization = personalization;
+      _isPersonalized = true;
+
+      // Re-order feeds based on AI personalization
+      final orderedIds = personalization.orderedFeedIds;
+      final feedMap = {for (var f in _feeds.data) f.id: f};
+      final reordered = <FeedData>[];
+      for (final id in orderedIds) {
+        if (feedMap.containsKey(id)) {
+          reordered.add(feedMap[id]!);
+          feedMap.remove(id);
+        }
+      }
+      // Append any remaining feeds not in the AI response
+      reordered.addAll(feedMap.values);
+      _feeds = CompanyFeed(data: reordered, success: _feeds.success);
+
+      log.i(
+          "HomeViewModel### Feed personalized with ${orderedIds.length} items");
+    }, (error) {
+      log.e("Feed personalization failed: $error");
+    });
+
+    _personalizingFeed = false;
+    notifyListeners();
+  }
+
+  // ========================
+  // AI: Sentiment Analysis
+  // ========================
+
+  final Map<String, SentimentResult> _sentimentCache = {};
+  Map<String, SentimentResult> get sentimentCache => _sentimentCache;
+
+  final Set<String> _analyzingFeedIds = {};
+
+  bool isAnalyzingSentiment(String feedId) =>
+      _analyzingFeedIds.contains(feedId);
+
+  Future<void> analyzeFeedSentiment(String feedId, String text) async {
+    if (_sentimentCache.containsKey(feedId) ||
+        _analyzingFeedIds.contains(feedId)) {
+      return;
+    }
+
+    _analyzingFeedIds.add(feedId);
+    notifyListeners();
+
+    final result = await _analyzeSentimentUseCase.invoke(text: text);
+    result.when((sentiment) {
+      _sentimentCache[feedId] = sentiment;
+      log.i("HomeViewModel### Sentiment for $feedId: ${sentiment.sentiment}");
+    }, (error) {
+      log.e("Sentiment analysis failed for $feedId: $error");
+    });
+
+    _analyzingFeedIds.remove(feedId);
+    notifyListeners();
+  }
+
+  SentimentResult? getSentiment(String feedId) => _sentimentCache[feedId];
 }

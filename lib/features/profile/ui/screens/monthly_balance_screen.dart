@@ -4,7 +4,8 @@ import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/domain/models/account_statement_model.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/account_statement_viewmodel.dart';
 import 'package:bondly_app/ui/shared/app_sliver_layout.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -31,7 +32,8 @@ class MonthlyBalanceScreen extends StatelessWidget {
                 ),
                 model.busy
                     ? const Center(
-                        child: CircularProgressIndicator.adaptive(),
+                        child: BondlyShimmerBlock(
+                            width: 200, height: 200, borderRadius: 12),
                       )
                     : Expanded(
                         child: Column(
@@ -78,13 +80,14 @@ class MonthlyBalanceScreen extends StatelessWidget {
   }
 
   Widget _buildTransactionItem(BuildContext context, Transaction transaction) {
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     bool isPositive = transaction.amount! > 0;
     return ListTile(
       leading: Icon(
         !isPositive
-            ? IconsaxOutline.arrow_circle_up
-            : IconsaxOutline.arrow_circle_down,
-        color: isPositive ? AppColors.tertiaryColor : AppColors.secondaryColor,
+            ? LucideIcons.arrowUpCircle
+            : LucideIcons.arrowDownCircle,
+        color: isPositive ? colors.gold : colors.likeColor,
       ),
       title: Text(
         transaction.name ?? "",
@@ -96,10 +99,10 @@ class MonthlyBalanceScreen extends StatelessWidget {
       ),
       trailing: Text(
         transaction.amount.toString(),
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: isPositive
-                ? AppColors.tertiaryColor
-                : AppColors.secondaryColor),
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium
+            ?.copyWith(color: isPositive ? colors.gold : colors.likeColor),
       ),
     );
   }

@@ -1,21 +1,22 @@
-import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:bondly_app/src/network_image_helpers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 
 class FullScreenImage extends StatefulWidget {
   final String image;
   final String tag;
   final bool isFile;
-  final File? imageFile;
+  final Uint8List? imageBytes;
 
   const FullScreenImage(
       {super.key,
       required this.image,
       required this.tag,
       this.isFile = false,
-      this.imageFile});
+      this.imageBytes});
 
   @override
   State<FullScreenImage> createState() => _FullScreenImageState();
@@ -34,11 +35,9 @@ class _FullScreenImageState extends State<FullScreenImage> {
               minScale: 1,
               maxScale: 1.8,
               child: widget.isFile
-                  ? Image.file(widget.imageFile!)
+                  ? Image.memory(widget.imageBytes!)
                   : CachedNetworkImage(
-                      imageUrl: widget.image.contains("http")
-                          ? widget.image
-                          : "https://api.bondly.mx/${widget.image}",
+                      imageUrl: safeImageUrl(widget.image),
                       fit: BoxFit.contain,
                     ),
             ),
@@ -54,7 +53,7 @@ class _FullScreenImageState extends State<FullScreenImage> {
                     borderRadius:
                         const BorderRadius.all(Radius.circular(24.0))),
                 child: IconButton(
-                  icon: Icon(IconsaxOutline.arrow_left,
+                  icon: Icon(LucideIcons.arrowLeft,
                       color: Theme.of(context).textTheme.bodyLarge?.color ??
                           Colors.white),
                   onPressed: () {

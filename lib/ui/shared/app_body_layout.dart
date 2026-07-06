@@ -8,10 +8,10 @@ class BodyLayout extends StatelessWidget {
   final Widget child;
 
   const BodyLayout({
-    Key? key,
+    super.key,
     required this.enableBanners,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

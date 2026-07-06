@@ -22,24 +22,23 @@ class UserEntity {
   bool isVisible;
   String? token;
 
-  UserEntity({
-    required this.employeeNumber,
-    this.id,
-    this.completeName,
-    this.role,
-    this.accountNumber,
-    this.accountHolder,
-    this.email,
-    this.isActive = false,
-    this.seats = 0,
-    this.planType,
-    this.monthlyPoints = 0,
-    this.accountType,
-    this.companyName,
-    this.avatar,
-    this.giftedPoints = 0,
-    this.pointsReceived = 0,
-    this.isVisible = false,
-    this.token
-  });
+  UserEntity(
+      {required this.employeeNumber,
+      this.id,
+      this.completeName,
+      this.role,
+      this.accountNumber,
+      this.accountHolder,
+      this.email,
+      this.isActive = false,
+      this.seats = 0,
+      this.planType,
+      this.monthlyPoints = 0,
+      this.accountType,
+      this.companyName,
+      this.avatar,
+      this.giftedPoints = 0,
+      this.pointsReceived = 0,
+      this.isVisible = false,
+      this.token});
 }

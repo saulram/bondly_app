@@ -1,7 +1,9 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:bondly_app/ui/shared/bondly_loading_button.dart';
+import 'package:bondly_app/src/network_image_helpers.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:moment_dart/moment_dart.dart';
 
@@ -38,8 +40,9 @@ class _PostCommentsWidgetState extends State<PostCommentsWidget> {
   Widget _buildCommentsHeader() {
     var theme = Theme.of(context);
 
-    return SizedBox(
-      height: 65,
+    return Container(
+      margin: EdgeInsets.only(left: 4),
+      height: 64,
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         CircleAvatar(
           backgroundImage: getIt<HomeViewModel>().user!.avatar != null
@@ -74,17 +77,16 @@ class _PostCommentsWidgetState extends State<PostCommentsWidget> {
           ),
         ),
         const SizedBox(width: 10),
-        busy
-            ? const CircularProgressIndicator.adaptive()
-            : IconButton(
-                onPressed: () {
-                  _handleCreateComment();
-                },
-                icon: Icon(
-                  IconsaxOutline.arrow_right,
-                  color: Theme.of(context).unselectedWidgetColor,
-                ),
-              ),
+        BondlyLoadingIconButton(
+          isLoading: busy,
+          onPressed: () {
+            _handleCreateComment();
+          },
+          icon: Icon(
+            LucideIcons.arrowRight,
+            color: Theme.of(context).unselectedWidgetColor,
+          ),
+        ),
       ]),
     );
   }
@@ -109,7 +111,8 @@ class _PostCommentsWidgetState extends State<PostCommentsWidget> {
           CircleAvatar(
             radius: 15,
             backgroundColor: Theme.of(context).primaryColor,
-            backgroundImage: NetworkImage(comment.user.avatar ?? ''),
+            backgroundImage:
+                NetworkImage(safeImageUrl(comment.user.avatar, isAvatar: true)),
           ),
           const SizedBox(width: 10),
           Column(

@@ -1,6 +1,6 @@
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/ui/shared/app_body_layout.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,7 +25,6 @@ class _BondlySliverLayoutState extends State<BondlySliverLayout> {
   bool addMargin = false;
 
   double top = 0.0;
-  String _value = "";
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +36,11 @@ class _BondlySliverLayoutState extends State<BondlySliverLayout> {
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
-                leading: GestureDetector(
-                  onTap: context.pop,
-                  child: const Icon(
-                    IconsaxOutline.arrow_left,
+                leading: IconButton(
+                  onPressed: () => context.pop(),
+                  tooltip: 'Regresar',
+                  icon: const Icon(
+                    LucideIcons.arrowLeft,
                   ),
                 ),
                 backgroundColor: theme.scaffoldBackgroundColor,

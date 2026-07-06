@@ -1,4 +1,4 @@
-
+import 'package:bondly_app/config/backend_config.dart';
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/users_repository.dart';
 import 'package:logger/logger.dart';
@@ -20,9 +20,11 @@ class UserUseCase {
   }
 
   Future<Result<User, Exception>> invoke({bool remote = false}) async {
-    if (remote) {
+    if (remote || BackendConfig.isSupabase) {
       var userResult = await _remoteRepository.getUser();
-      userResult.when((user) => update(user), (error) => error);
+      if (!BackendConfig.isSupabase) {
+        userResult.when((user) => update(user), (error) => error);
+      }
       return userResult;
     }
     return await _repository.getUser();

@@ -1,4 +1,5 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/ai/data/api/gemini_service.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/mappers/user_activity_response_mapper.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/users_api.dart';
@@ -18,7 +19,7 @@ import 'package:bondly_app/features/profile/data/api/cart_api.dart';
 import 'package:bondly_app/src/api_calls_handler.dart';
 
 class APIProvider {
-  static provide() {
+  static void provide() {
     getIt.registerSingleton<AuthAPI>(
       AuthAPI(getIt<ApiCallsHandler>()),
     );
@@ -78,6 +79,9 @@ class APIProvider {
       AccountBalanceAPI(
         getIt<ApiCallsHandler>(),
       ),
+    );
+    getIt.registerSingleton<GeminiService>(
+      GeminiService(),
     );
   }
 }

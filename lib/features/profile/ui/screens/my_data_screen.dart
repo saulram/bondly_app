@@ -1,9 +1,9 @@
-import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
-import 'package:ficonsax/ficonsax.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -48,12 +48,10 @@ class _MyDataScreenState extends State<MyDataScreen> {
       model: _model,
       child: ModelBuilder<ProfileViewModel>(
         builder: (context, model, child) => Scaffold(
-          backgroundColor: AppColors.secondaryColor,
+          backgroundColor: theme.colorScheme.secondary,
           body: Column(
             children: [
-              SafeArea(
-                  child: _buildTopBar(theme)
-              ),
+              SafeArea(child: _buildTopBar(theme)),
               _buildBodyCard(theme, model)
             ],
           ),
@@ -71,23 +69,26 @@ class _MyDataScreenState extends State<MyDataScreen> {
         children: [
           Expanded(
               child: Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      IconsaxOutline.arrow_left,
-                      color: Colors.white,
-                    ),
-                    onPressed: () => context.pop(),
+            children: [
+              IgnorePointer(
+                child: Center(
+                  child: Text(
+                    StringsProfile.myData,
+                    style: theme.textTheme.titleLarge!
+                        .copyWith(color: theme.colorScheme.onPrimary),
                   ),
-                  Center(
-                    child: Text(
-                      StringsProfile.myData,
-                      style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
-                    ),
-                  ),
-                ],
-              )
-          )
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  LucideIcons.arrowLeft,
+                  color: theme.colorScheme.onPrimary,
+                ),
+                onPressed: () => context.pop(),
+                tooltip: 'Regresar',
+              ),
+            ],
+          ))
         ],
       ),
     );
@@ -100,8 +101,8 @@ class _MyDataScreenState extends State<MyDataScreen> {
     cityTextFieldController.text = model.userProfile?.location ?? "";
     dobTextFieldController.text = updatedDate
         ? "${selectedDate.year}-"
-        "${selectedDate.month.toString().padLeft(2, '0')}-"
-        "${selectedDate.day.toString().padLeft(2, '0')}"
+            "${selectedDate.month.toString().padLeft(2, '0')}-"
+            "${selectedDate.day.toString().padLeft(2, '0')}"
         : stringDate?.substring(0, stringDate.indexOf(" ")) ?? "";
     jobTextFieldController.text = model.userProfile?.jobPosition ?? "";
 
@@ -112,58 +113,54 @@ class _MyDataScreenState extends State<MyDataScreen> {
             color: theme.scaffoldBackgroundColor,
             borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(32.0),
-                topRight: Radius.circular(32.0)
-            )
-        ),
+                topRight: Radius.circular(32.0))),
         width: double.infinity,
-        child: model.busy ? CircularProgressIndicator.adaptive(
-          backgroundColor: theme.unselectedWidgetColor,
-        )
+        child: model.busy
+            ? const Center(
+                child: BondlyShimmerBlock(
+                    width: 200, height: 200, borderRadius: 12),
+              )
             : Container(
-          margin: const EdgeInsets.symmetric(
-              vertical: 36.0,
-              horizontal: 32.0
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Text(
-                  StringsProfile.myDataSubtitle,
-                  style: theme.textTheme.titleMedium!.copyWith(
-                      fontSize: 18.0
+                margin: const EdgeInsets.symmetric(
+                    vertical: 36.0, horizontal: 32.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Text(
+                        StringsProfile.myDataSubtitle,
+                        style: theme.textTheme.titleMedium!
+                            .copyWith(fontSize: 18.0),
+                      ),
+                      const SizedBox(height: 64.0),
+                      _getNameTextField(theme),
+                      const SizedBox(height: 32.0),
+                      _getEmailTextField(theme),
+                      const SizedBox(height: 32.0),
+                      _getCityTextField(theme),
+                      const SizedBox(height: 32.0),
+                      _getJobTitleTextField(theme),
+                      const SizedBox(height: 32.0),
+                      _getDOBTextField(theme),
+                      const SizedBox(height: 64.0),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: () {
+                            model.saveMyData(
+                                email: emailTextFieldController.text,
+                                location: cityTextFieldController.text,
+                                dob: dobTextFieldController.text,
+                                job: jobTextFieldController.text);
+                          },
+                          child: const Text(
+                            StringsProfile.saveMyData,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 64.0),
-                _getNameTextField(theme),
-                const SizedBox(height: 32.0),
-                _getEmailTextField(theme),
-                const SizedBox(height: 32.0),
-                _getCityTextField(theme),
-                const SizedBox(height: 32.0),
-                _getJobTitleTextField(theme),
-                const SizedBox(height: 32.0),
-                _getDOBTextField(theme),
-                const SizedBox(height: 64.0),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () {
-                      model.saveMyData(
-                          email: emailTextFieldController.text,
-                          location: cityTextFieldController.text,
-                          dob: dobTextFieldController.text,
-                          job: jobTextFieldController.text
-                      );
-                    },
-                    child: const Text(
-                      StringsProfile.saveMyData,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }
@@ -177,7 +174,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
           StringsProfile.fullName,
           style: theme.textTheme.bodyMedium,
         ),
-        prefixIcon: const Icon(IconsaxBold.user),
+        prefixIcon: const Icon(LucideIcons.user),
       ),
     );
   }
@@ -190,7 +187,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
           StringsProfile.location,
           style: theme.textTheme.bodyMedium,
         ),
-        prefixIcon: const Icon(IconsaxBold.location),
+        prefixIcon: const Icon(LucideIcons.mapPin),
       ),
     );
   }
@@ -210,17 +207,16 @@ class _MyDataScreenState extends State<MyDataScreen> {
 
   Widget _getDOBTextField(ThemeData theme) {
     return TextFormField(
-      readOnly: true,
-      onTap: _showDialog,
-      controller: dobTextFieldController,
-      decoration: InputDecoration(
-        label: Text(
-          StringsProfile.dob,
-          style: theme.textTheme.bodyMedium,
-        ),
-        prefixIcon: const Icon(IconsaxBold.cake),
-      )
-    );
+        readOnly: true,
+        onTap: _showDialog,
+        controller: dobTextFieldController,
+        decoration: InputDecoration(
+          label: Text(
+            StringsProfile.dob,
+            style: theme.textTheme.bodyMedium,
+          ),
+          prefixIcon: const Icon(LucideIcons.cake),
+        ));
   }
 
   Widget _getJobTitleTextField(ThemeData theme) {
@@ -231,7 +227,7 @@ class _MyDataScreenState extends State<MyDataScreen> {
           StringsProfile.jobTitle,
           style: theme.textTheme.bodyMedium,
         ),
-        prefixIcon: const Icon(IconsaxBold.briefcase),
+        prefixIcon: const Icon(LucideIcons.briefcase),
       ),
     );
   }

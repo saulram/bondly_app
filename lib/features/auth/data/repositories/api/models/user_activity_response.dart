@@ -5,13 +5,12 @@ class PaginatedUserActivityResponse {
   final int prevPage;
   final List<UserActivityResponse> data;
 
-  PaginatedUserActivityResponse({
-    required this.success,
-    required this.count,
-    required this.nextPage,
-    required this.prevPage,
-    required this.data
-  });
+  PaginatedUserActivityResponse(
+      {required this.success,
+      required this.count,
+      required this.nextPage,
+      required this.prevPage,
+      required this.data});
 
   factory PaginatedUserActivityResponse.fromJson(Map<String, dynamic> json) {
     var success = json['success'] ?? false;
@@ -29,8 +28,7 @@ class PaginatedUserActivityResponse {
         count: count,
         nextPage: nextPage,
         prevPage: prevPage,
-        data: data
-    );
+        data: data);
   }
 
   Map<String, dynamic> toJson() {
@@ -40,7 +38,7 @@ class PaginatedUserActivityResponse {
     data['next'] = nextPage;
     data['prev'] = prevPage;
     data['data'] = this.data.map((v) => v.toJson()).toList();
-      return data;
+    return data;
   }
 }
 
@@ -69,16 +67,15 @@ class UserActivityResponse {
 
   factory UserActivityResponse.fromJson(Map<String, dynamic> json) {
     return UserActivityResponse(
-      id: json['_id'] ?? "",
-      userId: json['user_id'] ?? "",
-      feedId: json['feed_id'] ?? "",
-      title: json['title'] ?? "",
-      content: json['content'] ?? "",
-      read: json['read'] ?? false,
-      createdAt: json['createdAt'] ?? "",
-      updatedAt: json['updatedAt'] ?? "",
-      type: json['type'] ?? ""
-    );
+        id: json['_id'] ?? "",
+        userId: json['user_id'] ?? "",
+        feedId: json['feed_id'] ?? "",
+        title: json['title'] ?? "",
+        content: json['content'] ?? "",
+        read: json['read'] ?? false,
+        createdAt: json['createdAt'] ?? "",
+        updatedAt: json['updatedAt'] ?? "",
+        type: json['type'] ?? "");
   }
 
   Map<String, dynamic> toJson() {
