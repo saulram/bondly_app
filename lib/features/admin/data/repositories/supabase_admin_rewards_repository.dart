@@ -1,11 +1,36 @@
+import 'dart:typed_data';
+
 import 'package:bondly_app/features/admin/domain/models/admin_reward.dart';
 import 'package:bondly_app/src/supabase_client_provider.dart';
 import 'package:multiple_result/multiple_result.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseAdminRewardsRepository {
   final SupabaseClientProvider _supabase;
 
   SupabaseAdminRewardsRepository(this._supabase);
+
+  /// Uploads image [bytes] to the public `rewards` bucket and returns its URL.
+  /// [ext] is the file extension (jpg/jpeg/png/webp); admins-only via storage RLS.
+  Future<Result<String, Exception>> uploadImage(
+      Uint8List bytes, String ext) async {
+    try {
+      final safeExt = ext == 'jpeg' ? 'jpg' : ext;
+      final contentType = 'image/${ext == 'jpg' ? 'jpeg' : ext}';
+      final fileName =
+          'reward_${DateTime.now().millisecondsSinceEpoch}.$safeExt';
+      await _supabase.client.storage.from('rewards').uploadBinary(
+            fileName,
+            bytes,
+            fileOptions: FileOptions(contentType: contentType, upsert: true),
+          );
+      final url =
+          _supabase.client.storage.from('rewards').getPublicUrl(fileName);
+      return Result.success(url);
+    } catch (e) {
+      return Result.error(Exception(e.toString()));
+    }
+  }
 
   Future<Result<List<AdminReward>, Exception>> getRewards() async {
     try {
@@ -65,14 +90,18 @@ class SupabaseAdminRewardsRepository {
     String? description,
     String? category,
     required int points,
+    String? image,
   }) async {
     try {
-      await _supabase.client.from('rewards').update({
+      final data = <String, dynamic>{
         'name': name,
         'description': description,
         'category': category,
         'points': points,
-      }).eq('id', rewardId);
+      };
+      // Only overwrite the image when a new one was chosen.
+      if (image != null) data['image'] = image;
+      await _supabase.client.from('rewards').update(data).eq('id', rewardId);
       return const Result.success(null);
     } catch (e) {
       return Result.error(Exception(e.toString()));
