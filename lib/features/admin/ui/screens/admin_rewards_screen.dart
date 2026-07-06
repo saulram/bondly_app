@@ -8,6 +8,7 @@ import 'package:bondly_app/features/admin/ui/widgets/admin_empty_state.dart';
 import 'package:bondly_app/features/admin/ui/widgets/admin_permission_guard.dart';
 import 'package:bondly_app/features/admin/ui/widgets/admin_status_badge.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -251,7 +252,8 @@ class _RewardImagePicker extends StatelessWidget {
           border: Border.all(color: colors.border),
           image: (imageUrl != null && !uploading)
               ? DecorationImage(
-                  image: NetworkImage(imageUrl!), fit: BoxFit.cover)
+                  image: CachedNetworkImageProvider(imageUrl!),
+                  fit: BoxFit.cover)
               : null,
         ),
         child: uploading
@@ -314,13 +316,30 @@ class _RewardsList extends StatelessWidget {
       itemBuilder: (ctx, i) {
         final r = vm.rewards[i];
         return ListTile(
-          leading: r.image != null
+          leading: (r.image != null && r.image!.isNotEmpty)
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(r.image!,
-                      width: 44, height: 44, fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          Icon(LucideIcons.gift, color: colors.accent)))
+                  child: CachedNetworkImage(
+                    imageUrl: r.image!,
+                    width: 44,
+                    height: 44,
+                    fit: BoxFit.cover,
+                    placeholder: (_, __) => Container(
+                        width: 44,
+                        height: 44,
+                        color: colors.accentSoft,
+                        child: const Center(
+                            child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2)))),
+                    errorWidget: (_, __, ___) => Container(
+                        width: 44,
+                        height: 44,
+                        color: colors.accentSoft,
+                        child: Icon(LucideIcons.gift, color: colors.accent)),
+                  ))
               : Container(
                   width: 44,
                   height: 44,
