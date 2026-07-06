@@ -10,6 +10,7 @@ import 'package:bondly_app/features/admin/ui/widgets/admin_status_badge.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AdminRewardsScreen extends StatefulWidget {
@@ -105,9 +106,14 @@ class _AdminRewardsScreenState extends State<AdminRewardsScreen> {
     final ptsCtrl =
         TextEditingController(text: reward?.points.toString() ?? '0');
 
+    // Image state: existing URL, a freshly-uploaded URL, and upload progress.
+    String? imageUrl = reward?.image;
+    bool uploading = false;
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
         backgroundColor: colors.surface,
         title: Text(
           reward == null ? StringsAdmin.addReward : StringsAdmin.editReward,
@@ -115,9 +121,34 @@ class _AdminRewardsScreenState extends State<AdminRewardsScreen> {
         ),
         content: SizedBox(
           width: 440,
-          child: Column(
+          child: SingleChildScrollView(
+            child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              _RewardImagePicker(
+                imageUrl: imageUrl,
+                uploading: uploading,
+                colors: colors,
+                onPick: () async {
+                  final picked = await ImagePicker().pickImage(
+                    source: ImageSource.gallery,
+                    maxWidth: 1280,
+                    imageQuality: 85,
+                  );
+                  if (picked == null) return;
+                  setDialogState(() => uploading = true);
+                  final bytes = await picked.readAsBytes();
+                  final ext = picked.name.contains('.')
+                      ? picked.name.split('.').last.toLowerCase()
+                      : 'jpg';
+                  final url = await vm.uploadImage(bytes, ext);
+                  setDialogState(() {
+                    uploading = false;
+                    if (url != null) imageUrl = url;
+                  });
+                },
+              ),
+              const SizedBox(height: 12),
               TextField(
                 controller: nameCtrl,
                 decoration: InputDecoration(
@@ -149,37 +180,119 @@ class _AdminRewardsScreenState extends State<AdminRewardsScreen> {
               ),
             ],
           ),
+          ),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: const Text(StringsAdmin.cancel)),
           FilledButton(
-            onPressed: () async {
-              if (nameCtrl.text.isEmpty) return;
-              final pts = int.tryParse(ptsCtrl.text) ?? 0;
-              bool ok;
-              if (reward == null) {
-                ok = await vm.createReward(
-                  name: nameCtrl.text,
-                  description: descCtrl.text.isEmpty ? null : descCtrl.text,
-                  category: catCtrl.text.isEmpty ? null : catCtrl.text,
-                  points: pts,
-                );
-              } else {
-                ok = await vm.updateReward(
-                  rewardId: reward.id,
-                  name: nameCtrl.text,
-                  description: descCtrl.text.isEmpty ? null : descCtrl.text,
-                  category: catCtrl.text.isEmpty ? null : catCtrl.text,
-                  points: pts,
-                );
-              }
-              if (ok && ctx.mounted) Navigator.pop(ctx);
-            },
+            onPressed: uploading
+                ? null
+                : () async {
+                    if (nameCtrl.text.isEmpty) return;
+                    final pts = int.tryParse(ptsCtrl.text) ?? 0;
+                    bool ok;
+                    if (reward == null) {
+                      ok = await vm.createReward(
+                        name: nameCtrl.text,
+                        description:
+                            descCtrl.text.isEmpty ? null : descCtrl.text,
+                        category: catCtrl.text.isEmpty ? null : catCtrl.text,
+                        points: pts,
+                        image: imageUrl,
+                      );
+                    } else {
+                      ok = await vm.updateReward(
+                        rewardId: reward.id,
+                        name: nameCtrl.text,
+                        description:
+                            descCtrl.text.isEmpty ? null : descCtrl.text,
+                        category: catCtrl.text.isEmpty ? null : catCtrl.text,
+                        points: pts,
+                        image: imageUrl,
+                      );
+                    }
+                    if (ok && ctx.mounted) Navigator.pop(ctx);
+                  },
             child: const Text(StringsAdmin.save),
           ),
         ],
+      ),
+      ),
+    );
+  }
+}
+
+class _RewardImagePicker extends StatelessWidget {
+  final String? imageUrl;
+  final bool uploading;
+  final BondlyColorScheme colors;
+  final VoidCallback onPick;
+
+  const _RewardImagePicker({
+    required this.imageUrl,
+    required this.uploading,
+    required this.colors,
+    required this.onPick,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: uploading ? null : onPick,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        height: 120,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: colors.accentSoft,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.border),
+          image: (imageUrl != null && !uploading)
+              ? DecorationImage(
+                  image: NetworkImage(imageUrl!), fit: BoxFit.cover)
+              : null,
+        ),
+        child: uploading
+            ? const Center(child: CircularProgressIndicator())
+            : imageUrl == null
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(LucideIcons.imagePlus,
+                          color: colors.accent, size: 28),
+                      const SizedBox(height: 6),
+                      Text(StringsAdmin.uploadImage,
+                          style: GoogleFonts.montserrat(
+                              fontSize: 13, color: colors.textMuted)),
+                    ],
+                  )
+                : Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(LucideIcons.pencil,
+                                color: Colors.white, size: 13),
+                            const SizedBox(width: 5),
+                            Text(StringsAdmin.changeImage,
+                                style: GoogleFonts.montserrat(
+                                    fontSize: 12, color: Colors.white)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
       ),
     );
   }

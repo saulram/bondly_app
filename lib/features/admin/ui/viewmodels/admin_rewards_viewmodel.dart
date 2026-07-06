@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bondly_app/features/admin/data/repositories/supabase_admin_rewards_repository.dart';
 import 'package:bondly_app/features/admin/domain/models/admin_reward.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
@@ -35,14 +37,29 @@ class AdminRewardsViewModel extends NavigationModel {
     });
   }
 
+  /// Uploads a reward image and returns its public URL (or null on failure).
+  Future<String?> uploadImage(Uint8List bytes, String ext) async {
+    final r = await _repo.uploadImage(bytes, ext);
+    return r.when((url) => url, (e) {
+      _error = e.toString();
+      notifyListeners();
+      return null;
+    });
+  }
+
   Future<bool> createReward({
     required String name,
     String? description,
     String? category,
     required int points,
+    String? image,
   }) async {
     final r = await _repo.createReward(
-        name: name, description: description, category: category, points: points);
+        name: name,
+        description: description,
+        category: category,
+        points: points,
+        image: image);
     bool ok = false;
     r.when((_) {
       ok = true;
@@ -60,13 +77,15 @@ class AdminRewardsViewModel extends NavigationModel {
     String? description,
     String? category,
     required int points,
+    String? image,
   }) async {
     final r = await _repo.updateReward(
         rewardId: rewardId,
         name: name,
         description: description,
         category: category,
-        points: points);
+        points: points,
+        image: image);
     bool ok = false;
     r.when((_) {
       ok = true;
