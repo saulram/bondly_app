@@ -12,9 +12,18 @@ class GeminiService {
     try {
       _log.i('Gemini request initiated (via Edge Function)');
 
+      // Explicitly attach the session token. The Edge Function requires an
+      // Authorization header (verify_jwt=false + its own getUser check), and
+      // relying on the client's implicit header has proven flaky on web.
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session == null) {
+        throw GeminiServiceException('No active session for Gemini request');
+      }
+
       final response = await Supabase.instance.client.functions.invoke(
         'gemini',
         body: {'prompt': prompt},
+        headers: {'Authorization': 'Bearer ${session.accessToken}'},
       );
 
       final dynamic data = response.data;

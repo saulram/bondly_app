@@ -5,16 +5,19 @@
 
 const ALLOWED_ORIGINS = [
   "https://bondly-app.vercel.app",
+  "https://bondly.fluss.mx",
 ];
 
 /**
  * Check if an origin is allowed for CORS.
- * Allows: production Vercel URL, Vercel preview deploys, and localhost for dev.
+ * Allows: production domains, Vercel preview deploys, any *.fluss.mx custom
+ * domain, and localhost for dev.
  */
 function isAllowedOrigin(origin: string | null): boolean {
   if (!origin) return false;
   if (ALLOWED_ORIGINS.includes(origin)) return true;
   if (/^https:\/\/bondly-app-.+\.vercel\.app$/.test(origin)) return true;
+  if (/^https:\/\/[a-z0-9-]+\.fluss\.mx$/.test(origin)) return true;
   if (/^http:\/\/localhost(:\d+)?$/.test(origin)) return true;
   return false;
 }

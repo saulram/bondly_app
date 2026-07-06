@@ -2,13 +2,17 @@ import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
 import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const ALLOWED_ORIGINS = ["https://bondly-app.vercel.app"];
+const ALLOWED_ORIGINS = [
+  "https://bondly-app.vercel.app",
+  "https://bondly.fluss.mx",
+];
 
 function getCorsHeaders(origin: string | null): Record<string, string> {
   let allowed = ALLOWED_ORIGINS[0];
   if (origin) {
     if (ALLOWED_ORIGINS.includes(origin)
       || /^https:\/\/bondly-app-.+\.vercel\.app$/.test(origin)
+      || /^https:\/\/[a-z0-9-]+\.fluss\.mx$/.test(origin)
       || /^http:\/\/localhost(:\d+)?$/.test(origin)) {
       allowed = origin;
     }
