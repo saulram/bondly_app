@@ -78,6 +78,12 @@ const _navItems = [
     module: AdminModule.manageFeeds,
   ),
   _NavItem(
+    label: StringsAdmin.navSuggestions,
+    icon: LucideIcons.messageCircle,
+    route: '/admin/suggestions',
+    module: AdminModule.manageSuggestions,
+  ),
+  _NavItem(
     label: StringsAdmin.navReports,
     icon: LucideIcons.barChart2,
     route: '/admin/reports',

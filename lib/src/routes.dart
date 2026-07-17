@@ -11,6 +11,7 @@ import 'package:bondly_app/features/admin/ui/screens/admin_permissions_screen.da
 import 'package:bondly_app/features/admin/ui/screens/admin_reports_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_rewards_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_settings_screen.dart';
+import 'package:bondly_app/features/admin/ui/screens/admin_suggestions_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_shell_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_users_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_zones_screen.dart';
@@ -31,6 +32,7 @@ import 'package:bondly_app/features/profile/ui/screens/my_rewards_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/profile_screen.dart';
 import 'package:bondly_app/features/profile/ui/screens/shopping_cart_screen.dart';
 import 'package:bondly_app/features/ranking/ui/screens/ranking_screen.dart';
+import 'package:bondly_app/features/suggestions/ui/screens/suggestions_screen.dart';
 import 'package:bondly_app/features/start/ui/screens/start_screen.dart';
 import 'package:bondly_app/ui/shared/desktop_shell.dart';
 import 'package:go_router/go_router.dart';
@@ -44,6 +46,7 @@ List<String> _adminBreadcrumbs(String path) {
   if (path.startsWith('/admin/banners')) return ['Banners'];
   if (path.startsWith('/admin/news')) return ['Noticias'];
   if (path.startsWith('/admin/feeds')) return ['Moderación'];
+  if (path.startsWith('/admin/suggestions')) return ['Voz'];
   if (path.startsWith('/admin/ambassadors')) return ['Embajadores'];
   if (path.startsWith('/admin/reports')) return ['Reportes'];
   if (path == '/admin/settings/zones') return ['Configuración', 'Zonas'];
@@ -159,6 +162,11 @@ class AppRouter {
                 _fadePage(state, const AdminFeedsScreen()),
           ),
           GoRoute(
+            path: AdminSuggestionsScreen.route,
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminSuggestionsScreen()),
+          ),
+          GoRoute(
             path: AdminReportsScreen.route,
             pageBuilder: (context, state) =>
                 _fadePage(state, const AdminReportsScreen()),
@@ -214,6 +222,9 @@ class AppRouter {
           GoRoute(
               path: RankingScreen.route,
               builder: (context, state) => const RankingScreen()),
+          GoRoute(
+              path: SuggestionsScreen.route,
+              builder: (context, state) => const SuggestionsScreen()),
           GoRoute(
               path: MyDataScreen.route,
               builder: (context, state) => const MyDataScreen()),

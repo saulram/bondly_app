@@ -48,6 +48,9 @@ import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.d
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
 import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
 import 'package:bondly_app/features/ranking/ui/viewmodels/ranking_viewmodel.dart';
+import 'package:bondly_app/features/suggestions/domain/usecases/get_my_suggestions_usecase.dart';
+import 'package:bondly_app/features/suggestions/domain/usecases/submit_suggestion_usecase.dart';
+import 'package:bondly_app/features/suggestions/ui/viewmodels/suggestions_viewmodel.dart';
 import 'package:bondly_app/src/app_services.dart';
 import 'package:bondly_app/src/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -150,5 +153,11 @@ class ViewModelProvider {
 
     getIt.registerFactory<RankingViewModel>(
         () => RankingViewModel(getIt<GetRankingUseCase>()));
+
+    getIt.registerFactory<SuggestionsViewModel>(
+        () => SuggestionsViewModel(
+              getIt<SubmitSuggestionUseCase>(),
+              getIt<GetMySuggestionsUseCase>(),
+            ));
   }
 }

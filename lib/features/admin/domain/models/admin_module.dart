@@ -7,7 +7,8 @@ enum AdminModule {
   viewReports('view_reports'),
   manageZones('manage_zones'),
   manageSettings('manage_settings'),
-  manageFeeds('manage_feeds');
+  manageFeeds('manage_feeds'),
+  manageSuggestions('manage_suggestions');
 
   final String value;
   const AdminModule(this.value);

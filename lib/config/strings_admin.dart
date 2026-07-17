@@ -232,6 +232,20 @@ class StringsAdmin {
   static const String highlightFeed = 'Destacar';
   static const String unhighlightFeed = 'Quitar destacado';
 
+  // Voz — Buzón de sugerencias
+  static const String navSuggestions = 'Voz';
+  static const String suggestionsTitle = 'Buzón de Voz';
+  static const String suggestionsSubtitle =
+      'Sugerencias e inquietudes de los colaboradores';
+  static const String noSuggestionsFound = 'No hay sugerencias por ahora';
+  static const String suggestionDetail = 'Detalle de la sugerencia';
+  static const String suggestionStatus = 'Estado';
+  static const String suggestionAdminNote = 'Nota interna';
+  static const String suggestionAdminNoteHint =
+      'Uso interno del equipo (no se comparte con el autor)';
+  static const String suggestionCategory = 'Categoría';
+  static const String saveNote = 'Guardar nota';
+
   // Users: puntos y zonas
   static const String adjustPoints = 'Ajustar puntos';
   static const String pointsToGive = 'Puntos por regalar';
