@@ -25,6 +25,8 @@ class ForgotPasswordViewModel extends NavigationModel {
         final errorType = switch (error) {
           EmptyLoginFieldsException() => ForgotPasswordErrorType.emptyEmail,
           InvalidEmailException() => ForgotPasswordErrorType.invalidEmail,
+          TooManyLoginAttemptsException() =>
+            ForgotPasswordErrorType.tooManyAttempts,
           NoConnectionException() => ForgotPasswordErrorType.connectionError,
           _ => ForgotPasswordErrorType.unknownError,
         };

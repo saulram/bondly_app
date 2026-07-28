@@ -19,10 +19,7 @@ class StartScreen extends StatelessWidget {
         child: SizedBox(
           width: MediaQuery.of(context).size.width * 0.5,
           child: Image.asset(
-            context.isDarkMode
-              ? _logoDarkImagePath
-              : _logoImagePath
-          ),
+              context.isDarkMode ? _logoDarkImagePath : _logoImagePath),
         ),
       ),
     );

@@ -14,6 +14,8 @@ import 'package:bondly_app/features/profile/data/repositories/supabase_account_s
 import 'package:bondly_app/features/profile/data/repositories/supabase_activity_repository.dart';
 import 'package:bondly_app/features/profile/data/repositories/supabase_bondly_badges_repository.dart';
 import 'package:bondly_app/features/profile/data/repositories/supabase_cart_repository.dart';
+import 'package:bondly_app/features/ranking/data/repositories/supabase_ranking_repository.dart';
+import 'package:bondly_app/features/ranking/domain/repositories/ranking_repository.dart';
 import 'package:bondly_app/src/supabase_client_provider.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/users_api.dart';
@@ -49,6 +51,7 @@ import 'package:bondly_app/features/profile/domain/repositories/bondly_badges_re
 import 'package:bondly_app/features/profile/domain/repositories/cart_repository.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class RepositoryProvider {
   static void provide() {
@@ -92,14 +95,16 @@ class RepositoryProvider {
       );
     }
 
-    // Local cache always registered
-    getIt.registerSingletonWithDependencies<UsersRepository>(
-        () => DefaultUsersRepository(
-              getIt<UsersDao>(),
-              UserEntityMapper(),
-            ),
-        instanceName: DefaultUsersRepository.name,
-        dependsOn: [AppDatabase, UsersDao]);
+    // Local cache only available on non-web platforms
+    if (!kIsWeb) {
+      getIt.registerSingletonWithDependencies<UsersRepository>(
+          () => DefaultUsersRepository(
+                getIt<UsersDao>(),
+                UserEntityMapper(),
+              ),
+          instanceName: DefaultUsersRepository.name,
+          dependsOn: [AppDatabase, UsersDao]);
+    }
 
     // Conditional remote users repository (must be async to satisfy InitDependency in UseCaseProvider)
     if (BackendConfig.isSupabase) {
@@ -158,6 +163,11 @@ class RepositoryProvider {
         getIt<SupabaseClientProvider>(),
       ),
     );
+
+    getIt.registerSingleton<RankingRepository>(
+      SupabaseRankingRepository(getIt<SupabaseClientProvider>()),
+    );
+
     getIt.registerSingleton<AIRepository>(
       DefaultAIRepository(getIt<GeminiService>()),
     );

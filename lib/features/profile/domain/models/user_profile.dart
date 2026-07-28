@@ -18,7 +18,8 @@ class UserProfile {
   );
 
   factory UserProfile.fromSupabase(Map<String, dynamic> json) {
-    final profileData = json['user_profiles'] is List && (json['user_profiles'] as List).isNotEmpty
+    final profileData = json['user_profiles'] is List &&
+            (json['user_profiles'] as List).isNotEmpty
         ? (json['user_profiles'] as List).first as Map<String, dynamic>
         : json['user_profiles'] is Map
             ? json['user_profiles'] as Map<String, dynamic>
@@ -29,8 +30,8 @@ class UserProfile {
       json['company_name'] ?? '',
       profileData['job_position'] ?? '',
       profileData['location'] ?? '',
-      profileData['dob'] != null
-          ? DateTime.parse(profileData['dob'])
+      profileData['b_day'] != null
+          ? DateTime.parse(profileData['b_day'])
           : DateTime.now(),
       profileData['id'] ?? json['id'] ?? '',
     );

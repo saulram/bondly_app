@@ -1,4 +1,5 @@
 import 'package:bondly_app/features/auth/domain/models/user_model.dart';
+import 'package:bondly_app/src/api_calls_handler.dart' show ApiErrorException;
 import 'package:bondly_app/features/home/data/repositories/api/akcnowledgments_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/ambassadors_api.dart';
 import 'package:bondly_app/features/home/data/repositories/api/announcements_api.dart';
@@ -40,8 +41,7 @@ class DefaultCompanyFeedsRepository extends CompanyFeedsRepository {
       this._companyCollaboratorsAPI,
       this._createAcknowledgmentAPI,
       this._announcementsAPI,
-      this._ambassadorsAPI
-  );
+      this._ambassadorsAPI);
 
   @override
   Future<Result<CompanyFeed, Exception>> getCompanyFeeds() async {
@@ -61,14 +61,11 @@ class DefaultCompanyFeedsRepository extends CompanyFeedsRepository {
     try {
       return Result.success(await _feedsAPI.getFeedById(feedId));
     } catch (exception) {
-      return Result.error(
-        exception is TokenNotFoundException
-            ? exception
-            : (exception is FeedNotFoundException
-                ? exception
-                : NoConnectionException()
-        )
-      );
+      return Result.error(exception is TokenNotFoundException
+          ? exception
+          : (exception is FeedNotFoundException
+              ? exception
+              : NoConnectionException()));
     }
   }
 
@@ -127,6 +124,9 @@ class DefaultCompanyFeedsRepository extends CompanyFeedsRepository {
       return Result.success(await _createAcknowledgmentAPI.createAcknowledgment(
           badgeId, message, recipients));
     } catch (exception) {
+      if (exception is ApiErrorException) {
+        return Result.error(exception);
+      }
       return Result.error(NoConnectionException());
     }
   }

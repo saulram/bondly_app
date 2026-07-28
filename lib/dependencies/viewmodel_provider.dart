@@ -9,8 +9,12 @@ import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/forgot_password_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/reset_password_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/verify_reset_token_usecase.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/forgot_password_viewmodel.dart';
 import 'package:bondly_app/features/auth/ui/viewmodels/login_viewmodel.dart';
+import 'package:bondly_app/features/auth/ui/viewmodels/reset_password_viewmodel.dart';
+import 'package:bondly_app/features/auth/ui/viewmodels/verify_reset_token_viewmodel.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dart';
@@ -42,8 +46,11 @@ import 'package:bondly_app/features/profile/ui/viewmodels/bondly_badges_viewmode
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/profile_viewmodel.dart';
+import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
+import 'package:bondly_app/features/ranking/ui/viewmodels/ranking_viewmodel.dart';
 import 'package:bondly_app/src/app_services.dart';
 import 'package:bondly_app/src/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ViewModelProvider {
   static void provide() {
@@ -54,12 +61,13 @@ class ViewModelProvider {
     getIt.registerSingleton<AppModel>(AppModel());
 
     getIt.registerFactory<ProfileViewModel>(
-        () => ProfileViewModel(
-              userUseCase: getIt<UserUseCase>(),
-              logoutUseCase: getIt<LogoutUseCase>(),
-              updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
-              profileUseCase: getIt<UserProfileUseCase>(),
-            ),
+      () => ProfileViewModel(
+        userUseCase: getIt<UserUseCase>(),
+        logoutUseCase: getIt<LogoutUseCase>(),
+        updateUserUseCase: getIt<UpdateUserAvatarUseCase>(),
+        profileUseCase: getIt<UserProfileUseCase>(),
+        getAccountStatementUseCase: getIt<GetAccountStatementUseCase>(),
+      ),
     );
 
     getIt.registerSingletonWithDependencies<HomeViewModel>(
@@ -76,6 +84,7 @@ class ViewModelProvider {
               getIt<CreateAcknowledgmentUseCase>(),
               getIt<GetCompanyAnnouncementsUseCase>(),
               getIt<GetUserEmbassysUseCase>(),
+              getIt<GetRankingUseCase>(),
               getIt<PersonalizeFeedUseCase>(),
               getIt<AnalyzeSentimentUseCase>(),
             ),
@@ -97,6 +106,19 @@ class ViewModelProvider {
       );
     });
 
+    getIt.registerFactory<VerifyResetTokenViewModel>(() {
+      return VerifyResetTokenViewModel(
+        getIt<VerifyResetTokenUseCase>(),
+        getIt<ForgotPasswordUseCase>(),
+      );
+    });
+
+    getIt.registerFactory<ResetPasswordViewModel>(() {
+      return ResetPasswordViewModel(
+        getIt<ResetPasswordUseCase>(),
+      );
+    });
+
     getIt.registerFactory<MyActivityViewModel>(() => MyActivityViewModel(
         getIt<GetUserActivityUseCase>(),
         getIt<UserUseCase>(),
@@ -112,6 +134,8 @@ class ViewModelProvider {
         getIt<CheckOutCartUseCase>(),
         getIt<AppServices>(),
         getIt<GetRewardRecommendationsUseCase>(),
+        getIt<GetAccountStatementUseCase>(),
+        getIt<SharedPreferences>(),
       ),
     );
 
@@ -123,5 +147,8 @@ class ViewModelProvider {
         ));
     getIt.registerFactory<AccountStatementViewModel>(
         () => AccountStatementViewModel(getIt<GetAccountStatementUseCase>()));
+
+    getIt.registerFactory<RankingViewModel>(
+        () => RankingViewModel(getIt<GetRankingUseCase>()));
   }
 }

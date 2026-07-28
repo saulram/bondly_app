@@ -1,0 +1,167 @@
+# Supabase Configuration for Bondly Backend
+# Project ID that refers to the Supabase project
+project_id = "emyqillsdjtiqlnwdheq"
+
+[api]
+enabled = true
+# Port to use for the API URL
+port = 54321
+# Schemas to expose in your API
+schemas = ["public", "graphql_public"]
+# Extra schemas to add to the search_path
+extra_search_path = ["public", "extensions"]
+# Maximum number of rows to return from a view, table, or stored procedure
+max_rows = 1000
+
+[api.tls]
+enabled = false
+
+[db]
+# Port to use for the local database URL
+port = 54322
+# PostgreSQL version (matches remote project)
+major_version = 17
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[realtime]
+enabled = true
+ip_version = "IPv4"
+max_header_length = 4096
+
+[studio]
+enabled = true
+# Port to use for Supabase Studio
+port = 54323
+api_url = "http://127.0.0.1"
+
+[inbucket]
+enabled = true
+# Port to use for the email testing server web interface
+port = 54324
+smtp_port = 54325
+pop3_port = 54326
+
+[storage]
+enabled = true
+# Maximum file size allowed
+file_size_limit = "50MiB"
+
+[storage.image_transformation]
+enabled = true
+
+[auth]
+enabled = true
+# The base URL of your website
+site_url = "http://127.0.0.1:3000"
+# Allowed redirect URLs after authentication
+additional_redirect_urls = ["https://127.0.0.1:3000"]
+# How long tokens are valid for, in seconds
+jwt_expiry = 3600
+# If disabled, the refresh token will never expire
+enable_refresh_token_rotation = true
+# Refresh token reuse interval, in seconds
+refresh_token_reuse_interval = 10
+# Allow/disallow new user signups
+enable_signup = true
+# Allow/disallow anonymous sign-ins
+enable_anonymous_sign_ins = false
+# Minimum password length
+minimum_password_length = 6
+
+[auth.email]
+# Allow new user signups via email
+enable_signup = true
+# If enabled, user must confirm email change on both old and new email
+double_confirm_changes = true
+# If enabled, users need to confirm their email address before signing in
+enable_confirmations = true
+# Max frequency in seconds for sending email
+max_frequency = "1s"
+
+[auth.email.template.invite]
+subject = "Te han invitado a Bondly"
+content_path = "./supabase/templates/invite.html"
+
+[auth.email.template.confirmation]
+subject = "Confirma tu correo - Bondly"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Restablece tu contraseña - Bondly"
+content_path = "./supabase/templates/recovery.html"
+
+[auth.email.template.magic_link]
+subject = "Tu enlace mágico - Bondly"
+content_path = "./supabase/templates/magic_link.html"
+
+[auth.email.template.email_change]
+subject = "Confirma tu cambio de correo - Bondly"
+content_path = "./supabase/templates/email_change.html"
+
+[auth.sms]
+enable_signup = false
+enable_confirmations = false
+template = "Tu código de verificación Bondly es: {{ .Code }}"
+max_frequency = "5s"
+
+[auth.mfa]
+max_enrolled_factors = 10
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.mfa.phone]
+enroll_enabled = false
+verify_enabled = false
+
+[auth.external.apple]
+enabled = false
+client_id = ""
+secret = ""
+redirect_uri = ""
+url = ""
+
+[auth.external.google]
+enabled = false
+client_id = ""
+secret = ""
+redirect_uri = ""
+url = ""
+
+[auth.third_party.firebase]
+enabled = false
+
+[auth.third_party.auth0]
+enabled = false
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"
+inspector_port = 8083
+
+[analytics]
+enabled = false
+port = 54327
+backend = "postgres"
+
+[functions.gemini]
+enabled = true
+verify_jwt = false
+import_map = "./functions/import_map.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/gemini/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/gemini/*.html" ]

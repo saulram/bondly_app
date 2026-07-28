@@ -2,284 +2,198 @@ import 'package:bondly_app/config/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// We create a class AppTheme that will hold all the theme data for our app.
-/// We will have a light theme and a dark theme.
-/// We will also have a static method called getTheme that will return the
-/// current theme based on the isDarkMode parameter.
-/// This is the class that we will use to get the theme data in our app.
-/// We will also use this class to create the theme data for our app.
-///
 class AppTheme extends ChangeNotifier {
-  final ThemeData _dark = ThemeData(
-    primaryColor: AppColors.primaryColor,
-    primaryColorLight: AppColors.primaryColorLight,
-    cardColor: AppColors.tertiaryColor,
-    dividerColor: AppColors.darkDividerColor,
-    chipTheme: const ChipThemeData(backgroundColor: AppColors.secondaryColorLight),
-    unselectedWidgetColor: AppColors.backgroundColor,
-    colorScheme: const ColorScheme(
-      brightness: Brightness.dark,
-      primary: AppColors.primaryColor,
-      onPrimary: AppColors.bodyColorDark,
-      secondary: AppColors.secondaryColorLight,
-      onSecondary: AppColors.bodyColor,
-      tertiary: AppColors.tertiaryColorLight,
-      onTertiary: AppColors.bodyColor,
-      surface: AppColors.darkBackgroundColor,
-      onSurface: AppColors.bodyColorDark,
-      error: Color(0xFFCF6679),
-      onError: Color(0xFF000000),
-      outline: AppColors.primaryColorLight,
-      surfaceContainerHighest: AppColors.greyBackGroundColorDark,
-    ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: AppColors.primaryColor,
-    ),
-    textTheme: TextTheme(
-      titleLarge: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
+  ThemeData get lightTheme => _buildTheme(Brightness.light);
+  ThemeData get darkTheme => _buildTheme(Brightness.dark);
+
+  static ThemeData _buildTheme(Brightness brightness) {
+    final isLight = brightness == Brightness.light;
+    final bondly = isLight ? BondlyColorScheme.light : BondlyColorScheme.dark;
+
+    final colorScheme = ColorScheme(
+      brightness: brightness,
+      primary: bondly.accent,
+      onPrimary: BondlyColors.white,
+      secondary: bondly.accentGradientEnd,
+      onSecondary: BondlyColors.white,
+      tertiary: bondly.gold,
+      onTertiary: bondly.textPrimary,
+      surface: bondly.surface,
+      onSurface: bondly.textPrimary,
+      error: isLight ? const Color(0xFFB00020) : const Color(0xFFCF6679),
+      onError: BondlyColors.white,
+      outline: bondly.border,
+      surfaceContainerHighest: bondly.surfaceElevated,
+    );
+
+    final baseTextTheme = GoogleFonts.montserratTextTheme(
+      ThemeData(brightness: brightness).textTheme,
+    );
+
+    final textTheme = baseTextTheme.copyWith(
+      titleLarge: baseTextTheme.titleLarge?.copyWith(
+        color: bondly.textPrimary,
         fontWeight: FontWeight.bold,
       ),
-      titleMedium: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
+      titleMedium: baseTextTheme.titleMedium?.copyWith(
+        color: bondly.textPrimary,
+        fontWeight: FontWeight.w600,
       ),
-      titleSmall: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
+      titleSmall: baseTextTheme.titleSmall?.copyWith(
+        color: bondly.textPrimary,
+        fontWeight: FontWeight.w600,
       ),
-      bodyLarge: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
+      bodyLarge: baseTextTheme.bodyLarge?.copyWith(
+        color: bondly.textPrimary,
       ),
-      bodyMedium: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
+      bodyMedium: baseTextTheme.bodyMedium?.copyWith(
+        color: bondly.textSecondary,
       ),
-      bodySmall: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
+      bodySmall: baseTextTheme.bodySmall?.copyWith(
+        color: bondly.textMuted,
       ),
-      labelLarge: GoogleFonts.montserrat(color: AppColors.bodyColorDark),
-      labelMedium: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
+      labelLarge: baseTextTheme.labelLarge?.copyWith(
+        color: bondly.textPrimary,
+        fontWeight: FontWeight.w600,
       ),
-      labelSmall: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
+      labelMedium: baseTextTheme.labelMedium?.copyWith(
+        color: bondly.textSecondary,
       ),
-      headlineLarge: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
+      labelSmall: baseTextTheme.labelSmall?.copyWith(
+        color: bondly.textMuted,
       ),
-      headlineMedium: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
-      ),
-      headlineSmall: GoogleFonts.montserrat(
-        color: AppColors.bodyColorDark,
-      ),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      counterStyle: GoogleFonts.poppins(
-          color: AppColors.bodyColorDark, fontWeight: FontWeight.w300),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.bodyColorDark),
-      ),
-      prefixIconColor: AppColors.bodyColorDark,
-      iconColor: AppColors.bodyColorDark,
-
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.secondaryColor),
-      ),
-    ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: AppColors.primaryColor,
-      selectedItemColor: AppColors.tertiaryColorLight,
-      unselectedItemColor: AppColors.bodyColorDark,
-      type: BottomNavigationBarType.fixed,
-      selectedIconTheme: IconThemeData(
-        color: AppColors.tertiaryColorLight,
-      ),
-      unselectedIconTheme: IconThemeData(
-        color: AppColors.bodyColorDark,
-      ),
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: AppColors.primaryColorLight,
-      ),
-    ),
-    dropdownMenuTheme: DropdownMenuThemeData(
-        menuStyle: MenuStyle(
-      backgroundColor:
-          WidgetStateProperty.all<Color>(AppColors.darkBackgroundColor),
-    )),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        shape: const StadiumBorder(),
-        fixedSize: const Size(150, 48),
-        side: const BorderSide(color: AppColors.tertiaryColorLight),
-        foregroundColor: AppColors.tertiaryColorLight,
-        textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700, fontSize: 16,color: AppColors.tertiaryColorLight),
-      ),
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(1),
-        ),
-        fixedSize: const Size(250, 48),
-        foregroundColor: AppColors.bodyColorDark,
-        backgroundColor: AppColors.tertiaryColor,
-        textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
-      ),
-    ),
-    scaffoldBackgroundColor: AppColors.darkBackgroundColor,
-    useMaterial3: false,
-  );
-
-  final ThemeData _light = ThemeData(
-    primaryColor: AppColors.primaryColor,
-    primaryColorLight: AppColors.primaryColorLight,
-    cardColor: AppColors.tertiaryColorLight,
-    secondaryHeaderColor: AppColors.secondaryColor,
-    chipTheme: const ChipThemeData(backgroundColor: AppColors.secondaryColor),
-    dividerColor: AppColors.dividerColor,
-    unselectedWidgetColor: AppColors.darkBackgroundColor,
-    colorScheme: const ColorScheme(
-      brightness: Brightness.light,
-      primary: AppColors.primaryColor,
-      onPrimary: AppColors.bodyColorDark,
-      secondary: AppColors.secondaryColor,
-      onSecondary: AppColors.bodyColorDark,
-      tertiary: AppColors.tertiaryColor,
-      onTertiary: AppColors.bodyColorDark,
-      surface: AppColors.backgroundColor,
-      onSurface: AppColors.bodyColor,
-      error: Color(0xFFB00020),
-      onError: Color(0xFFFFFFFF),
-      outline: AppColors.primaryColorLight,
-      surfaceContainerHighest: AppColors.greyBackGroundColor,
-    ),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(
-      circularTrackColor: AppColors.tertiaryColorLight,
-      linearTrackColor: AppColors.tertiaryColorLight,
-      color: AppColors.bodyColor,
-    ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.secondaryColor,
-        extendedTextStyle: TextStyle(color: AppColors.bodyColorDark)),
-    textTheme: TextTheme(
-      titleLarge: GoogleFonts.montserrat(
-        color: AppColors.bodyColor,
+      headlineLarge: baseTextTheme.headlineLarge?.copyWith(
+        color: bondly.textPrimary,
         fontWeight: FontWeight.bold,
       ),
-      titleMedium: GoogleFonts.montserrat(
-        color: AppColors.bodyColor,
+      headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+        color: bondly.textPrimary,
+        fontWeight: FontWeight.bold,
       ),
-      titleSmall: GoogleFonts.montserrat(
-        color: AppColors.bodyColor,
+      headlineSmall: baseTextTheme.headlineSmall?.copyWith(
+        color: bondly.textPrimary,
+        fontWeight: FontWeight.w600,
       ),
-      bodyLarge: GoogleFonts.montserrat(
-        color: AppColors.bodyColor,
+    );
+
+    return ThemeData(
+      brightness: brightness,
+      primaryColor: bondly.accent,
+      primaryColorLight: bondly.accentSoft,
+      cardColor: bondly.surface,
+      dividerColor: bondly.border,
+      unselectedWidgetColor: bondly.textSecondary,
+      colorScheme: colorScheme,
+      textTheme: textTheme,
+      scaffoldBackgroundColor: bondly.bg,
+      useMaterial3: false,
+      chipTheme: ChipThemeData(
+        backgroundColor: bondly.accentSoft,
+        labelStyle: textTheme.labelSmall?.copyWith(color: bondly.accent),
       ),
-      bodyMedium: GoogleFonts.montserrat(
-        color: AppColors.bodyColor,
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: bondly.accent,
+        foregroundColor: BondlyColors.white,
       ),
-      bodySmall: GoogleFonts.montserrat(color: AppColors.bodyColor),
-      labelLarge: GoogleFonts.montserrat(color: AppColors.bodyColor),
-      labelMedium: GoogleFonts.montserrat(
-        color: AppColors.bodyColor,
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        circularTrackColor: bondly.border,
+        linearTrackColor: bondly.border,
+        color: bondly.accent,
       ),
-      headlineLarge: GoogleFonts.montserrat(
-        color: AppColors.bodyColor,
-      ),
-      headlineMedium: GoogleFonts.montserrat(
-        color: AppColors.bodyColor,
-      ),
-      headlineSmall: GoogleFonts.montserrat(
-        color: AppColors.bodyColor,
-      ),
-      labelSmall: GoogleFonts.montserrat(color: AppColors.bodyColor),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      counterStyle: GoogleFonts.poppins(
-          color: AppColors.bodyColor, fontWeight: FontWeight.w300),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.primaryColorLight),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.primaryColor),
-      ),
-      prefixIconColor: AppColors.primaryColorLight,
-      iconColor: AppColors.primaryColor,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(
-          color: Colors.white,
+      inputDecorationTheme: InputDecorationTheme(
+        counterStyle: GoogleFonts.montserrat(
+          color: bondly.textMuted,
+          fontWeight: FontWeight.w300,
         ),
-      ),
-    ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: AppColors.backgroundColor,
-      selectedItemColor: AppColors.secondaryColor,
-      unselectedItemColor: AppColors.darkBackgroundColor,
-      type: BottomNavigationBarType.fixed,
-      selectedIconTheme: IconThemeData(
-        color: AppColors.secondaryColor,
-      ),
-      unselectedIconTheme: IconThemeData(
-        color: AppColors.darkBackgroundColor,
-      ),
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: AppColors.primaryColorLight,
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        shape: const StadiumBorder(),
-        fixedSize: const Size(150, 48),
-        foregroundColor: AppColors.primaryColorLight,
-        textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
-      ),
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        shape: RoundedRectangleBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: bondly.border),
         ),
-        fixedSize: const Size(250, 48),
-        foregroundColor: AppColors.bodyColorDark,
-        backgroundColor: AppColors.primaryButtonColor,
-        textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: bondly.accent),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: bondly.border),
+        ),
+        prefixIconColor: bondly.textSecondary,
+        iconColor: bondly.textSecondary,
       ),
-    ),
-    scaffoldBackgroundColor: AppColors.backgroundColor,
-    useMaterial3: false,
-  );
-
-  ThemeData get lightTheme => _light;
-
-  ThemeData get darkTheme => _dark;
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: bondly.surface,
+        selectedItemColor: bondly.tabActive,
+        unselectedItemColor: bondly.tabInactive,
+        type: BottomNavigationBarType.fixed,
+        selectedIconTheme: IconThemeData(color: bondly.tabActive),
+        unselectedIconTheme: IconThemeData(color: bondly.tabInactive),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: bondly.accent,
+        ),
+      ),
+      navigationDrawerTheme: NavigationDrawerThemeData(
+        backgroundColor: bondly.surface,
+        elevation: 0,
+        indicatorColor: bondly.accentSoft,
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return IconThemeData(color: bondly.accent, size: 18);
+          }
+          return IconThemeData(color: bondly.textMuted, size: 18);
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: bondly.accent,
+            );
+          }
+          return GoogleFonts.inter(fontSize: 14, color: bondly.textMuted);
+        }),
+      ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStateProperty.all<Color>(bondly.surface),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          shape: const StadiumBorder(),
+          fixedSize: const Size(150, 48),
+          side: BorderSide(color: bondly.accent),
+          foregroundColor: bondly.accent,
+          textStyle: GoogleFonts.montserrat(
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          fixedSize: const Size(250, 48),
+          foregroundColor: BondlyColors.white,
+          backgroundColor: bondly.accent,
+          textStyle: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
+        ),
+      ),
+      extensions: [bondly],
+    );
+  }
 }
 
-///with this extension you can check whether device is dark mode or not by simply calling:
-///context.isDarkMode
-///or
-///context.isDarkMode ? doSomething() : doSomethingElse()
-
 extension DarkMode on BuildContext {
-  /// is dark mode currently enabled?
   bool get isDarkMode {
     final brightness = MediaQuery.of(this).platformBrightness;
     return brightness == Brightness.dark;
   }
 }
 
-///
-/// This is an extension for the context to get the current theme data
-/// by simply calling:
-/// context.themeData
-///
 extension ThemeExtension on BuildContext {
   ThemeData get themeData => Theme.of(this);
 }

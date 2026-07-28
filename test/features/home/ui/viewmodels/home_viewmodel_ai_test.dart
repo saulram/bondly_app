@@ -16,6 +16,7 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart'
 import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
+import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:multiple_result/multiple_result.dart';
@@ -52,6 +53,8 @@ class MockGetCompanyAnnouncementsUseCase extends Mock
 
 class MockGetUserEmbassysUseCase extends Mock
     implements GetUserEmbassysUseCase {}
+
+class MockGetRankingUseCase extends Mock implements GetRankingUseCase {}
 
 class MockPersonalizeFeedUseCase extends Mock
     implements PersonalizeFeedUseCase {}
@@ -99,7 +102,6 @@ FeedData _testFeedData({
       likes: [],
       createdAt: createdAt ?? DateTime(2024, 1, 1),
       updatedAt: DateTime(2024, 1, 1),
-      v: 0,
       visible: true,
     );
 
@@ -125,6 +127,7 @@ void main() {
       MockCreateAcknowledgmentUseCase(),
       MockGetCompanyAnnouncementsUseCase(),
       MockGetUserEmbassysUseCase(),
+      MockGetRankingUseCase(),
       mockPersonalizeFeed,
       mockAnalyzeSentiment,
     );

@@ -8,11 +8,13 @@ import 'package:bondly_app/features/profile/domain/usecases/get_shopping_cart_us
 import 'package:bondly_app/features/profile/domain/usecases/get_shopping_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/pull_cart_item.usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/push_cart_item.usecase.dart';
+import 'package:bondly_app/features/profile/domain/usecases/get_account_statement_usecase.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_rewards_viewmodel.dart';
 import 'package:bondly_app/src/app_services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:multiple_result/multiple_result.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockGetShoppingItemsUseCase extends Mock
     implements GetShoppingItemsUseCase {}
@@ -33,6 +35,11 @@ class MockAppServices extends Mock implements AppServices {}
 
 class MockGetRewardRecommendationsUseCase extends Mock
     implements GetRewardRecommendationsUseCase {}
+
+class MockGetAccountStatementUseCase extends Mock
+    implements GetAccountStatementUseCase {}
+
+class MockSharedPreferences extends Mock implements SharedPreferences {}
 
 Reward _testReward({
   required String id,
@@ -83,6 +90,8 @@ void main() {
       MockCheckOutCartUseCase(),
       MockAppServices(),
       mockGetRecommendations,
+      MockGetAccountStatementUseCase(),
+      MockSharedPreferences(),
     );
   });
 

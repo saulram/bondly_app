@@ -12,6 +12,7 @@ import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:moment_dart/moment_dart.dart';
 
@@ -31,13 +32,6 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   @override
   void initState() {
     super.initState();
-    // Trigger sentiment analysis for this post
-    if (widget.post.id != null) {
-      getIt<HomeViewModel>().analyzeFeedSentiment(
-        widget.post.id!,
-        widget.post.body,
-      );
-    }
   }
 
   @override
@@ -50,12 +44,13 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   Container _buildBadgePost(Size size, BuildContext context) {
     var theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final colors = theme.extension<BondlyColorScheme>()!;
     return Container(
         width: size.width,
         margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingMd),
         decoration: BoxDecoration(
-            border: Border.all(color: theme.cardColor),
-            color: theme.dividerColor,
+            border: Border.all(color: colors.border),
+            color: colors.surface,
             borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
             boxShadow: AppDimensions.cardShadow(colorScheme.onSurface)),
         child: Column(
@@ -93,9 +88,8 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   }
 
   Widget _buildPostHeader(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     Moment postDate = Moment(widget.post.createdAt.toLocal());
-    //format postType to be always first letter uppercase
     String type =
         widget.post.type[0].toUpperCase() + widget.post.type.substring(1);
 
@@ -124,11 +118,11 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
           label: Text(
             type,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: colorScheme.tertiary,
-              fontSize: 12,
-            ),
+                  color: colors.tagText,
+                  fontSize: 12,
+                ),
           ),
-          backgroundColor: AppColors.tertiaryColorLight,
+          backgroundColor: colors.tagBg,
         ),
       ],
     );
@@ -171,8 +165,10 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
         const SizedBox(height: 5),
         Text(
           widget.post.badge?.name ?? 'Badge Name',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: colorScheme.tertiary),
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall
+              ?.copyWith(color: colorScheme.tertiary),
         ),
       ],
     );
@@ -212,12 +208,13 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
 
   Widget _buildActions(BuildContext context) {
     final homeModel = getIt<HomeViewModel>();
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     final sentiment = homeModel.getSentiment(widget.post.id ?? '');
     final isAnalyzing = homeModel.isAnalyzingSentiment(widget.post.id ?? '');
 
     return Row(
       children: [
-        // AI Sentiment badge
+        // AI Sentiment: tap-to-analyze button → spinner → badge
         if (sentiment != null)
           SentimentBadge(sentiment: sentiment)
         else if (isAnalyzing)
@@ -225,6 +222,39 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
             width: 14,
             height: 14,
             child: CircularProgressIndicator(strokeWidth: 1.5),
+          )
+        else
+          GestureDetector(
+            onTap: () {
+              if (widget.post.id != null) {
+                homeModel.analyzeFeedSentiment(
+                  widget.post.id!,
+                  widget.post.body,
+                );
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: colors.accentSoft,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.auto_awesome, size: 14, color: colors.accent),
+                  const SizedBox(width: 4),
+                  Text(
+                    'IA',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: colors.accent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         const Expanded(child: SizedBox()),
         _buildLike(),
@@ -235,35 +265,38 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   }
 
   Widget _buildLike() {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     return AnimatedOpacity(
       opacity: likesBusy ? 0.4 : 1.0,
       duration: const Duration(milliseconds: 300),
       child: InkWell(
-      onTap: likesBusy ? null : () {
-        _handleLikes();
-      },
-      child: Row(
-        children: [
-          Icon(
-            widget.post.isLiked == true
-                ? IconsaxBold.heart
-                : IconsaxOutline.heart,
-            color: widget.post.isLiked == true
-                ? colorScheme.secondary
-                : colorScheme.outline,
-          ),
-          const SizedBox(width: 5),
-          Text(
-            widget.post.likes.length.toString(),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                color: colorScheme.secondary),
-          ),
-        ],
+        onTap: likesBusy
+            ? null
+            : () {
+                _handleLikes();
+              },
+        child: Row(
+          children: [
+            Icon(
+              widget.post.isLiked == true
+                  ? IconsaxBold.heart
+                  : IconsaxOutline.heart,
+              color: widget.post.isLiked == true
+                  ? colors.likeColor
+                  : colors.textMuted,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              widget.post.likes.length.toString(),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: colors.likeColor),
+            ),
+          ],
+        ),
       ),
-    ),);
+    );
   }
 
   void _handleLikes() {
@@ -278,7 +311,7 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
   }
 
   Widget _buildComents(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -287,15 +320,14 @@ class _SinglePostWidgetState extends State<SinglePostWidget> {
       },
       child: Row(
         children: [
-          Icon(IconsaxOutline.message,
-              color: colorScheme.tertiary),
+          Icon(IconsaxOutline.message, color: colors.accent),
           const SizedBox(width: 5),
           Text(
             widget.post.comments.length.toString(),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: colorScheme.tertiary),
+                color: colors.accent),
           ),
         ],
       ),

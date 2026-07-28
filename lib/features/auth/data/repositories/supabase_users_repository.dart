@@ -56,22 +56,19 @@ class SupabaseUsersRepository extends UsersRepository {
       if (userId == null) throw UserUnavailableException();
 
       final fileBytes = params.first;
-      final fileName = params.length > 1
-          ? params.last as String
-          : 'avatar_$userId.jpg';
+      final fileName =
+          params.length > 1 ? params.last as String : 'avatar_$userId.jpg';
 
       await _provider.client.storage
           .from('avatars')
           .uploadBinary(fileName, fileBytes);
 
-      final publicUrl = _provider.client.storage
-          .from('avatars')
-          .getPublicUrl(fileName);
+      final publicUrl =
+          _provider.client.storage.from('avatars').getPublicUrl(fileName);
 
       await _provider.client
           .from('users')
-          .update({'avatar': publicUrl})
-          .eq('id', userId);
+          .update({'avatar': publicUrl}).eq('id', userId);
     } catch (exception) {
       throw UserUpdateException();
     }
@@ -101,13 +98,26 @@ class SupabaseUsersRepository extends UsersRepository {
       final userId = data['id'] ?? _provider.client.auth.currentUser?.id;
       if (userId == null) throw UserUnavailableException();
 
-      final updateData = Map<String, String>.from(data);
-      updateData.remove('id');
+      // Translate camelCase keys to snake_case for Supabase columns
+      final profileUpdate = <String, String>{};
+      if (data['location'] != null) profileUpdate['location'] = data['location']!;
+      if (data['jobPosition'] != null) profileUpdate['job_position'] = data['jobPosition']!;
+      if (data['bDay'] != null && data['bDay']!.isNotEmpty) profileUpdate['b_day'] = data['bDay']!;
 
-      await _provider.client
-          .from('user_profiles')
-          .update(updateData)
-          .eq('user_id', userId);
+      if (profileUpdate.isNotEmpty) {
+        await _provider.client
+            .from('user_profiles')
+            .update(profileUpdate)
+            .eq('user_id', userId);
+      }
+
+      // Update email on the users table
+      if (data['email'] != null) {
+        await _provider.client
+            .from('users')
+            .update({'email': data['email']!})
+            .eq('id', userId);
+      }
     } catch (exception) {
       throw UserUpdateException();
     }

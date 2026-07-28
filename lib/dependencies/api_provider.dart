@@ -1,4 +1,3 @@
-import 'package:bondly_app/config/environment.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/ai/data/api/gemini_service.dart';
 import 'package:bondly_app/features/auth/data/repositories/api/auth_api.dart';
@@ -82,7 +81,7 @@ class APIProvider {
       ),
     );
     getIt.registerSingleton<GeminiService>(
-      GeminiService(apiKey: Environment.geminiApiKey),
+      GeminiService(),
     );
   }
 }

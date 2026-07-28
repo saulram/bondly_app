@@ -1,415 +1,1130 @@
+import 'dart:async';
+
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_home.dart';
-import 'package:bondly_app/config/theme.dart';
-import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/home/domain/models/badge_model.dart';
 import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
-import 'package:bondly_app/ui/shared/bondly_loading_button.dart';
+import 'package:bondly_app/ui/shared/badge_icon_button.dart' show BadgeType;
 import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
-import 'package:bondly_app/features/home/ui/widgets/gold_bordered_container.dart';
-import 'package:bondly_app/src/network_image_helpers.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_mentions/flutter_mentions.dart';
+import 'package:bondly_app/ui/shared/info_card.dart';
+import 'package:bondly_app/ui/shared/slider_banner_card.dart';
+import 'package:flutter/material.dart' hide Badge;
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
-class Recognizetab extends StatefulWidget {
+enum RecognizeStep { selectBadge, selectPerson, writeMessage }
+
+class RecognizeTab extends StatefulWidget {
   final HomeViewModel model;
-  const Recognizetab({super.key, required this.model});
+  const RecognizeTab({super.key, required this.model});
 
   @override
-  State<Recognizetab> createState() => _RecognizetabState();
+  State<RecognizeTab> createState() => _RecognizeTabState();
 }
 
-class _RecognizetabState extends State<Recognizetab> {
-  late HomeViewModel model;
+class _RecognizeTabState extends State<RecognizeTab> {
+  RecognizeStep _currentStep = RecognizeStep.selectBadge;
+  int _activeCategoryIndex = -1;
+  Map<String, dynamic>? _selectedPerson;
+
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounceTimer;
+  String _searchQuery = '';
+
+  final TextEditingController _messageController = TextEditingController();
+
+  HomeViewModel get model => widget.model;
+
   @override
   void initState() {
-    model = getIt<HomeViewModel>();
     super.initState();
+    _messageController.addListener(() => setState(() {}));
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    _messageController.dispose();
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  void _goToStep(RecognizeStep step) {
+    setState(() => _currentStep = step);
+  }
+
+  void _resetToStep1() {
+    setState(() {
+      _currentStep = RecognizeStep.selectBadge;
+      _activeCategoryIndex = -1;
+      _selectedPerson = null;
+      _searchController.clear();
+      _searchQuery = '';
+      _messageController.clear();
+      model.selectedBadge = null;
+      model.collaboratorsIds = [];
+    });
+  }
+
+  void _resetToStep2() {
+    setState(() {
+      _currentStep = RecognizeStep.selectPerson;
+      _selectedPerson = null;
+      _messageController.clear();
+      _searchController.clear();
+      _searchQuery = '';
+      model.collaboratorsIds = [];
+    });
+  }
+
+  BadgeType _badgeTypeForIndex(int index) {
+    switch (index) {
+      case 0:
+        return BadgeType.competencias;
+      case 1:
+        return BadgeType.especiales;
+      case 2:
+        return BadgeType.valores;
+      default:
+        return BadgeType.competencias;
+    }
+  }
+
+  String _categoryLabelForIndex(int index) {
+    switch (index) {
+      case 0:
+        return StringsHome.badgeCompetencias;
+      case 1:
+        return StringsHome.badgeEspeciales;
+      case 2:
+        return StringsHome.badgeValores;
+      default:
+        return '';
+    }
+  }
+
+  IconData _defaultIconForBadgeType(BadgeType type) {
+    switch (type) {
+      case BadgeType.competencias:
+        return LucideIcons.award;
+      case BadgeType.especiales:
+        return LucideIcons.star;
+      case BadgeType.valores:
+        return LucideIcons.heart;
+    }
+  }
+
+  LinearGradient _gradientForCategoryIndex(int index) {
+    switch (index) {
+      case 0:
+        return const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            BondlyColors.badgeCompetenciasStart,
+            BondlyColors.badgeCompetenciasEnd,
+          ],
+        );
+      case 1:
+        return const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            BondlyColors.badgeEspecialesStart,
+            BondlyColors.badgeEspecialesEnd,
+          ],
+        );
+      case 2:
+        return const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            BondlyColors.badgeValoresStart,
+            BondlyColors.badgeValoresEnd,
+          ],
+        );
+      default:
+        return const LinearGradient(
+          colors: [
+            BondlyColors.badgeCompetenciasStart,
+            BondlyColors.badgeCompetenciasEnd,
+          ],
+        );
+    }
+  }
+
+  bool get _isLoading => model.user == null;
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(AppDimensions.spacingSm),
-      child: SingleChildScrollView(
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
+    if (_isLoading) return _buildSkeletonState(colors);
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildSliderSection(),
+          _buildAvisosSection(colors),
+          _buildPointsSection(colors),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  // ─── Skeleton Loading State ─────────────────────────────────────────
+
+  Widget _buildSkeletonState(BondlyColorScheme colors) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.paddingScreen,
+        ),
         child: Column(
           children: [
-            _buildAnouncementsSection(),
-            const SizedBox(height: AppDimensions.radiusLg),
-            _buildAcknowledgmentsSection(),
-            const SizedBox(height: AppDimensions.radiusLg),
+            const SizedBox(height: 8),
+            // Slider banner placeholder
+            const BondlyShimmerBlock(
+              width: double.infinity,
+              height: 160,
+              borderRadius: 16,
+            ),
+            const SizedBox(height: 12),
+            // Avisos card placeholder
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.radiusCard),
+                border: Border.all(color: colors.border, width: 1),
+              ),
+              child: const Row(
+                children: [
+                  BondlyShimmerCircle(size: 32),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BondlyShimmerBlock(width: 80, height: 12),
+                        SizedBox(height: 8),
+                        BondlyShimmerBlock(
+                          width: double.infinity,
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Points card placeholder
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius:
+                    BorderRadius.circular(AppDimensions.radiusCard),
+                border: Border.all(color: colors.border, width: 1),
+              ),
+              child: Column(
+                children: [
+                  // Points value
+                  const BondlyShimmerBlock(width: 100, height: 32),
+                  const SizedBox(height: 6),
+                  const BondlyShimmerBlock(width: 180, height: 12),
+                  const SizedBox(height: 20),
+                  Divider(color: colors.border, height: 1),
+                  const SizedBox(height: 14),
+                  // Subtitle
+                  const BondlyShimmerBlock(width: 140, height: 12),
+                  const SizedBox(height: 16),
+                  // 3 category circles
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _CategoryCircleSkeleton(),
+                      _CategoryCircleSkeleton(),
+                      _CategoryCircleSkeleton(),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Cost info row
+                  const BondlyShimmerBlock(width: 200, height: 10),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAnouncementsSection() {
-    return GoldBorderedContainer(
-      child: Column(
-        children: [
-          Text(
-            StringsHome.announcementTitle,
-            style: Theme.of(context).textTheme.titleLarge,
-            textAlign: TextAlign.center,
+  // ─── Slider Section ───────────────────────────────────────────────────
+
+  Widget _buildSliderSection() {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppDimensions.paddingScreen,
+        8,
+        AppDimensions.paddingScreen,
+        0,
+      ),
+      child: SliderBannerCard(
+        items: [
+          BannerItem(
+            tag: StringsHome.bannerTag1,
+            title: StringsHome.bannerTitle1,
+            subtitle: StringsHome.bannerSubtitle1,
           ),
-          const Divider(),
-          const SizedBox(height: AppDimensions.spacingMd),
-          _buildAnnouncementsList(),
+          BannerItem(
+            tag: StringsHome.bannerTag2,
+            title: StringsHome.bannerTitle2,
+            subtitle: StringsHome.bannerSubtitle2,
+          ),
+          BannerItem(
+            title: StringsHome.bannerTitle3,
+            subtitle: StringsHome.bannerSubtitle3,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildAnnouncementsList() {
-    return Column(
-      children: [
-        SizedBox(
-          height: 80,
-          width: double.infinity,
-          child: CarouselSlider(
-            carouselController: model.carouselController,
-            options: CarouselOptions(
-              height: 80.0,
-              autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 10),
-              autoPlayAnimationDuration: const Duration(milliseconds: 2000),
-              autoPlayCurve: Curves.fastOutSlowIn,
-              pauseAutoPlayOnTouch: true,
-              viewportFraction: 1,
-              disableCenter: true,
-              onPageChanged: (index, reason) {
-                model.onAnnouncementChanged(index);
-              },
-            ),
-            items: model.announcements.map<Widget>((announcement) {
-              debugPrint("Announcement: ${announcement.content}");
-              return Builder(
-                builder: (BuildContext context) {
-                  return SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Text(
-                        "${announcement.content}",
-                        style: Theme.of(context).textTheme.titleMedium,
-                        textAlign: TextAlign.center,
-                      ));
-                },
-              );
-            }).toList(),
-          ),
+  // ─── Avisos Section ───────────────────────────────────────────────────
+
+  Widget _buildAvisosSection(BondlyColorScheme colors) {
+    final bodies = model.announcements.isNotEmpty
+        ? model.announcements
+            .map((a) => a.content ?? '')
+            .where((c) => c.isNotEmpty)
+            .toList()
+        : [StringsHome.announcementDefaultBody];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.paddingScreen,
+        12,
+        AppDimensions.paddingScreen,
+        0,
+      ),
+      child: InfoCard(
+        icon: LucideIcons.megaphone,
+        title: StringsHome.announcementTitle,
+        bodies: bodies,
+      ),
+    );
+  }
+
+  // ─── Points Section (dispatches per step) ─────────────────────────────
+
+  Widget _buildPointsSection(BondlyColorScheme colors) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppDimensions.paddingScreen,
+        16,
+        AppDimensions.paddingScreen,
+        0,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+          border: Border.all(color: colors.border, width: 1),
         ),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: _buildCurrentStep(colors),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCurrentStep(BondlyColorScheme colors) {
+    switch (_currentStep) {
+      case RecognizeStep.selectBadge:
+        return _buildStep1Content(colors);
+      case RecognizeStep.selectPerson:
+        return _buildStep2Content(colors);
+      case RecognizeStep.writeMessage:
+        return _buildStep3Content(colors);
+    }
+  }
+
+  // ─── Step 1: Select Badge ─────────────────────────────────────────────
+
+  Widget _buildStep1Content(BondlyColorScheme colors) {
+    final categories = model.categories.categories ?? [];
+    final hasActiveCategory =
+        _activeCategoryIndex >= 0 && _activeCategoryIndex < categories.length;
+    final activeCategoryName = hasActiveCategory
+        ? categories[_activeCategoryIndex].name ?? ''
+        : StringsHome.badgePickSubtitle;
+
+    return Column(
+      key: const ValueKey('step1'),
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Points header
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: model.announcements.map((announcement) {
-            int index = model.announcements.indexOf(announcement);
-            return GestureDetector(
-              onTap: () {
-                model.carouselController.animateToPage(index);
-              },
-              child: Container(
-                width: 8.0,
-                height: 8.0,
-                margin:
-                    const EdgeInsets.symmetric(vertical: AppDimensions.spacingMd, horizontal: 2.0),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: model.currentAnnouncementIndex == index
-                      ? AppColors.primaryColor
-                      : AppColors.primaryColor.withValues(alpha: 0.5),
-                ),
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              model.user?.giftedPoints.toString() ?? '0',
+              style: GoogleFonts.montserrat(
+                fontSize: 36,
+                fontWeight: FontWeight.w800,
+                color: colors.accent,
               ),
-            );
-          }).toList(),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              StringsHome.pointsLabel,
+              style: GoogleFonts.montserrat(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: colors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          StringsHome.pointsDescription,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.montserrat(
+            fontSize: 13,
+            color: colors.textMuted,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Divider(color: colors.border, height: 1),
+        const SizedBox(height: 14),
+
+        // Active category name
+        Text(
+          activeCategoryName,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.montserrat(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: colors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // 3 badge categories
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(
+            categories.length > 3 ? 3 : categories.length,
+            (index) {
+              final isActive = index == _activeCategoryIndex;
+              final badgeType = _badgeTypeForIndex(index);
+              return GestureDetector(
+                onTap: () {
+                  setState(() => _activeCategoryIndex = index);
+                  model.selectedCategory = categories[index].id;
+                },
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 200),
+                  opacity: isActive || !hasActiveCategory ? 1.0 : 0.35,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 62,
+                        height: 62,
+                        decoration: isActive
+                            ? BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: colors.accent,
+                                  width: 2.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color:
+                                        colors.accent.withValues(alpha: 0.3),
+                                    blurRadius: 12,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              )
+                            : null,
+                        child: Center(
+                          child: Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient:
+                                  _gradientForCategoryIndex(index),
+                            ),
+                            child: Icon(
+                              _defaultIconForBadgeType(badgeType),
+                              size: 26,
+                              color: BondlyColors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _categoryLabelForIndex(index),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: colors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        if (hasActiveCategory) ...[
+          const SizedBox(height: 14),
+          Divider(color: colors.border, height: 1),
+          const SizedBox(height: 14),
+
+          // "Elige una insignia" label
+          Text(
+            StringsHome.step1ChooseBadge,
+            style: GoogleFonts.montserrat(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: colors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Sub-badge grid
+          if (model.loadingBadges)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 20),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              alignment: WrapAlignment.center,
+              children: model.badges.badges.map((badge) {
+                return _buildBadgeItem(badge, colors);
+              }).toList(),
+            ),
+        ],
+
+        const SizedBox(height: 16),
+
+        // Cost info row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(LucideIcons.info, size: 14, color: colors.textMuted),
+            const SizedBox(width: 6),
+            Text(
+              StringsHome.step1BadgeCostInfo,
+              style: GoogleFonts.montserrat(
+                fontSize: 11,
+                color: colors.textMuted,
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildAcknowledgmentsSection() {
-    return GoldBorderedContainer(
-      child: Column(
-        children: [
-          Text(
-            StringsHome.acknowledgmentAmountOfPoints(
-                model.user?.giftedPoints.toString() ?? ''),
-            style: Theme.of(context).textTheme.bodyMedium,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppDimensions.spacingMd),
-          Text(
-            StringsHome.acknowledgmentCategorySubHeader(
-                model.categories.categories?.length.toString() ?? ''),
-            style: Theme.of(context).textTheme.bodyMedium,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(
-            height: AppDimensions.spacingMd,
-          ),
-          _buildCategoriesSection(),
-          model.selectedCategory == null
-              ? const SizedBox()
-              : Column(
-                  children: [
-                    const Divider(),
-                    _buildBadgesFromCategorySection(),
-                  ],
-                ),
-          model.selectedBadge == null
-              ? const SizedBox()
-              : Column(
-                  children: [
-                    const Divider(),
-                    _buildCreateAcknowledgment(),
-                  ],
-                )
-        ],
+  Widget _buildBadgeItem(Badge badge, BondlyColorScheme colors) {
+    return GestureDetector(
+      onTap: () {
+        model.selectedBadge = badge;
+        _goToStep(RecognizeStep.selectPerson);
+      },
+      child: SizedBox(
+        width: 64,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: colors.accentGradientStart.withValues(alpha: 0.09),
+              ),
+              child: badge.image != null && badge.image!.isNotEmpty
+                  ? ClipOval(
+                      child: Image.network(
+                        badge.image!,
+                        width: 48,
+                        height: 48,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Icon(
+                          LucideIcons.award,
+                          size: 24,
+                          color: colors.accent,
+                        ),
+                      ),
+                    )
+                  : Icon(
+                      LucideIcons.award,
+                      size: 24,
+                      color: colors.accent,
+                    ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              badge.name ?? '',
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.montserrat(
+                fontSize: 10,
+                color: colors.textSecondary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildCreateAcknowledgment() {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Row(
+  // ─── Step 2: Select Person ────────────────────────────────────────────
+
+  Widget _buildStep2Content(BondlyColorScheme colors) {
+    final currentUserId = model.user?.id;
+    final collaboratorsWithoutSelf = model.collaboratorsList.where((c) {
+      final userId = c['user_id'] as String? ?? '';
+      return userId != currentUserId;
+    }).toList();
+    final filteredCollaborators = _searchQuery.isEmpty
+        ? collaboratorsWithoutSelf
+        : collaboratorsWithoutSelf.where((c) {
+            final name = (c['display'] as String? ?? '').toLowerCase();
+            return name.contains(_searchQuery.toLowerCase());
+          }).toList();
+
+    return Column(
+      key: const ValueKey('step2'),
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Header row with points + cancel
+        _buildStepHeader(colors, onCancel: _resetToStep1),
+        const SizedBox(height: 12),
+
+        // Badge chip
+        _buildBadgeChip(colors, onTap: _resetToStep1),
+        const SizedBox(height: 14),
+        Divider(color: colors.border, height: 1),
+        const SizedBox(height: 14),
+
+        // "A quién quieres reconocer?" label
+        Text(
+          StringsHome.step2SearchLabel,
+          style: GoogleFonts.montserrat(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: colors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // Search field
         Container(
-          height: 120,
-          width: 90,
-          margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMd),
-          child: InkWell(
-            onTap: () {},
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 50,
-                  width: 50,
-                  child: CachedNetworkImage(
-                    imageUrl:
-                        safeImageUrl(model.selectedBadge?.image),
-                  ),
-                ),
-                Text(
-                  "${model.selectedBadge?.value ?? ''} pts",
-                  style: Theme.of(context).textTheme.bodySmall,
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  model.selectedBadge?.name ?? '',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.tertiary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+          decoration: BoxDecoration(
+            color: colors.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+            border: Border.all(color: colors.border, width: 1),
+          ),
+          child: TextField(
+            controller: _searchController,
+            onChanged: (value) {
+              _debounceTimer?.cancel();
+              _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+                setState(() => _searchQuery = value);
+              });
+            },
+            style: GoogleFonts.montserrat(
+              fontSize: 13,
+              color: colors.textPrimary,
+            ),
+            decoration: InputDecoration(
+              hintText: StringsHome.step2SearchHint,
+              hintStyle: GoogleFonts.montserrat(
+                fontSize: 13,
+                color: colors.textMuted,
+              ),
+              prefixIcon: Icon(
+                LucideIcons.search,
+                size: 18,
+                color: colors.textMuted,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
           ),
         ),
-        SizedBox(
-          width: 230,
-          child: Column(
-            children: [
-              FlutterMentions(
-                key: model.mentionsKey,
-                suggestionPosition: SuggestionPosition.Top,
-                maxLines: 5,
-                minLines: 1,
-                onMentionAdd: (mention) {
-                  model.pushCollaboratorId(mention['id']);
-                },
-                onSubmitted: (value) {},
-                decoration:  InputDecoration(
-                  labelStyle: Theme.of(context).textTheme.bodyMedium,
-                    helperStyle: Theme.of(context).textTheme.bodyMedium,
-                    hintText: StringsHome.acknowledgMentInputHint,
-                  hintStyle: Theme.of(context).textTheme.bodyMedium,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide(
-                      color: colorScheme.secondary,
-                    ),
-                  ),
+        const SizedBox(height: 10),
+
+        // Results list
+        if (filteredCollaborators.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Center(
+              child: Text(
+                StringsHome.step2NoResults,
+                style: GoogleFonts.montserrat(
+                  fontSize: 13,
+                  color: colors.textMuted,
                 ),
-                mentions: [
-                  Mention(
-                    trigger: '@',
-                    style: TextStyle(
-                      color: colorScheme.secondary,
-                      fontWeight: FontWeight.bold,
+              ),
+            ),
+          )
+        else
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 200),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: filteredCollaborators.length,
+              itemBuilder: (context, index) {
+                final collaborator = filteredCollaborators[index];
+                return _buildCollaboratorItem(collaborator, colors);
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildCollaboratorItem(
+    Map<String, dynamic> collaborator,
+    BondlyColorScheme colors,
+  ) {
+    final name = collaborator['display'] as String? ?? '';
+    final avatar = collaborator['avatar'] as String? ?? '';
+    final userId = collaborator['user_id'] as String? ?? '';
+
+    return InkWell(
+      onTap: () {
+        setState(() => _selectedPerson = collaborator);
+        model.collaboratorsIds = [userId];
+        _goToStep(RecognizeStep.writeMessage);
+      },
+      borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundImage: avatar.isNotEmpty ? NetworkImage(avatar) : null,
+              backgroundColor: colors.surfaceElevated,
+              child: avatar.isEmpty
+                  ? Icon(LucideIcons.user, size: 16, color: colors.textMuted)
+                  : null,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: colors.textPrimary,
                     ),
-                    data: model.collaboratorsList,
-                    matchAll: false,
-                    suggestionBuilder: (data) {
-                      return Container(
-                        padding: const EdgeInsets.all(AppDimensions.spacingMd),
-                        decoration: BoxDecoration(
-                          color: colorScheme.surface,
-                        ),
-                        width: 150,
-                        child: Row(
-                          children: <Widget>[
-                            CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                data['avatar'],
-                              ),
-                              backgroundColor: AppColors.tertiaryColorLight,
-                            ),
-                            const SizedBox(
-                              width: 20.0,
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Text("${data['display']}",style: context.themeData.textTheme.bodyMedium),
-                              ],
-                            )
-                          ],
-                        ),
-                      );
-                    },
+                  ),
+                  if (model.user?.companyName != null)
+                    Text(
+                      model.user!.companyName!,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 11,
+                        color: colors.textMuted,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── Step 3: Write Message & Send ─────────────────────────────────────
+
+  Widget _buildStep3Content(BondlyColorScheme colors) {
+    final canSend = _messageController.text.trim().isNotEmpty &&
+        !model.creatingAcknowledgment;
+
+    return Column(
+      key: const ValueKey('step3'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header row with points + cancel
+        _buildStepHeader(colors, onCancel: _resetToStep1),
+        const SizedBox(height: 12),
+
+        // Badge chip
+        _buildBadgeChip(colors, onTap: _resetToStep1),
+        const SizedBox(height: 8),
+
+        // Person chip
+        _buildPersonChip(colors, onTap: _resetToStep2),
+        const SizedBox(height: 14),
+        Divider(color: colors.border, height: 1),
+        const SizedBox(height: 14),
+
+        // "Escribe tu reconocimiento" label
+        Text(
+          StringsHome.step3WriteLabel,
+          style: GoogleFonts.montserrat(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: colors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // Text area
+        Container(
+          decoration: BoxDecoration(
+            color: colors.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+            border: Border.all(color: colors.border, width: 1),
+          ),
+          child: TextField(
+            controller: _messageController,
+            maxLength: 150,
+            maxLines: 3,
+            style: GoogleFonts.montserrat(
+              fontSize: 13,
+              color: colors.textPrimary,
+            ),
+            decoration: InputDecoration(
+              hintText: StringsHome.step3WriteLabel,
+              hintStyle: GoogleFonts.montserrat(
+                fontSize: 13,
+                color: colors.textMuted,
+              ),
+              border: InputBorder.none,
+              counterText: '',
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+
+        // Char counter
+        Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            '${_messageController.text.length}/150',
+            style: GoogleFonts.montserrat(
+              fontSize: 11,
+              color: colors.textMuted,
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // Send button
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 200),
+          opacity: canSend ? 1.0 : 0.5,
+          child: GestureDetector(
+            onTap: canSend ? _handleSend : null,
+            child: Container(
+              width: double.infinity,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: AppDimensions.accentGradient(colors),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                boxShadow: [
+                  BoxShadow(
+                    color: colors.accent.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              const SizedBox(
-                height: AppDimensions.spacingMd,
-              ),
-              model.collaboratorsIds.isNotEmpty &&
-                      model
-                          .mentionsKey.currentState!.controller!.text.isNotEmpty
-                  ? BondlyLoadingButton(
-                      isLoading: model.creatingAcknowledgment,
-                      style: BondlyButtonStyle.outlined,
-                      buttonStyle: Theme.of(context).outlinedButtonTheme.style?.copyWith(
-                        side: WidgetStateProperty.all(
-                          BorderSide(
-                            color: colorScheme.tertiary,
-                          ),
-                      )
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (model.creatingAcknowledgment)
+                    const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: BondlyColors.white,
                       ),
-                      onPressed: () async {
-                        model.creatingAcknowledgment = true;
-                        await model.handleSubmitAcknowledgment();
-
-                        model.creatingAcknowledgment = false;
-                      },
-                      child: Text(
-                              StringsHome.acknowledgmentInputButtonText,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.tertiary,
-                    ),),)
-                  : const SizedBox()
-            ],
+                    )
+                  else ...[
+                    const Icon(
+                      LucideIcons.send,
+                      size: 18,
+                      color: BondlyColors.white,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      StringsHome.step3SendButton,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: BondlyColors.white,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
-        )
+        ),
       ],
     );
   }
 
-  Widget _buildBadgesFromCategorySection() {
-    return SizedBox(
-      height: 110,
-      child: model.loadingBadges
-          ? const Center(
-              child: BondlyShimmerBlock(width: 80, height: 80, borderRadius: 12),
-            )
-          : ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.all(AppDimensions.spacingMd),
-              itemCount: model.badges.badges.length,
-              itemBuilder: (context, index) {
-                return Container(
-                  height: 100,
-                  width: 90,
-                  margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMd),
-                  child: InkWell(
-                    onTap: () {
-                      model.selectedBadge == model.badges.badges[index]
-                          ? model.selectedBadge = null
-                          : model.selectedBadge = model.badges.badges[index];
-                    },
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 50,
-                          width: 50,
-                          child: CachedNetworkImage(
-                            imageUrl:
-                                safeImageUrl(model.badges.badges[index].image),
-                          ),
-                        ),
-                        Text(
-                          '${model.badges.badges[index].value}pts',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text(
-                          model.badges.badges[index].name ?? '',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
+  Future<void> _handleSend() async {
+    final personName = _selectedPerson?['display'] as String? ?? '';
+    final personId = _selectedPerson?['user_id'] as String? ?? '';
+    final taggedMessage =
+        '@[$personName]($personId) ${_messageController.text}';
+    final error =
+        await model.submitAcknowledgmentDirect(taggedMessage);
+    if (!mounted) return;
+    if (error == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(StringsHome.acknowledgmentSuccess)),
+      );
+      _resetToStep1();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
+    }
+  }
+
+  // ─── Shared Widgets ───────────────────────────────────────────────────
+
+  Widget _buildStepHeader(BondlyColorScheme colors,
+      {required VoidCallback onCancel}) {
+    return Row(
+      children: [
+        Expanded(child: _buildCompactPointsHeader(colors)),
+        GestureDetector(
+          onTap: onCancel,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(LucideIcons.x, size: 14, color: colors.textMuted),
+              const SizedBox(width: 4),
+              Text(
+                'Cancelar',
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: colors.textMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildCategoriesSection() {
-    return SizedBox(
-      height: 100,
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.all(AppDimensions.spacingMd),
-          itemCount: model.categories.categories?.length ?? 0,
-          itemBuilder: (context, index) {
-            return Container(
-              height: 80,
-              width: 90,
-              margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMd),
-              child: InkWell(
-                onTap: () {
-                  model.loadingBadges = true;
-                  model.selectedCategory ==
-                          model.categories.categories?[index].id
-                      ? model.selectedCategory = null
-                      : model.selectedCategory =
-                          model.categories.categories?[index].id;
-                },
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: CachedNetworkImage(
-                        imageUrl:
-                            safeImageUrl(model.categories.categories?[index].imageUrl),
+  Widget _buildCompactPointsHeader(BondlyColorScheme colors) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(
+          model.user?.giftedPoints.toString() ?? '0',
+          style: GoogleFonts.montserrat(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+            color: colors.accent,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          StringsHome.pointsLabel,
+          style: GoogleFonts.montserrat(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: colors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBadgeChip(BondlyColorScheme colors, {VoidCallback? onTap}) {
+    final badge = model.selectedBadge;
+    if (badge == null) return const SizedBox.shrink();
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: colors.accentSoft,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: _gradientForCategoryIndex(_activeCategoryIndex),
+              ),
+              child: badge.image != null && badge.image!.isNotEmpty
+                  ? ClipOval(
+                      child: Image.network(
+                        badge.image!,
+                        width: 36,
+                        height: 36,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          LucideIcons.award,
+                          size: 18,
+                          color: BondlyColors.white,
+                        ),
+                      ),
+                    )
+                  : const Icon(
+                      LucideIcons.award,
+                      size: 18,
+                      color: BondlyColors.white,
+                    ),
+            ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    badge.name ?? '',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    _categoryLabelForIndex(_activeCategoryIndex),
+                    style: GoogleFonts.montserrat(
+                      fontSize: 11,
+                      color: colors.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(LucideIcons.check, size: 16, color: colors.accent),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPersonChip(BondlyColorScheme colors, {VoidCallback? onTap}) {
+    if (_selectedPerson == null) return const SizedBox.shrink();
+
+    final name = _selectedPerson!['display'] as String? ?? '';
+    final avatar = _selectedPerson!['avatar'] as String? ?? '';
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: colors.accentSoft,
+          borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundImage:
+                  avatar.isNotEmpty ? NetworkImage(avatar) : null,
+              backgroundColor: colors.surfaceElevated,
+              child: avatar.isEmpty
+                  ? Icon(LucideIcons.user, size: 18, color: colors.textMuted)
+                  : null,
+            ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    name,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                  if (model.user?.companyName != null)
+                    Text(
+                      model.user!.companyName!,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 11,
+                        color: colors.textMuted,
                       ),
                     ),
-                    Text(
-                      model.categories.categories?[index].name ?? '',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+                ],
               ),
-            );
-          }),
+            ),
+            const SizedBox(width: 8),
+            Icon(LucideIcons.check, size: 16, color: colors.accent),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryCircleSkeleton extends StatelessWidget {
+  const _CategoryCircleSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        BondlyShimmerCircle(size: 56),
+        SizedBox(height: 8),
+        BondlyShimmerBlock(width: 60, height: 10),
+      ],
     );
   }
 }

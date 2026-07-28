@@ -27,32 +27,33 @@ class User {
   bool isVisible;
   String? token;
 
-  User({
-    this.rewards,
-    this.id,
-    this.completeName,
-    this.employeeNumber = 1,
-    this.role,
-    this.accountNumber,
-    this.accountHolder,
-    this.email,
-    this.isActive = false,
-    this.seats = 0,
-    this.planType,
-    this.monthlyPoints = 0,
-    this.accountType,
-    this.companyName,
-    this.avatar,
-    this.giftedPoints = 0,
-    this.pointsReceived = 0,
-    this.isVisible = false,
-    this.token
-  });
+  User(
+      {this.rewards,
+      this.id,
+      this.completeName,
+      this.employeeNumber = 1,
+      this.role,
+      this.accountNumber,
+      this.accountHolder,
+      this.email,
+      this.isActive = false,
+      this.seats = 0,
+      this.planType,
+      this.monthlyPoints = 0,
+      this.accountType,
+      this.companyName,
+      this.avatar,
+      this.giftedPoints = 0,
+      this.pointsReceived = 0,
+      this.isVisible = false,
+      this.token});
 
   factory User.fromJson(Map<String, dynamic> map) {
     Map<String, dynamic> json = map["data"];
     return User(
-        rewards: json["rewards"] == null ? [] : List<dynamic>.from(json["rewards"]!.map((x) => x)),
+        rewards: json["rewards"] == null
+            ? []
+            : List<dynamic>.from(json["rewards"]!.map((x) => x)),
         id: json["_id"],
         completeName: json["completeName"],
         employeeNumber: json["employeeNumber"] ?? 1,
@@ -66,37 +67,38 @@ class User {
         monthlyPoints: json["monthlyPoints"] ?? 0,
         accountType: json["accountType"],
         companyName: json["companyName"],
-        avatar: json["avatar"] == null || json["avatar"].toString().contains("http")
-            ? json["avatar"]
-            : StringsMain.baseImagesUrl + json["avatar"].toString(),
+        avatar:
+            json["avatar"] == null || json["avatar"].toString().contains("http")
+                ? json["avatar"]
+                : StringsMain.baseImagesUrl + json["avatar"].toString(),
         giftedPoints: json["giftedPoints"] ?? 0,
         pointsReceived: json["pointsReceived"] ?? 0,
         isVisible: json["visible"] ?? false,
-        token: map["token"]
-    );
+        token: map["token"]);
   }
 
   Map<String, dynamic> toJson() => {
-    "rewards": rewards == null ? [] : List<dynamic>.from(rewards!.map((x) => x)),
-    "_id": id,
-    "completeName": completeName,
-    "employeeNumber": employeeNumber,
-    "role": role,
-    "accountNumber": accountNumber,
-    "accountHolder": accountHolder,
-    "email": email,
-    "isActive": isActive,
-    "seats": seats,
-    "planType": planType,
-    "monthlyPoints": monthlyPoints,
-    "accountType": accountType,
-    "companyName": companyName,
-    "avatar": avatar,
-    "giftedPoints": giftedPoints,
-    "pointsReceived": pointsReceived,
-    "visible": isVisible,
-    "token": token,
-  };
+        "rewards":
+            rewards == null ? [] : List<dynamic>.from(rewards!.map((x) => x)),
+        "_id": id,
+        "completeName": completeName,
+        "employeeNumber": employeeNumber,
+        "role": role,
+        "accountNumber": accountNumber,
+        "accountHolder": accountHolder,
+        "email": email,
+        "isActive": isActive,
+        "seats": seats,
+        "planType": planType,
+        "monthlyPoints": monthlyPoints,
+        "accountType": accountType,
+        "companyName": companyName,
+        "avatar": avatar,
+        "giftedPoints": giftedPoints,
+        "pointsReceived": pointsReceived,
+        "visible": isVisible,
+        "token": token,
+      };
 
   factory User.fromSupabaseAuth(Map<String, dynamic> json, String accessToken) {
     return User(
@@ -120,6 +122,9 @@ class User {
       token: accessToken,
     );
   }
+
+  bool get isAdmin => role == 'admin' || role == 'superAdmin';
+  bool get isSuperAdmin => role == 'superAdmin';
 
   factory User.fromSupabase(Map<String, dynamic> json) {
     return User(
@@ -146,7 +151,9 @@ class User {
   factory User.fromSingleJson(Map<String, dynamic> map) {
     Map<String, dynamic> json = map;
     return User(
-        rewards: json["rewards"] == null ? [] : List<dynamic>.from(json["rewards"]!.map((x) => x)),
+        rewards: json["rewards"] == null
+            ? []
+            : List<dynamic>.from(json["rewards"]!.map((x) => x)),
         id: json["_id"],
         completeName: json["completeName"],
         employeeNumber: json["employeeNumber"] ?? 1,
@@ -160,13 +167,13 @@ class User {
         monthlyPoints: json["monthlyPoints"] ?? 0,
         accountType: json["accountType"],
         companyName: json["companyName"],
-        avatar: json["avatar"] == null || json["avatar"].toString().contains("http")
-            ? json["avatar"]
-            : StringsMain.baseImagesUrl + json["avatar"].toString(),
+        avatar:
+            json["avatar"] == null || json["avatar"].toString().contains("http")
+                ? json["avatar"]
+                : StringsMain.baseImagesUrl + json["avatar"].toString(),
         giftedPoints: json["giftedPoints"] ?? 0,
         pointsReceived: json["pointsReceived"] ?? 0,
         isVisible: json["visible"] ?? false,
-        token: map["token"]
-    );
+        token: map["token"]);
   }
 }

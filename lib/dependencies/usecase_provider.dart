@@ -1,8 +1,4 @@
 import 'package:bondly_app/dependencies/dependency_manager.dart';
-import 'package:bondly_app/features/ai/domain/repositories/ai_repository.dart';
-import 'package:bondly_app/features/ai/domain/usecases/analyze_sentiment_usecase.dart';
-import 'package:bondly_app/features/ai/domain/usecases/get_reward_recommendations_usecase.dart';
-import 'package:bondly_app/features/ai/domain/usecases/personalize_feed_usecase.dart';
 import 'package:bondly_app/features/auth/data/repositories/default_users_repository.dart';
 import 'package:bondly_app/features/auth/data/repositories/remote_users_repository.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
@@ -12,7 +8,9 @@ import 'package:bondly_app/features/auth/domain/usecases/login_state_usecase.dar
 import 'package:bondly_app/features/auth/domain/usecases/forgot_password_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/login_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
+import 'package:bondly_app/features/auth/domain/usecases/verify_reset_token_usecase.dart';
 import 'package:bondly_app/features/home/domain/repositories/banners_repository.dart';
 import 'package:bondly_app/features/home/domain/repositories/company_feeds_respository.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
@@ -29,6 +27,8 @@ import 'package:bondly_app/features/profile/domain/repositories/account_statemen
 import 'package:bondly_app/features/profile/domain/repositories/activity_repository.dart';
 import 'package:bondly_app/features/profile/domain/repositories/bondly_badges_repository.dart';
 import 'package:bondly_app/features/profile/domain/repositories/cart_repository.dart';
+import 'package:bondly_app/features/ranking/domain/repositories/ranking_repository.dart';
+import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/clear_shopping_cart_usecase.dart';
@@ -44,6 +44,11 @@ import 'package:bondly_app/features/profile/domain/usecases/update_user_avatar_u
 import 'package:bondly_app/features/profile/domain/usecases/user_profile_use_case.dart';
 import 'package:bondly_app/features/storage/data/local/bondly_database.dart';
 import 'package:bondly_app/features/storage/data/local/dao/users_dao.dart';
+import 'package:bondly_app/features/ai/domain/repositories/ai_repository.dart';
+import 'package:bondly_app/features/ai/domain/usecases/analyze_sentiment_usecase.dart';
+import 'package:bondly_app/features/ai/domain/usecases/get_reward_recommendations_usecase.dart';
+import 'package:bondly_app/features/ai/domain/usecases/personalize_feed_usecase.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,6 +60,14 @@ class UseCaseProvider {
 
     getIt.registerSingleton<ForgotPasswordUseCase>(
       ForgotPasswordUseCase(getIt<AuthRepository>()),
+    );
+
+    getIt.registerSingleton<VerifyResetTokenUseCase>(
+      VerifyResetTokenUseCase(getIt<AuthRepository>()),
+    );
+
+    getIt.registerSingleton<ResetPasswordUseCase>(
+      ResetPasswordUseCase(getIt<AuthRepository>()),
     );
 
     getIt.registerSingleton<GetCompaniesUseCase>(
@@ -85,37 +98,60 @@ class UseCaseProvider {
     getIt.registerSingleton<GetCategoryBadgesUseCase>(
         GetCategoryBadgesUseCase(getIt<CompanyFeedsRepository>()));
 
-    getIt.registerSingletonWithDependencies(
-        () => UserUseCase(
-            getIt<UsersRepository>(instanceName: DefaultUsersRepository.name),
-            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
-        dependsOn: [
-          AppDatabase,
-          UsersDao,
-          InitDependency(UsersRepository,
-              instanceName: DefaultUsersRepository.name),
-          InitDependency(UsersRepository,
-              instanceName: RemoteUsersRepository.name)
-        ]);
+    if (kIsWeb) {
+      getIt.registerSingletonWithDependencies(
+          () => UserUseCase(
+              getIt<UsersRepository>(instanceName: RemoteUsersRepository.name),
+              getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
+          dependsOn: [
+            InitDependency(UsersRepository,
+                instanceName: RemoteUsersRepository.name)
+          ]);
+    } else {
+      getIt.registerSingletonWithDependencies(
+          () => UserUseCase(
+              getIt<UsersRepository>(instanceName: DefaultUsersRepository.name),
+              getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
+          dependsOn: [
+            AppDatabase,
+            UsersDao,
+            InitDependency(UsersRepository,
+                instanceName: DefaultUsersRepository.name),
+            InitDependency(UsersRepository,
+                instanceName: RemoteUsersRepository.name)
+          ]);
+    }
 
-    getIt.registerSingletonWithDependencies(
-        () => LogoutUseCase(
-            sharedPreferences: getIt<SharedPreferences>(),
-            usersRepository: getIt<UsersRepository>(
-                instanceName: DefaultUsersRepository.name)),
-        dependsOn: [
-          AppDatabase,
-          UsersDao,
-          InitDependency(UsersRepository,
-              instanceName: DefaultUsersRepository.name)
-        ]);
+    if (kIsWeb) {
+      getIt.registerSingletonWithDependencies(
+          () => LogoutUseCase(
+              sharedPreferences: getIt<SharedPreferences>(),
+              usersRepository: getIt<UsersRepository>(
+                  instanceName: RemoteUsersRepository.name)),
+          dependsOn: [
+            InitDependency(UsersRepository,
+                instanceName: RemoteUsersRepository.name)
+          ]);
+    } else {
+      getIt.registerSingletonWithDependencies(
+          () => LogoutUseCase(
+              sharedPreferences: getIt<SharedPreferences>(),
+              usersRepository: getIt<UsersRepository>(
+                  instanceName: DefaultUsersRepository.name)),
+          dependsOn: [
+            AppDatabase,
+            UsersDao,
+            InitDependency(UsersRepository,
+                instanceName: DefaultUsersRepository.name)
+          ]);
+    }
 
     getIt.registerSingletonWithDependencies(
         () => UpdateUserAvatarUseCase(
             getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
         dependsOn: [
-          AppDatabase,
-          UsersDao,
+          if (!kIsWeb) AppDatabase,
+          if (!kIsWeb) UsersDao,
           InitDependency(UsersRepository,
               instanceName: RemoteUsersRepository.name)
         ]);
@@ -162,16 +198,18 @@ class UseCaseProvider {
     getIt.registerSingleton<GetAccountStatementUseCase>(
         GetAccountStatementUseCase(getIt<AccountStatementRepository>()));
 
+    getIt.registerSingleton<GetRankingUseCase>(
+        GetRankingUseCase(getIt<RankingRepository>()));
+
     getIt.registerSingletonWithDependencies<UserProfileUseCase>(
         () => UserProfileUseCase(
-          getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)
-        ),
-      dependsOn: [
-        AppDatabase,
-        UsersDao,
-        InitDependency(UsersRepository, instanceName: RemoteUsersRepository.name)
-      ]
-    );
+            getIt<UsersRepository>(instanceName: RemoteUsersRepository.name)),
+        dependsOn: [
+          if (!kIsWeb) AppDatabase,
+          if (!kIsWeb) UsersDao,
+          InitDependency(UsersRepository,
+              instanceName: RemoteUsersRepository.name)
+        ]);
 
     getIt.registerSingleton<PersonalizeFeedUseCase>(
         PersonalizeFeedUseCase(getIt<AIRepository>()));

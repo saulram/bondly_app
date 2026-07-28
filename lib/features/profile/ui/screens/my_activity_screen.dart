@@ -3,15 +3,14 @@ import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_profile.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
-import 'package:bondly_app/features/profile/domain/models/user_activity.dart';
 import 'package:bondly_app/features/profile/ui/screens/activity_detail_screen.dart';
 import 'package:bondly_app/features/profile/ui/viewmodels/my_activity_viewmodel.dart';
 import 'package:bondly_app/features/profile/ui/widgets/user_activity_item.dart';
-import 'package:bondly_app/ui/shared/app_body_layout.dart';
 import 'package:bondly_app/ui/shared/bondly_skeleton.dart';
-import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 class MyActivityScreen extends StatefulWidget {
   static const String route = "/myActivityScreen";
@@ -22,13 +21,9 @@ class MyActivityScreen extends StatefulWidget {
   State<MyActivityScreen> createState() => _MyActivityScreenState();
 }
 
-class _MyActivityScreenState
-    extends State<MyActivityScreen>
+class _MyActivityScreenState extends State<MyActivityScreen>
     with AutomaticKeepAliveClientMixin<MyActivityScreen> {
   late MyActivityViewModel _viewModel;
-  bool addMargin = false;
-
-  double top = 0.0;
 
   @override
   bool get wantKeepAlive => true;
@@ -43,197 +38,246 @@ class _MyActivityScreenState
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var theme = Theme.of(context);
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: _buildBody(theme),
-    );
-  }
-
-  Widget _buildBody(ThemeData theme) {
     return ModelProvider<MyActivityViewModel>(
       model: _viewModel,
-      child: ModelBuilder<MyActivityViewModel>(builder: (context, model, widget) {
-        var length = model.activities.length + (model.nextPage > -1 ? 1 : 0);
-        return Stack(
-          children: [
-            NestedScrollView(
-                headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                  return <Widget>[
-                    SliverAppBar(
-                        leading: IconButton(
-                          onPressed: () => context.pop(),
-                          tooltip: 'Regresar',
-                          icon: const Icon(
-                            IconsaxOutline.arrow_left,
-                          ),
-                        ),
-                        backgroundColor: theme.scaffoldBackgroundColor,
-                        iconTheme: IconThemeData(
-                          color: theme.unselectedWidgetColor,
-                        ),
-                        expandedHeight: 260.0,
-                        floating: false,
-                        pinned: true,
-                        flexibleSpace: LayoutBuilder(
-                          builder: (context, constraints) {
-                            top = constraints.biggest.height;
-
-                            return FlexibleSpaceBar(
-                              centerTitle: true,
-                              background: SafeArea(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 44.0),
-                                  child: BodyLayout(
-                                    enableBanners: true,
-                                    child: Container(),
-                                  ),
-                                ),
-                              ),
-                              title: top < 120.0
-                                  ? Text(
-                                StringsProfile.myActivity,
-                                style: theme.textTheme.titleLarge,
-                              )
-                                  : const SizedBox(),
-                            );
-                          },
-                        )),
-                    /*
-                  Leaving this commented until create filter feature
-                  SliverPersistentHeader(
-                    delegate: _SliverAppBarDelegate(_buildChips(theme)),
-                    pinned: true,
-                  )*/
-                  ];
-                },
-                body: NotificationListener<ScrollEndNotification>(
-                  onNotification: (notification) {
-                    var metrics = notification.metrics;
-                    if (metrics.atEdge && metrics.pixels > 0) {
-                      model.loadActivity();
-                    }
-
-                    return true;
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 24.0),
-                    child: ListView.builder(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        itemCount: length,
-                        itemBuilder: (context, index) {
-                          if (index < model.activities.length) {
-                            var item = model.activities[index];
-
-                            if (index == 0) {
-                              return Column(
-                                children: [
-                                  _buildHeaderCard(theme),
-                                  _buildActivityItem(item)
-                                ],
-                              );
-                            }
-
-                            return _buildActivityItem(item);
-                          }
-
-                          return Container(
-                              margin: const EdgeInsets.only(top: 16),
-                              child: model.notificationMessage.isEmpty && model.busy
-                                  ? const Center(child: BondlyShimmerBlock(width: 40, height: 40, borderRadius: 20))
-                                  : Container());
-                        }),
-                  ),
-                )
+      child: ModelBuilder<MyActivityViewModel>(
+        builder: (context, model, child) {
+          return Scaffold(
+            backgroundColor: colors.bg,
+            body: Stack(
+              children: [
+                Column(
+                  children: [
+                    _buildHeader(colors),
+                    Expanded(
+                      child: _buildContent(model, colors),
+                    ),
+                  ],
+                ),
+                if (!model.errorShown &&
+                    model.notificationMessage.isNotEmpty)
+                  _buildNotificationToast(model, colors),
+              ],
             ),
-            !model.errorShown && model.notificationMessage.isNotEmpty
-                ? Positioned(
-                bottom: 24.0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(8.0),
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 16.0),
-                  decoration: BoxDecoration(
-                      color: theme.dividerColor,
-                      border: Border.all(color: AppColors.secondaryColor),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusLg)),
-                  child: Text(
-                    model.notificationMessage,
-                    style:
-                    theme.textTheme.bodyLarge!.copyWith(fontSize: 18.0),
-                    textAlign: TextAlign.center,
-                  ),
-                ))
-                : Container()
-          ],
-        );
-      })
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildHeaderCard(ThemeData theme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
-      margin: const EdgeInsets.only(
-        left: 12.0,
-        right: 12.0,
-      ),
-      decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppColors.secondaryColor,
-              theme.primaryColor,
+  Widget _buildHeader(BondlyColorScheme colors) {
+    return SafeArea(
+      bottom: false,
+      child: SizedBox(
+        height: 56,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.paddingScreen,
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => context.pop(),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: colors.surfaceElevated,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    LucideIcons.arrowLeft,
+                    size: 24,
+                    color: colors.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  StringsProfile.myActivity,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: colors.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 36),
             ],
           ),
-          borderRadius: const BorderRadius.all(Radius.circular(20.0))),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent(MyActivityViewModel model, BondlyColorScheme colors) {
+    if (model.activities.isEmpty && model.busy) {
+      return _buildSkeletonList(colors);
+    }
+
+    final itemCount =
+        model.activities.length + (model.nextPage > -1 ? 1 : 0);
+
+    return NotificationListener<ScrollEndNotification>(
+      onNotification: (notification) {
+        final metrics = notification.metrics;
+        if (metrics.atEdge && metrics.pixels > 0) {
+          model.loadActivity();
+        }
+        return true;
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(
+          vertical: AppDimensions.spacingSm,
+          horizontal: AppDimensions.paddingScreen,
+        ),
+        itemCount: itemCount + 1, // +1 for the info banner at index 0
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return _buildInfoBanner(colors);
+          }
+
+          final activityIndex = index - 1;
+
+          if (activityIndex < model.activities.length) {
+            final item = model.activities[activityIndex];
+            return UserActivityItemWidget(
+              key: Key(item.id),
+              id: item.feedId,
+              type: item.type,
+              title: item.title,
+              description: item.content,
+              date: item.createdAt,
+              read: item.read,
+              onTap: () {
+                context.push(ActivityDetailScreen.route, extra: {
+                  ActivityDetailScreen.idParam: item.id,
+                  ActivityDetailScreen.feedIdParam: item.feedId,
+                  ActivityDetailScreen.readParam: item.read,
+                });
+                if (!item.read) {
+                  item.read = true;
+                  setState(() {});
+                }
+              },
+            );
+          }
+
+          // Pagination loading indicator
+          if (model.notificationMessage.isEmpty && model.busy) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: BondlyShimmerBlock(
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                ),
+              ),
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+
+  Widget _buildInfoBanner(BondlyColorScheme colors) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: AppDimensions.accentGradient(colors),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusPost),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             StringsProfile.myActivityHeader,
-            style: theme.textTheme.titleLarge!.copyWith(color: theme.colorScheme.onPrimary),
+            style: GoogleFonts.montserrat(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: BondlyColors.white,
+            ),
           ),
-          const SizedBox(height: 12.0),
+          const SizedBox(height: 8),
           Text(
             StringsProfile.myActivitySubHeader,
-            style: theme.textTheme.labelLarge!
-                .copyWith(height: 1.4, fontSize: 16.0, color: theme.colorScheme.onPrimary),
-          )
+            style: GoogleFonts.montserrat(
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xCCFFFFFF),
+              height: 1.5,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  UserActivityItemWidget _buildActivityItem(UserActivityItem item) {
-    return UserActivityItemWidget(
-        key: Key(item.id),
-        id: item.feedId,
-        type: item.type,
-        title: item.title,
-        description: item.content,
-        date: item.createdAt,
-        read: item.read,
-        onTap: () {
-          context.push(
-              ActivityDetailScreen.route,
-              extra: {
-                ActivityDetailScreen.idParam: item.id,
-                ActivityDetailScreen.feedIdParam: item.feedId,
-                ActivityDetailScreen.readParam: item.read
-              }
+  Widget _buildSkeletonList(BondlyColorScheme colors) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(
+        vertical: AppDimensions.spacingSm,
+        horizontal: AppDimensions.paddingScreen,
+      ),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            child: const BondlyShimmerBlock(
+              width: double.infinity,
+              height: 140,
+              borderRadius: 20,
+            ),
           );
-
-          if (!item.read) {
-            item.read = true;
-            setState(() {});
-          }
         }
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          child: const BondlyShimmerBlock(
+            width: double.infinity,
+            height: 120,
+            borderRadius: 16,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildNotificationToast(
+    MyActivityViewModel model,
+    BondlyColorScheme colors,
+  ) {
+    return Positioned(
+      bottom: 24,
+      left: AppDimensions.paddingScreen,
+      right: AppDimensions.paddingScreen,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: colors.surfaceElevated,
+          border: Border.all(color: colors.border),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+          boxShadow: AppDimensions.cardShadow(colors.textPrimary),
+        ),
+        child: Text(
+          model.notificationMessage,
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: colors.textSecondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }

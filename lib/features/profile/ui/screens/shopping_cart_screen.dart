@@ -183,7 +183,8 @@ class _MyCartScreenState extends State<MyCartScreen> {
               height: size.height * .6,
               child: rewardsModel.busy
                   ? const Center(
-                      child: BondlyShimmerBlock(width: 200, height: 200, borderRadius: 12),
+                      child: BondlyShimmerBlock(
+                          width: 200, height: 200, borderRadius: 12),
                     )
                   : rewardsModel.userCart.rewards.isEmpty
                       ? Center(
@@ -321,7 +322,8 @@ class CartItemTile extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
           image: DecorationImage(
-            image: CachedNetworkImageProvider(safeImageUrl(item.reward.imageUrl)),
+            image:
+                CachedNetworkImageProvider(safeImageUrl(item.reward.imageUrl)),
             fit: BoxFit.cover,
           ),
         ),

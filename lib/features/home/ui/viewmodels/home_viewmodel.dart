@@ -24,6 +24,9 @@ import 'package:bondly_app/features/home/domain/usecases/get_company_collaborato
 import 'package:bondly_app/features/home/domain/usecases/get_company_feeds.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_user_embassys.dart';
 import 'package:bondly_app/features/home/domain/usecases/handle_like.dart';
+import 'package:bondly_app/config/backend_config.dart';
+import 'package:bondly_app/features/ranking/domain/models/ranked_user.dart';
+import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
@@ -48,6 +51,7 @@ class HomeViewModel extends NavigationModel {
   final CreateAcknowledgmentUseCase _createAcknowledgmentUseCase;
   final GetCompanyAnnouncementsUseCase _getCompanyAnnouncementsUseCase;
   final GetUserEmbassysUseCase _getUserEmbassysUseCase;
+  final GetRankingUseCase _getRankingUseCase;
 
   /// AI Use Cases
   final PersonalizeFeedUseCase _personalizeFeedUseCase;
@@ -74,6 +78,7 @@ class HomeViewModel extends NavigationModel {
       this._createAcknowledgmentUseCase,
       this._getCompanyAnnouncementsUseCase,
       this._getUserEmbassysUseCase,
+      this._getRankingUseCase,
       this._personalizeFeedUseCase,
       this._analyzeSentimentUseCase) {
     log.i("HomeViewModel created");
@@ -107,6 +112,7 @@ class HomeViewModel extends NavigationModel {
       getCompanyCategories(),
       getCompanyCollaborators(),
       handleGetAnnounceMents(),
+      getRanking(),
     ]);
   }
 
@@ -126,8 +132,17 @@ class HomeViewModel extends NavigationModel {
         duration: const Duration(milliseconds: 500), curve: Curves.ease);
   }
 
+  /// Immediately switches to the given tab without animation.
+  /// Used by the desktop sidebar for instant nav highlight updates.
+  void jumpToTab(int index) {
+    _currentIndex = index;
+    notifyListeners();
+    pageController.jumpToPage(index);
+  }
+
   /// Handles page change.
   void onPageChanged(int index) {
+    if (_currentIndex == index) return;
     _currentIndex = index;
     notifyListeners();
   }
@@ -153,9 +168,10 @@ class HomeViewModel extends NavigationModel {
       _banners = banners;
 
       log.i("HomeViewModel### Get Banners Success");
-      List<String> uris = _banners!.banners!.map((banner) {
-        return banner.image!;
-      }).toList();
+      List<String> uris = _banners!.banners!
+          .where((banner) => banner.image != null)
+          .map((banner) => banner.image!)
+          .toList();
       bannersList = uris;
     }, (error) {
       log.e(error.toString());
@@ -320,8 +336,7 @@ class HomeViewModel extends NavigationModel {
             return {
               "id": collaborator.id ?? "No Name",
               "display": collaborator.completeName ?? "No Name",
-              "avatar": collaborator.avatar ??
-                  "https://api.minimalavatars.com/avatar/random/png",
+              "avatar": collaborator.avatar ?? "",
               "user_id": collaborator.id ?? "No Id"
             };
           })
@@ -379,6 +394,33 @@ class HomeViewModel extends NavigationModel {
     }
   }
 
+  /// Returns `null` on success, or the error message on failure.
+  Future<String?> submitAcknowledgmentDirect(String message) async {
+    if (selectedBadge == null ||
+        message.trim().isEmpty ||
+        collaboratorsIds.isEmpty) {
+      return 'Datos incompletos';
+    }
+    creatingAcknowledgment = true;
+    final result = await _createAcknowledgmentUseCase.invoke(
+      selectedBadge!.id!,
+      message.trim(),
+      collaboratorsIds,
+    );
+    String? errorMessage;
+    result.when((s) {
+      getCompanyFeeds();
+      collaboratorsIds = [];
+      selectedCategory = null;
+      selectedBadge = null;
+    }, (error) {
+      log.e(error.toString());
+      errorMessage = error.toString();
+    });
+    creatingAcknowledgment = false;
+    return errorMessage;
+  }
+
   CarouselSliderController carouselController = CarouselSliderController();
 
   List<Announcement> _announcements = [];
@@ -430,6 +472,30 @@ class HomeViewModel extends NavigationModel {
       if (error is TokenNotFoundException) {
         // Dispatch logout
       }
+    });
+  }
+
+  // ─── Ranking ──────────────────────────────────────────────────────────
+
+  bool get isRankingEnabled => !BackendConfig.isApi;
+
+  List<RankedUser> _rankingUsers = [];
+  List<RankedUser> get rankingUsers => _rankingUsers;
+  set rankingUsers(List<RankedUser> data) {
+    _rankingUsers = data;
+    notifyListeners();
+  }
+
+  Future<void> getRanking() async {
+    if (!isRankingEnabled) return;
+
+    log.i("Get Ranking for home podium");
+    final result = await _getRankingUseCase.invoke(period: 'month', limit: 3);
+    result.when((users) {
+      log.i("HomeViewModel### Ranking: ${users.length} users");
+      rankingUsers = users;
+    }, (error) {
+      log.e("HomeViewModel### Ranking Error: $error");
     });
   }
 
@@ -502,7 +568,8 @@ class HomeViewModel extends NavigationModel {
       reordered.addAll(feedMap.values);
       _feeds = CompanyFeed(data: reordered, success: _feeds.success);
 
-      log.i("HomeViewModel### Feed personalized with ${orderedIds.length} items");
+      log.i(
+          "HomeViewModel### Feed personalized with ${orderedIds.length} items");
     }, (error) {
       log.e("Feed personalization failed: $error");
     });
@@ -520,7 +587,8 @@ class HomeViewModel extends NavigationModel {
 
   final Set<String> _analyzingFeedIds = {};
 
-  bool isAnalyzingSentiment(String feedId) => _analyzingFeedIds.contains(feedId);
+  bool isAnalyzingSentiment(String feedId) =>
+      _analyzingFeedIds.contains(feedId);
 
   Future<void> analyzeFeedSentiment(String feedId, String text) async {
     if (_sentimentCache.containsKey(feedId) ||

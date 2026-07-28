@@ -17,10 +17,10 @@ class BannersCarousel extends StatefulWidget {
 
 class _BannersCarouselState extends State<BannersCarousel> {
   final controller = InfiniteScrollController();
-  final Color bodyColor = AppColors.primaryButtonColor;
 
   Widget _buildIconButton(IconData iconData, VoidCallback onPressed,
       {left, right, top, bottom}) {
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
     return Positioned(
       left: left,
       right: right,
@@ -29,10 +29,12 @@ class _BannersCarouselState extends State<BannersCarousel> {
       child: GestureDetector(
         onTap: onPressed,
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingLg),
+          margin:
+              const EdgeInsets.symmetric(horizontal: AppDimensions.spacingLg),
           padding: const EdgeInsets.all(2),
-          decoration: BoxDecoration(color: bodyColor, shape: BoxShape.circle),
-          child: Center(child: Icon(iconData, color: Theme.of(context).colorScheme.onPrimary)),
+          decoration:
+              BoxDecoration(color: colors.accent, shape: BoxShape.circle),
+          child: Center(child: Icon(iconData, color: BondlyColors.white)),
         ),
       ),
     );
@@ -46,7 +48,10 @@ class _BannersCarouselState extends State<BannersCarousel> {
         children: [
           widget.imageUris!.isEmpty
               ? const Center(
-                  child: BondlyShimmerBlock(width: 300, height: 120, borderRadius: AppDimensions.radiusLg),
+                  child: BondlyShimmerBlock(
+                      width: 300,
+                      height: 120,
+                      borderRadius: AppDimensions.radiusLg),
                 )
               : InfiniteCarousel.builder(
                   itemCount: widget.imageUris!.length,
@@ -60,14 +65,16 @@ class _BannersCarouselState extends State<BannersCarousel> {
                     return Container(
                         margin: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
-                          boxShadow: AppDimensions.cardShadow(Theme.of(context).colorScheme.onSurface),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.radiusLg),
+                          boxShadow: AppDimensions.cardShadow(
+                              Theme.of(context).colorScheme.onSurface),
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(AppDimensions.radiusLg),
+                          borderRadius:
+                              BorderRadius.circular(AppDimensions.radiusLg),
                           child: CachedNetworkImage(
-                            imageUrl:
-                                safeImageUrl(widget.imageUris![index]),
+                            imageUrl: safeImageUrl(widget.imageUris![index]),
                             fit: BoxFit.fill,
                             alignment: Alignment.topLeft,
                           ),

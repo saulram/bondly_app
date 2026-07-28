@@ -147,19 +147,12 @@ class SupabaseCompanyFeedsRepository extends CompanyFeedsRepository {
   @override
   Future<Result<List<User>, Exception>> getCompanyCollaborators() async {
     try {
-      final currentUserData = await _provider.client
-          .from('users')
-          .select('company_name')
-          .eq('id', _currentUserId!)
-          .single();
-
-      final companyName = currentUserData['company_name'] as String;
-
+      // Single-tenant: all users in this Supabase instance belong to the same company
       final response = await _provider.client
           .from('users')
           .select()
-          .eq('company_name', companyName)
-          .eq('visible', true);
+          .eq('visible', true)
+          .neq('id', _currentUserId!);
 
       final collaborators = (response as List)
           .map((row) => User.fromSupabase(row as Map<String, dynamic>))
@@ -178,28 +171,16 @@ class SupabaseCompanyFeedsRepository extends CompanyFeedsRepository {
     List<String> recipients,
   ) async {
     try {
-      final ackResponse = await _provider.client
-          .from('acknowledgments')
-          .insert({
-            'sender_id': _currentUserId,
-            'badge_id': badgeId,
-            'message': message,
-          })
-          .select()
-          .single();
+      final result = await _provider.client.rpc('create_acknowledgment', params: {
+        'p_badge_id': badgeId,
+        'p_recipients': recipients,
+        'p_message': message,
+      });
 
-      final ackId = ackResponse['id'];
-
-      final recipientRows = recipients
-          .map((recipientId) => {
-                'acknowledgment_id': ackId,
-                'recipient_id': recipientId,
-              })
-          .toList();
-
-      await _provider.client
-          .from('acknowledgment_recipients')
-          .insert(recipientRows);
+      final success = result['success'] as bool? ?? false;
+      if (!success) {
+        return Result.error(Exception(result['message'] ?? 'Error al crear reconocimiento'));
+      }
 
       return Result.success(true);
     } catch (exception) {
@@ -218,8 +199,7 @@ class SupabaseCompanyFeedsRepository extends CompanyFeedsRepository {
           .order('created_at', ascending: false);
 
       final announcements = (response as List)
-          .map((row) =>
-              Announcement.fromSupabase(row as Map<String, dynamic>))
+          .map((row) => Announcement.fromSupabase(row as Map<String, dynamic>))
           .toList();
 
       return Result.success(Announcements(announcement: announcements));

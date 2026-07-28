@@ -7,7 +7,6 @@ import 'package:bondly_app/features/profile/domain/models/user_activity.dart';
 import 'package:bondly_app/features/profile/domain/repositories/activity_repository.dart';
 import 'package:bondly_app/features/profile/domain/usecases/get_user_activity_usecase.dart';
 
-
 class MyActivityViewModel extends NavigationModel {
   final GetUserActivityUseCase _useCase;
   final UserUseCase _userUseCase;
@@ -24,17 +23,14 @@ class MyActivityViewModel extends NavigationModel {
 
   Future<void> load() async {
     var result = await _userUseCase.invoke();
-    result.when(
-      (user) {
-        if (user.id == null) {
-        }
-        userId = user.id!;
-        loadActivity();
-      }, (error) {
-        _logoutUseCase.invoke();
-        navigation.go(LoginScreen.route);
-      }
-    );
+    result.when((user) {
+      if (user.id == null) {}
+      userId = user.id!;
+      loadActivity();
+    }, (error) {
+      _logoutUseCase.invoke();
+      navigation.go(LoginScreen.route);
+    });
   }
 
   Future<void> loadActivity() async {
@@ -49,20 +45,17 @@ class MyActivityViewModel extends NavigationModel {
 
     try {
       var result = await _useCase.invoke(userId, limit: limit, page: nextPage);
-      result.when(
-        (activity) {
-          nextPage = activity.nextPage > nextPage ? activity.nextPage : -1;
-          activities.addAll(activity.activity);
-          notifyListeners();
-        },
-        (error) {
-          notificationMessage = StringsProfile.myActivityLoadError;
-          if (error is NoMoreContentException) {
-            notificationMessage = StringsProfile.myActivityLoadComplete;
-          }
-          notifyListeners();
+      result.when((activity) {
+        nextPage = activity.nextPage > nextPage ? activity.nextPage : -1;
+        activities.addAll(activity.activity);
+        notifyListeners();
+      }, (error) {
+        notificationMessage = StringsProfile.myActivityLoadError;
+        if (error is NoMoreContentException) {
+          notificationMessage = StringsProfile.myActivityLoadComplete;
         }
-      );
+        notifyListeners();
+      });
     } catch (exception) {
       notificationMessage = StringsProfile.myActivityLoadError;
       if (exception is NoMoreContentException) {
