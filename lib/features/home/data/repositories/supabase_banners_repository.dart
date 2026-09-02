@@ -15,7 +15,8 @@ class SupabaseBannersRepository extends BannersRepository {
           .from('banners')
           .select()
           .eq('is_active', true)
-          .eq('visible', true);
+          .eq('visible', true)
+          .order('created_at', ascending: false);
 
       final banners = (response as List)
           .map((row) => Banner.fromSupabase(row as Map<String, dynamic>))

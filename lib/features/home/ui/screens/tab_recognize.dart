@@ -195,8 +195,7 @@ class _RecognizeTabState extends State<RecognizeTab> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: colors.surface,
-                borderRadius:
-                    BorderRadius.circular(AppDimensions.radiusCard),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
                 border: Border.all(color: colors.border, width: 1),
               ),
               child: const Row(
@@ -225,8 +224,7 @@ class _RecognizeTabState extends State<RecognizeTab> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: colors.surface,
-                borderRadius:
-                    BorderRadius.circular(AppDimensions.radiusCard),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
                 border: Border.all(color: colors.border, width: 1),
               ),
               child: Column(
@@ -266,7 +264,7 @@ class _RecognizeTabState extends State<RecognizeTab> {
   // ─── Slider Section ───────────────────────────────────────────────────
 
   Widget _buildSliderSection() {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.fromLTRB(
         AppDimensions.paddingScreen,
         8,
@@ -274,22 +272,18 @@ class _RecognizeTabState extends State<RecognizeTab> {
         0,
       ),
       child: SliderBannerCard(
-        items: [
-          BannerItem(
-            tag: StringsHome.bannerTag1,
-            title: StringsHome.bannerTitle1,
-            subtitle: StringsHome.bannerSubtitle1,
-          ),
-          BannerItem(
-            tag: StringsHome.bannerTag2,
-            title: StringsHome.bannerTitle2,
-            subtitle: StringsHome.bannerSubtitle2,
-          ),
-          BannerItem(
-            title: StringsHome.bannerTitle3,
-            subtitle: StringsHome.bannerSubtitle3,
-          ),
-        ],
+        items: model.banners
+            .map((banner) => BannerItem(
+                tag: 'Novedades',
+                title: banner.name ?? 'Novedad',
+                subtitle: banner.description,
+                image: banner.image))
+            .toList(),
+        isLoading: model.bannersLoading,
+        errorMessage: model.bannersError == null
+            ? null
+            : 'No se pudieron cargar las novedades',
+        onRetry: model.getCompanyBanners,
       ),
     );
   }
@@ -450,8 +444,7 @@ class _RecognizeTabState extends State<RecognizeTab> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color:
-                                        colors.accent.withValues(alpha: 0.3),
+                                    color: colors.accent.withValues(alpha: 0.3),
                                     blurRadius: 12,
                                     spreadRadius: 1,
                                   ),
@@ -464,8 +457,7 @@ class _RecognizeTabState extends State<RecognizeTab> {
                             height: 56,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient:
-                                  _gradientForCategoryIndex(index),
+                              gradient: _gradientForCategoryIndex(index),
                             ),
                             child: Icon(
                               _defaultIconForBadgeType(badgeType),
@@ -909,8 +901,7 @@ class _RecognizeTabState extends State<RecognizeTab> {
     final personId = _selectedPerson?['user_id'] as String? ?? '';
     final taggedMessage =
         '@[$personName]($personId) ${_messageController.text}';
-    final error =
-        await model.submitAcknowledgmentDirect(taggedMessage);
+    final error = await model.submitAcknowledgmentDirect(taggedMessage);
     if (!mounted) return;
     if (error == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1072,8 +1063,7 @@ class _RecognizeTabState extends State<RecognizeTab> {
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundImage:
-                  avatar.isNotEmpty ? NetworkImage(avatar) : null,
+              backgroundImage: avatar.isNotEmpty ? NetworkImage(avatar) : null,
               backgroundColor: colors.surfaceElevated,
               child: avatar.isEmpty
                   ? Icon(LucideIcons.user, size: 18, color: colors.textMuted)

@@ -23,11 +23,16 @@ class NavigationModel extends ContextModel {
   }
 
   Future<void> getPackageInfo() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    appName = packageInfo.appName;
-    packageName = packageInfo.packageName;
-    version = packageInfo.version;
-    buildNumber = packageInfo.buildNumber;
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      appName = packageInfo.appName;
+      packageName = packageInfo.packageName;
+      version = packageInfo.version;
+      buildNumber = packageInfo.buildNumber;
+    } catch (_) {
+      // Package metadata is optional for a view model and unavailable in
+      // isolated environments without a platform-channel implementation.
+    }
   }
 
   String? _appName;
@@ -60,8 +65,10 @@ class NavigationModel extends ContextModel {
     notifyListeners();
   }
 
-  final GoRouter _navigation = getIt<AppRouter>().router;
-  GoRouter get navigation => _navigation;
+  // Resolve the router only when navigation is actually requested. This keeps
+  // view models usable in isolated tests and avoids constructing routing
+  // dependencies during model initialization.
+  GoRouter get navigation => getIt<AppRouter>().router;
   bool _busy = false;
   bool get busy => _busy;
   set busy(bool value) {

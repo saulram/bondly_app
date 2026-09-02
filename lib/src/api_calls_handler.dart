@@ -2,7 +2,6 @@
 
 import "dart:async";
 import "dart:convert";
-import 'dart:typed_data';
 
 import 'package:bondly_app/config/environment.dart';
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
@@ -207,8 +206,7 @@ class ApiCallsHandler extends CallsHandler {
       String filename = 'image',
       Map<String, String>? extraHeader}) async {
     var request = http.MultipartRequest(method, _bondlyUri(path));
-    final httpFile = http.MultipartFile.fromBytes(
-        name ?? 'image', bytes,
+    final httpFile = http.MultipartFile.fromBytes(name ?? 'image', bytes,
         filename: filename);
 
     request.headers.addAll({"Authorization": sessionTokenHandler.get()!});

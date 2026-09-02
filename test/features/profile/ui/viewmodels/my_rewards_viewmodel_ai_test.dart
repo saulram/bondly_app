@@ -63,15 +63,19 @@ Reward _testReward({
     );
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late MyRewardsViewModel viewModel;
   late MockGetShoppingItemsUseCase mockGetShoppingItems;
   late MockGetUserShoppingCartUseCase mockGetUserCart;
   late MockGetRewardRecommendationsUseCase mockGetRecommendations;
+  late MockGetAccountStatementUseCase mockGetAccountStatement;
 
   setUp(() {
     mockGetShoppingItems = MockGetShoppingItemsUseCase();
     mockGetUserCart = MockGetUserShoppingCartUseCase();
     mockGetRecommendations = MockGetRewardRecommendationsUseCase();
+    mockGetAccountStatement = MockGetAccountStatementUseCase();
 
     // Stub init() calls to prevent errors during construction
     when(() => mockGetShoppingItems.invoke()).thenAnswer(
@@ -79,6 +83,10 @@ void main() {
     );
     when(() => mockGetUserCart.invoke()).thenAnswer(
       (_) async => Result.success(UserCart(rewards: [])),
+    );
+    when(() => mockGetAccountStatement.invoke()).thenAnswer(
+      (_) async =>
+          Result.error(Exception('Balance is not needed in this test')),
     );
 
     viewModel = MyRewardsViewModel(
@@ -90,7 +98,7 @@ void main() {
       MockCheckOutCartUseCase(),
       MockAppServices(),
       mockGetRecommendations,
-      MockGetAccountStatementUseCase(),
+      mockGetAccountStatement,
       MockSharedPreferences(),
     );
   });
@@ -188,7 +196,9 @@ void main() {
       expect(profile['company'], 'CustomCo');
     });
 
-    test('handleGetRecommendations uses default profile when userProfileForAI is null', () async {
+    test(
+        'handleGetRecommendations uses default profile when userProfileForAI is null',
+        () async {
       viewModel.rewardList = RewardList(rewards: [
         _testReward(id: 'r1'),
       ]);

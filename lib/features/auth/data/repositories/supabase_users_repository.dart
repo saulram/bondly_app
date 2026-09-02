@@ -100,9 +100,15 @@ class SupabaseUsersRepository extends UsersRepository {
 
       // Translate camelCase keys to snake_case for Supabase columns
       final profileUpdate = <String, String>{};
-      if (data['location'] != null) profileUpdate['location'] = data['location']!;
-      if (data['jobPosition'] != null) profileUpdate['job_position'] = data['jobPosition']!;
-      if (data['bDay'] != null && data['bDay']!.isNotEmpty) profileUpdate['b_day'] = data['bDay']!;
+      if (data['location'] != null) {
+        profileUpdate['location'] = data['location']!;
+      }
+      if (data['jobPosition'] != null) {
+        profileUpdate['job_position'] = data['jobPosition']!;
+      }
+      if (data['bDay'] != null && data['bDay']!.isNotEmpty) {
+        profileUpdate['b_day'] = data['bDay']!;
+      }
 
       if (profileUpdate.isNotEmpty) {
         await _provider.client
@@ -115,8 +121,7 @@ class SupabaseUsersRepository extends UsersRepository {
       if (data['email'] != null) {
         await _provider.client
             .from('users')
-            .update({'email': data['email']!})
-            .eq('id', userId);
+            .update({'email': data['email']!}).eq('id', userId);
       }
     } catch (exception) {
       throw UserUpdateException();

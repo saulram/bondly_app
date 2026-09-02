@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:floor/floor.dart';
 
+// ignore: experimental_member_use
 class StringListConverter extends TypeConverter<List<String>, String> {
   @override
   List<String> decode(String databaseValue) {

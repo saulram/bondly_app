@@ -28,7 +28,7 @@ import 'package:bondly_app/config/backend_config.dart';
 import 'package:bondly_app/features/ranking/domain/models/ranked_user.dart';
 import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart' hide Banner;
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:logger/logger.dart';
 import 'package:multiple_result/multiple_result.dart';
@@ -158,14 +158,23 @@ class HomeViewModel extends NavigationModel {
   }
 
   CompanyBanners? _banners;
+  bool _bannersLoading = false;
+  Exception? _bannersError;
+  List<Banner> get banners => _banners?.banners ?? const [];
+  bool get bannersLoading => _bannersLoading;
+  Exception? get bannersError => _bannersError;
 
   /// Fetches company banners.
   Future<void> getCompanyBanners() async {
+    _bannersLoading = true;
+    _bannersError = null;
+    notifyListeners();
     log.i("Get Company Banners for user: ${user?.completeName}");
     final Result<CompanyBanners, Exception> result =
         await _bannersUseCase.invoke();
     result.when((banners) {
       _banners = banners;
+      _bannersLoading = false;
 
       log.i("HomeViewModel### Get Banners Success");
       List<String> uris = _banners!.banners!
@@ -174,6 +183,9 @@ class HomeViewModel extends NavigationModel {
           .toList();
       bannersList = uris;
     }, (error) {
+      _bannersLoading = false;
+      _bannersError = error;
+      notifyListeners();
       log.e(error.toString());
       if (error is TokenNotFoundException) {
         // Dispatch logout

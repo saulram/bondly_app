@@ -7,6 +7,27 @@ void main() {
       final service = GeminiService();
       expect(service, isNotNull);
     });
+
+    test('normalizes nested dynamic maps and list values', () {
+      final result = GeminiService.normalizeMap({
+        42: {'score': 0.9},
+        'items': [
+          {1: 'value'},
+        ],
+      });
+
+      expect(result['42'], {'score': 0.9});
+      expect(result['items'], [
+        {'1': 'value'},
+      ]);
+    });
+
+    test('rejects non-object responses', () {
+      expect(
+        () => GeminiService.normalizeMap(['not', 'an', 'object']),
+        throwsA(isA<FormatException>()),
+      );
+    });
   });
 
   group('GeminiServiceException', () {

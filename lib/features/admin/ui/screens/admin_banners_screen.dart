@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_admin.dart';
@@ -5,12 +7,14 @@ import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/admin/domain/models/admin_banner.dart';
 import 'package:bondly_app/features/admin/domain/models/admin_module.dart';
 import 'package:bondly_app/features/admin/ui/viewmodels/admin_banners_viewmodel.dart';
+import 'package:bondly_app/features/admin/data/validators/banner_image_validator.dart';
 import 'package:bondly_app/features/admin/ui/widgets/admin_empty_state.dart';
 import 'package:bondly_app/features/admin/ui/widgets/admin_permission_guard.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AdminBannersScreen extends StatefulWidget {
   static const String route = '/admin/banners';
@@ -57,8 +61,7 @@ class _AdminBannersScreenState extends State<AdminBannersScreen> {
                     ),
                     const Spacer(),
                     FilledButton.icon(
-                      onPressed: () =>
-                          _showBannerDialog(context, vm, colors),
+                      onPressed: () => _showBannerDialog(context, vm, colors),
                       icon: const Icon(LucideIcons.plus, size: 16),
                       label: const Text(StringsAdmin.addBanner),
                     ),
@@ -79,8 +82,8 @@ class _AdminBannersScreenState extends State<AdminBannersScreen> {
                                   icon: LucideIcons.image,
                                   message: StringsAdmin.noBannersFound,
                                   ctaLabel: StringsAdmin.addBanner,
-                                  onCta: () => _showBannerDialog(
-                                      context, vm, colors))
+                                  onCta: () =>
+                                      _showBannerDialog(context, vm, colors))
                               : _BannersGrid(
                                   vm: vm,
                                   colors: colors,
@@ -96,79 +99,168 @@ class _AdminBannersScreenState extends State<AdminBannersScreen> {
     );
   }
 
-  void _showBannerDialog(BuildContext context, AdminBannersViewModel vm,
-      BondlyColorScheme colors,
+  void _showBannerDialog(
+      BuildContext context, AdminBannersViewModel vm, BondlyColorScheme colors,
       {AdminBanner? banner}) {
     final nameCtrl = TextEditingController(text: banner?.name);
     final slugCtrl = TextEditingController(text: banner?.slug);
     final descCtrl = TextEditingController(text: banner?.description);
+    Uint8List? imageBytes;
+    String? imageError;
+    var saving = false;
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: colors.surface,
-        title: Text(
-          banner == null ? StringsAdmin.addBanner : StringsAdmin.editBanner,
-          style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
-        ),
-        content: SizedBox(
-          width: 400,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameCtrl,
-                decoration: InputDecoration(
-                    labelText: StringsAdmin.bannerName,
-                    border: const OutlineInputBorder()),
+      barrierDismissible: false,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => PopScope(
+          canPop: !saving,
+          child: AlertDialog(
+            backgroundColor: colors.surface,
+            title: Text(
+              banner == null ? StringsAdmin.addBanner : StringsAdmin.editBanner,
+              style: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+            ),
+            content: SizedBox(
+              width: 400,
+              child: IgnorePointer(
+                ignoring: saving,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      onTap: saving
+                          ? null
+                          : () async {
+                              final picked = await ImagePicker()
+                                  .pickImage(source: ImageSource.gallery);
+                              if (picked == null || !ctx.mounted) return;
+                              final bytes = await picked.readAsBytes();
+                              if (!ctx.mounted) return;
+                              try {
+                                BannerImageValidator.validate(bytes);
+                                setDialogState(() {
+                                  imageBytes = bytes;
+                                  imageError = null;
+                                });
+                              } on FormatException catch (e) {
+                                setDialogState(() => imageError = e.message);
+                              }
+                            },
+                      child: AspectRatio(
+                        aspectRatio: 2,
+                        child: imageBytes != null
+                            ? Image.memory(imageBytes!, fit: BoxFit.cover)
+                            : (banner?.image != null
+                                ? Image.network(banner!.image!,
+                                    fit: BoxFit.cover)
+                                : DecoratedBox(
+                                    decoration: BoxDecoration(
+                                        color: colors.surfaceElevated),
+                                    child: const Center(
+                                        child: Icon(LucideIcons.image)),
+                                  )),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Imagen panorámica (recomendado 2:1)',
+                            style: TextStyle(
+                                color: colors.textMuted, fontSize: 12))),
+                    if (imageError != null)
+                      Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(imageError!,
+                              style: const TextStyle(
+                                  color: Colors.red, fontSize: 12))),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: nameCtrl,
+                      decoration: InputDecoration(
+                          labelText: StringsAdmin.bannerName,
+                          border: const OutlineInputBorder()),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: slugCtrl,
+                      decoration: InputDecoration(
+                          labelText: StringsAdmin.bannerSlug,
+                          border: const OutlineInputBorder()),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: descCtrl,
+                      maxLines: 2,
+                      decoration: const InputDecoration(
+                          labelText: 'Descripción',
+                          border: OutlineInputBorder()),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: slugCtrl,
-                decoration: InputDecoration(
-                    labelText: StringsAdmin.bannerSlug,
-                    border: const OutlineInputBorder()),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: descCtrl,
-                maxLines: 2,
-                decoration: const InputDecoration(
-                    labelText: 'Descripción',
-                    border: OutlineInputBorder()),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: saving ? null : () => Navigator.pop(ctx),
+                  child: const Text(StringsAdmin.cancel)),
+              FilledButton(
+                onPressed: saving
+                    ? null
+                    : () async {
+                        if (nameCtrl.text.isEmpty) return;
+                        setDialogState(() => saving = true);
+                        bool ok;
+                        if (banner == null) {
+                          ok = await vm.createBanner(
+                            name: nameCtrl.text,
+                            slug: slugCtrl.text.isEmpty ? null : slugCtrl.text,
+                            description:
+                                descCtrl.text.isEmpty ? null : descCtrl.text,
+                            imageBytes: imageBytes,
+                          );
+                        } else {
+                          ok = await vm.updateBanner(
+                            bannerId: banner.id,
+                            name: nameCtrl.text,
+                            slug: slugCtrl.text.isEmpty ? null : slugCtrl.text,
+                            description:
+                                descCtrl.text.isEmpty ? null : descCtrl.text,
+                            imageBytes: imageBytes,
+                          );
+                        }
+                        if (!ctx.mounted) return;
+                        setDialogState(() => saving = false);
+                        if (ok) {
+                          Navigator.pop(ctx);
+                          return;
+                        }
+                        final message =
+                            vm.error ?? 'No se pudo guardar el banner.';
+                        await showDialog<void>(
+                          context: ctx,
+                          builder: (errorContext) => AlertDialog(
+                            title: const Text('No se pudo guardar'),
+                            content: Text(message),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(errorContext),
+                                child: const Text('Aceptar'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                child: saving
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Text(StringsAdmin.save),
               ),
             ],
           ),
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text(StringsAdmin.cancel)),
-          FilledButton(
-            onPressed: () async {
-              if (nameCtrl.text.isEmpty) return;
-              bool ok;
-              if (banner == null) {
-                ok = await vm.createBanner(
-                  name: nameCtrl.text,
-                  slug: slugCtrl.text.isEmpty ? null : slugCtrl.text,
-                  description:
-                      descCtrl.text.isEmpty ? null : descCtrl.text,
-                );
-              } else {
-                ok = await vm.updateBanner(
-                  bannerId: banner.id,
-                  name: nameCtrl.text,
-                  slug: slugCtrl.text.isEmpty ? null : slugCtrl.text,
-                  description:
-                      descCtrl.text.isEmpty ? null : descCtrl.text,
-                );
-              }
-              if (ok && ctx.mounted) Navigator.pop(ctx);
-            },
-            child: const Text(StringsAdmin.save),
-          ),
-        ],
       ),
     );
   }
@@ -194,8 +286,8 @@ class _BannersGrid extends StatelessWidget {
           childAspectRatio: 1.6,
         ),
         itemCount: vm.banners.length,
-        itemBuilder: (_, i) =>
-            _BannerCard(banner: vm.banners[i], vm: vm, colors: colors, onEdit: onEdit),
+        itemBuilder: (_, i) => _BannerCard(
+            banner: vm.banners[i], vm: vm, colors: colors, onEdit: onEdit),
       );
     });
   }
@@ -246,8 +338,7 @@ class _BannerCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
                 Expanded(
@@ -299,8 +390,8 @@ class _BannerCard extends StatelessWidget {
         backgroundColor: colors.surface,
         title: Text(StringsAdmin.confirmDeleteTitle,
             style: GoogleFonts.montserrat(fontWeight: FontWeight.bold)),
-        content: Text('¿Eliminar "${b.name}"?',
-            style: GoogleFonts.montserrat()),
+        content:
+            Text('¿Eliminar "${b.name}"?', style: GoogleFonts.montserrat()),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),

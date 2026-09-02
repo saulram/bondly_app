@@ -8,6 +8,25 @@ class GeminiService {
 
   GeminiService();
 
+  /// Converts response maps from Supabase/JSON into the strongly typed map
+  /// shape used by the AI layer. Supabase can return `Map<dynamic, dynamic>`
+  /// depending on the platform and transport decoder.
+  static Map<String, dynamic> normalizeMap(dynamic value) {
+    if (value is! Map) {
+      throw const FormatException('Expected a JSON object');
+    }
+
+    return value.map<String, dynamic>(
+      (key, item) => MapEntry(key.toString(), _normalizeValue(item)),
+    );
+  }
+
+  static dynamic _normalizeValue(dynamic value) {
+    if (value is Map) return normalizeMap(value);
+    if (value is List) return value.map(_normalizeValue).toList();
+    return value;
+  }
+
   Future<Map<String, dynamic>> generateJsonResponse(String prompt) async {
     try {
       _log.i('Gemini request initiated (via Edge Function)');
@@ -37,14 +56,8 @@ class GeminiService {
       // The edge function should return JSON parsed by the supabase client
       // If it returned a raw string, we might need to jsonDecode.
       // Let's handle both cases.
-      if (data is Map<String, dynamic>) {
-        return data;
-      } else if (data is String) {
-        return json.decode(data) as Map<String, dynamic>;
-      } else {
-        throw GeminiServiceException(
-            'Unexpected response format from Gemini Edge Function');
-      }
+      final decoded = data is String ? json.decode(data) : data;
+      return normalizeMap(decoded);
     } on FunctionException catch (e) {
       _log.e('Supabase Edge Function error: ${e.toString()}');
       throw GeminiServiceException('Edge Function error: ${e.toString()}');

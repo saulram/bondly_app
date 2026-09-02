@@ -5,6 +5,7 @@ import 'package:bondly_app/features/ai/domain/usecases/personalize_feed_usecase.
 import 'package:bondly_app/features/auth/domain/handlers/session_token_handler.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/home/domain/models/company_feed_model.dart';
+import 'package:bondly_app/features/home/domain/models/company_banners_model.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_acknowlegment.dart';
 import 'package:bondly_app/features/home/domain/usecases/create_feed_comment.dart';
 import 'package:bondly_app/features/home/domain/usecases/get_announcements.dart';
@@ -106,6 +107,8 @@ FeedData _testFeedData({
     );
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   late HomeViewModel viewModel;
   late MockPersonalizeFeedUseCase mockPersonalizeFeed;
   late MockAnalyzeSentimentUseCase mockAnalyzeSentiment;
@@ -224,8 +227,7 @@ void main() {
       expect(viewModel.personalizingFeed, isFalse);
     });
 
-    test(
-        'toggleFeedPersonalization preserves feeds not in AI response',
+    test('toggleFeedPersonalization preserves feeds not in AI response',
         () async {
       viewModel.feeds = CompanyFeed(
         data: [
@@ -277,8 +279,8 @@ void main() {
       await viewModel.analyzeFeedSentiment('feed_1', 'Great job!');
 
       expect(viewModel.getSentiment('feed_1'), isNotNull);
-      expect(viewModel.getSentiment('feed_1')!.sentiment,
-          SentimentType.positive);
+      expect(
+          viewModel.getSentiment('feed_1')!.sentiment, SentimentType.positive);
       expect(viewModel.getSentiment('feed_1')!.confidence, 0.92);
     });
 
@@ -351,6 +353,112 @@ void main() {
           viewModel.getSentiment('feed_a')!.sentiment, SentimentType.positive);
       expect(
           viewModel.getSentiment('feed_b')!.sentiment, SentimentType.negative);
+    });
+  });
+
+  group('Company banners', () {
+    late MockGetCompanyBannersUseCase bannersUseCase;
+
+    setUp(() {
+      bannersUseCase = MockGetCompanyBannersUseCase();
+      viewModel = HomeViewModel(
+        MockUserUseCase(),
+        MockSessionTokenHandler(),
+        bannersUseCase,
+        MockGetCompanyFeedsUseCase(),
+        MockCreateFeedCommentUseCase(),
+        MockHandleLikesUseCase(),
+        MockGetCategoriesUseCase(),
+        MockGetCategoryBadgesUseCase(),
+        MockGetCompanyCollaboratorsUseCase(),
+        MockCreateAcknowledgmentUseCase(),
+        MockGetCompanyAnnouncementsUseCase(),
+        MockGetUserEmbassysUseCase(),
+        MockGetRankingUseCase(),
+        mockPersonalizeFeed,
+        mockAnalyzeSentiment,
+      );
+    });
+
+    test('starts loading and exposes zero banners on an empty response',
+        () async {
+      final response = CompanyBanners(success: true, banners: []);
+      when(() => bannersUseCase.invoke())
+          .thenAnswer((_) async => Result.success(response));
+
+      final request = viewModel.getCompanyBanners();
+      expect(viewModel.bannersLoading, isTrue);
+      expect(viewModel.bannersError, isNull);
+      await request;
+
+      expect(viewModel.bannersLoading, isFalse);
+      expect(viewModel.banners, isEmpty);
+      expect(viewModel.bannersList, isEmpty);
+      expect(viewModel.bannersError, isNull);
+    });
+
+    test('stores one banner and its image URI', () async {
+      final banner = Banner(id: 'b1', name: 'One', image: 'https://one');
+      when(() => bannersUseCase.invoke())
+          .thenAnswer((_) async => Result.success(
+                CompanyBanners(success: true, banners: [banner]),
+              ));
+
+      await viewModel.getCompanyBanners();
+
+      expect(viewModel.banners, hasLength(1));
+      expect(viewModel.banners.single.id, 'b1');
+      expect(viewModel.bannersList, ['https://one']);
+    });
+
+    test(
+        'stores many banners and excludes banners without images from URI list',
+        () async {
+      when(() => bannersUseCase.invoke())
+          .thenAnswer((_) async => Result.success(
+                CompanyBanners(success: true, banners: [
+                  Banner(id: 'b1', image: 'https://one'),
+                  Banner(id: 'b2'),
+                  Banner(id: 'b3', image: 'https://three'),
+                ]),
+              ));
+
+      await viewModel.getCompanyBanners();
+
+      expect(viewModel.banners, hasLength(3));
+      expect(viewModel.bannersList, ['https://one', 'https://three']);
+    });
+
+    test('exposes errors and clears loading', () async {
+      final error = Exception('banner request failed');
+      when(() => bannersUseCase.invoke())
+          .thenAnswer((_) async => Result.error(error));
+
+      await viewModel.getCompanyBanners();
+
+      expect(viewModel.bannersLoading, isFalse);
+      expect(viewModel.bannersError, same(error));
+    });
+
+    test('refresh replaces the previous banners', () async {
+      when(() => bannersUseCase.invoke())
+          .thenAnswer((_) async => Result.success(
+                CompanyBanners(success: true, banners: [
+                  Banner(id: 'old', image: 'https://old'),
+                ]),
+              ));
+      await viewModel.getCompanyBanners();
+
+      when(() => bannersUseCase.invoke())
+          .thenAnswer((_) async => Result.success(
+                CompanyBanners(success: true, banners: [
+                  Banner(id: 'new', image: 'https://new'),
+                ]),
+              ));
+      await viewModel.getCompanyBanners();
+
+      expect(viewModel.banners.single.id, 'new');
+      expect(viewModel.bannersList, ['https://new']);
     });
   });
 }

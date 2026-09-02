@@ -63,7 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         context.push(NotificationsScreen.route);
                       },
                       showAdminButton: model.user?.isAdmin ?? false,
-                      onAdminTap: () => context.push('/admin'),
+                      onAdminTap: () => context.push('/admin').then((_) {
+                        if (mounted) model.getCompanyBanners();
+                      }),
                     ),
                     // Body (PageView for tabs)
                     Expanded(

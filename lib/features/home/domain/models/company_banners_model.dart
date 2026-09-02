@@ -41,6 +41,7 @@ class Banner {
   String? description;
   bool? isActive;
   String? companyName;
+  DateTime? createdAt;
   int? v;
 
   Banner({
@@ -51,6 +52,7 @@ class Banner {
     this.description,
     this.isActive,
     this.companyName,
+    this.createdAt,
     this.v,
   });
 
@@ -62,6 +64,7 @@ class Banner {
         description: json["description"],
         isActive: json["isActive"],
         companyName: json["companyName"],
+        createdAt: DateTime.tryParse(json["createdAt"]?.toString() ?? ''),
         v: json["__v"],
       );
 
@@ -73,6 +76,7 @@ class Banner {
         description: json["description"],
         isActive: json["is_active"],
         companyName: json["company_name"],
+        createdAt: DateTime.tryParse(json["created_at"]?.toString() ?? ''),
       );
 
   Map<String, dynamic> toJson() => {
@@ -83,6 +87,7 @@ class Banner {
         "description": description,
         "isActive": isActive,
         "companyName": companyName,
+        "createdAt": createdAt?.toIso8601String(),
         "__v": v,
       };
 }

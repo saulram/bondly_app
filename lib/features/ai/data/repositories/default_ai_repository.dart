@@ -23,7 +23,8 @@ class DefaultAIRepository extends AIRepository {
         return {
           'id': f['id'],
           'header': f['header'],
-          'body': (f['body'] as String?)?.substring(0, (f['body'] as String).length.clamp(0, 100)),
+          'body': (f['body'] as String?)
+              ?.substring(0, (f['body'] as String).length.clamp(0, 100)),
           'type': f['type'],
           'likes': f['likesCount'],
           'comments': f['commentsCount'],
@@ -68,11 +69,14 @@ Criterios de relevancia:
           feedItems.map((f) => f['id'].toString()).toList();
 
       final insightsMap = <String, FeedInsight>{};
-      final rawInsights = response['insights'] as Map<String, dynamic>? ?? {};
+      final rawInsights = response['insights'] == null
+          ? <String, dynamic>{}
+          : GeminiService.normalizeMap(response['insights']);
       for (final entry in rawInsights.entries) {
-        insightsMap[entry.key] = FeedInsight.fromJson(
-          entry.value as Map<String, dynamic>,
-        );
+        if (entry.value is Map) {
+          insightsMap[entry.key] =
+              FeedInsight.fromJson(GeminiService.normalizeMap(entry.value));
+        }
       }
 
       return Result.success(PersonalizedFeedResult(
@@ -86,7 +90,8 @@ Criterios de relevancia:
   }
 
   @override
-  Future<Result<List<RewardRecommendation>, Exception>> getRewardRecommendations({
+  Future<Result<List<RewardRecommendation>, Exception>>
+      getRewardRecommendations({
     required Map<String, dynamic> userProfile,
     required List<Map<String, dynamic>> availableRewards,
   }) async {
@@ -136,7 +141,10 @@ Criterios:
       final response = await _geminiService.generateJsonResponse(prompt);
 
       final recommendations = (response['recommendations'] as List<dynamic>?)
-              ?.map((r) => RewardRecommendation.fromJson(r as Map<String, dynamic>))
+              ?.whereType<Map>()
+              .map((r) => RewardRecommendation.fromJson(
+                    GeminiService.normalizeMap(r),
+                  ))
               .toList() ??
           [];
 

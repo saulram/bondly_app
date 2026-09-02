@@ -129,7 +129,8 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
       ),
       child: const Column(
         children: [
-          SizedBox(height: 80, child: Center(child: BondlyShimmerCircle(size: 52))),
+          SizedBox(
+              height: 80, child: Center(child: BondlyShimmerCircle(size: 52))),
           Padding(
             padding: EdgeInsets.all(12),
             child: Column(
@@ -148,7 +149,7 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
   // ─── Slider Section ───────────────────────────────────────────────────
 
   Widget _buildSliderSection() {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.fromLTRB(
         AppDimensions.paddingScreen,
         8,
@@ -156,22 +157,18 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
         0,
       ),
       child: SliderBannerCard(
-        items: [
-          BannerItem(
-            tag: StringsHome.bannerTag1,
-            title: StringsHome.bannerTitle1,
-            subtitle: StringsHome.bannerSubtitle1,
-          ),
-          BannerItem(
-            tag: StringsHome.bannerTag2,
-            title: StringsHome.bannerTitle2,
-            subtitle: StringsHome.bannerSubtitle2,
-          ),
-          BannerItem(
-            title: StringsHome.bannerTitle3,
-            subtitle: StringsHome.bannerSubtitle3,
-          ),
-        ],
+        items: model.banners
+            .map((banner) => BannerItem(
+                tag: 'Novedades',
+                title: banner.name ?? 'Novedad',
+                subtitle: banner.description,
+                image: banner.image))
+            .toList(),
+        isLoading: model.bannersLoading,
+        errorMessage: model.bannersError == null
+            ? null
+            : 'No se pudieron cargar las novedades',
+        onRetry: model.getCompanyBanners,
       ),
     );
   }
