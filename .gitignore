@@ -52,3 +52,7 @@ app.*.map.json
 supabase/.temp/
 supabase/.branches/
 models.json
+.vercel/
+.env
+.env.*
+!.env.example
