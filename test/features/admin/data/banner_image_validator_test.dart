@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:bondly_app/features/admin/data/validators/banner_image_validator.dart';
@@ -88,6 +89,23 @@ void main() {
         () => BannerImageValidator.validate(
             Uint8List(BannerImageValidator.maxBytes + 1)),
         throwsA(isA<FormatException>()));
+  });
+
+  test('generates web-safe unique storage object names', () {
+    final timestamp = DateTime.fromMicrosecondsSinceEpoch(1730000000000);
+    final first = BannerStorageObjectName.generate(
+      extension: 'webp',
+      timestamp: timestamp,
+      random: Random(1),
+    );
+    final second = BannerStorageObjectName.generate(
+      extension: 'webp',
+      timestamp: timestamp,
+      random: Random(2),
+    );
+
+    expect(first, matches(RegExp(r'^banner_1730000000000_[0-9a-f]{8}\.webp$')));
+    expect(second, isNot(first));
   });
 
   test('decodes only generated banner paths from the real storage origin', () {

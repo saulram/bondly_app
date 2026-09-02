@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
@@ -67,6 +68,24 @@ class BannerImageValidator {
       return 'webp';
     }
     return null;
+  }
+}
+
+class BannerStorageObjectName {
+  static String generate({
+    required String extension,
+    DateTime? timestamp,
+    Random? random,
+  }) {
+    final generator = random ?? Random.secure();
+    // Keep each nextInt bound within 16 bits. A 2^32 bound overflows to zero
+    // in compiled Flutter Web builds, while two 16-bit draws preserve the
+    // intended 32 bits of entropy.
+    final randomHex =
+        '${generator.nextInt(0x10000).toRadixString(16).padLeft(4, '0')}'
+        '${generator.nextInt(0x10000).toRadixString(16).padLeft(4, '0')}';
+    return 'banner_${(timestamp ?? DateTime.now()).microsecondsSinceEpoch}_'
+        '$randomHex.$extension';
   }
 }
 

@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:bondly_app/features/admin/data/validators/banner_image_validator.dart';
@@ -42,8 +41,7 @@ class SupabaseAdminBannersRepository {
   Future<Result<String, Exception>> uploadBannerImage(Uint8List bytes) async {
     try {
       final info = BannerImageValidator.validate(bytes);
-      final name =
-          'banner_${DateTime.now().microsecondsSinceEpoch}_${_random.nextInt(1 << 32).toRadixString(16)}.${info.extension}';
+      final name = BannerStorageObjectName.generate(extension: info.extension);
       await _supabase.client.storage.from('banners').uploadBinary(
             name,
             bytes,
@@ -138,8 +136,6 @@ class SupabaseAdminBannersRepository {
       return Result.error(Exception(e.toString()));
     }
   }
-
-  static final Random _random = Random.secure();
 
   Future<void> _removeOwnedObject(String? url) async {
     if (url == null) {
