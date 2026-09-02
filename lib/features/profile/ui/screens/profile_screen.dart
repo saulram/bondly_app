@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_profile.dart';
+import 'package:bondly_app/config/strings_suggestions.dart';
+import 'package:bondly_app/features/suggestions/ui/screens/suggestions_screen.dart';
 import 'package:bondly_app/dependencies/dependency_manager.dart';
 import 'package:bondly_app/features/base/ui/viewmodels/base_model.dart';
 import 'package:bondly_app/features/home/ui/widgets/full_screen_image.dart';
@@ -418,6 +420,11 @@ class ProfileScreenState extends State<ProfileScreen> {
         title: StringsProfile.monthlyReport,
         icon: LucideIcons.wallet,
         onTap: () => context.push(MonthlyBalanceScreen.route),
+      ),
+      _MenuItem(
+        title: StringsSuggestions.screenTitle,
+        icon: LucideIcons.messageCircle,
+        onTap: () => context.push(SuggestionsScreen.route),
       ),
     ];
 

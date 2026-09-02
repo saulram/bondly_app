@@ -29,6 +29,9 @@ import 'package:bondly_app/features/profile/domain/repositories/bondly_badges_re
 import 'package:bondly_app/features/profile/domain/repositories/cart_repository.dart';
 import 'package:bondly_app/features/ranking/domain/repositories/ranking_repository.dart';
 import 'package:bondly_app/features/ranking/domain/usecases/get_ranking_usecase.dart';
+import 'package:bondly_app/features/suggestions/domain/repositories/suggestions_repository.dart';
+import 'package:bondly_app/features/suggestions/domain/usecases/get_my_suggestions_usecase.dart';
+import 'package:bondly_app/features/suggestions/domain/usecases/submit_suggestion_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/bulk_add_cart_items_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/checkout_cart_usecase.dart';
 import 'package:bondly_app/features/profile/domain/usecases/clear_shopping_cart_usecase.dart';
@@ -200,6 +203,12 @@ class UseCaseProvider {
 
     getIt.registerSingleton<GetRankingUseCase>(
         GetRankingUseCase(getIt<RankingRepository>()));
+
+    getIt.registerSingleton<SubmitSuggestionUseCase>(
+        SubmitSuggestionUseCase(getIt<SuggestionsRepository>()));
+
+    getIt.registerSingleton<GetMySuggestionsUseCase>(
+        GetMySuggestionsUseCase(getIt<SuggestionsRepository>()));
 
     getIt.registerSingletonWithDependencies<UserProfileUseCase>(
         () => UserProfileUseCase(

@@ -47,3 +47,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Supabase local dev state (never commit)
+supabase/.temp/
+supabase/.branches/
+models.json

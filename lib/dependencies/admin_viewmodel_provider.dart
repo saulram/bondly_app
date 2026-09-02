@@ -7,6 +7,7 @@ import 'package:bondly_app/features/admin/data/repositories/supabase_admin_feeds
 import 'package:bondly_app/features/admin/data/repositories/supabase_admin_news_repository.dart';
 import 'package:bondly_app/features/admin/data/repositories/supabase_admin_permissions_repository.dart';
 import 'package:bondly_app/features/admin/data/repositories/supabase_admin_rewards_repository.dart';
+import 'package:bondly_app/features/admin/data/repositories/supabase_admin_suggestions_repository.dart';
 import 'package:bondly_app/features/admin/data/repositories/supabase_admin_users_repository.dart';
 import 'package:bondly_app/features/admin/data/repositories/supabase_admin_zones_repository.dart';
 import 'package:bondly_app/features/admin/domain/usecases/get_admin_permissions_usecase.dart';
@@ -22,6 +23,7 @@ import 'package:bondly_app/features/admin/ui/viewmodels/admin_permissions_viewmo
 import 'package:bondly_app/features/admin/ui/viewmodels/admin_reports_viewmodel.dart';
 import 'package:bondly_app/features/admin/ui/viewmodels/admin_rewards_viewmodel.dart';
 import 'package:bondly_app/features/admin/ui/viewmodels/admin_shell_viewmodel.dart';
+import 'package:bondly_app/features/admin/ui/viewmodels/admin_suggestions_viewmodel.dart';
 import 'package:bondly_app/features/admin/ui/viewmodels/admin_users_viewmodel.dart';
 import 'package:bondly_app/features/admin/ui/viewmodels/admin_zones_viewmodel.dart';
 import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
@@ -82,6 +84,10 @@ class AdminViewModelProvider {
     );
     getIt.registerFactory<AdminFeedsViewModel>(
       () => AdminFeedsViewModel(getIt<SupabaseAdminFeedsRepository>()),
+    );
+    getIt.registerFactory<AdminSuggestionsViewModel>(
+      () => AdminSuggestionsViewModel(
+          getIt<SupabaseAdminSuggestionsRepository>()),
     );
   }
 }

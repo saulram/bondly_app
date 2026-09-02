@@ -302,5 +302,6 @@ class _PermissionsGrid extends StatelessWidget {
         AdminModule.manageZones => StringsAdmin.navZones,
         AdminModule.manageSettings => StringsAdmin.navSettings,
         AdminModule.manageFeeds => StringsAdmin.navFeeds,
+        AdminModule.manageSuggestions => StringsAdmin.navSuggestions,
       };
 }
