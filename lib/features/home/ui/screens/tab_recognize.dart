@@ -525,7 +525,9 @@ class _RecognizeTabState extends State<RecognizeTab> {
             Icon(LucideIcons.info, size: 14, color: colors.textMuted),
             const SizedBox(width: 6),
             Text(
-              StringsHome.step1BadgeCostInfo,
+              StringsHome.badgeCostInfo(
+                model.badges.badges.map((badge) => badge.value),
+              ),
               style: GoogleFonts.montserrat(
                 fontSize: 11,
                 color: colors.textMuted,

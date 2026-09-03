@@ -1,15 +1,81 @@
 import 'package:bondly_app/config/colors.dart';
 import 'package:bondly_app/config/dimensions.dart';
 import 'package:bondly_app/config/strings_notifications.dart';
+import 'package:bondly_app/dependencies/dependency_manager.dart';
+import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
+import 'package:bondly_app/features/profile/domain/models/user_activity.dart';
+import 'package:bondly_app/features/profile/domain/repositories/activity_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class NotificationsScreen extends StatelessWidget {
+class NotificationsScreen extends StatefulWidget {
   static const String route = "/notificationsScreen";
 
   const NotificationsScreen({super.key});
+
+  @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  final _userUseCase = getIt<UserUseCase>();
+  final _activityRepository = getIt<ActivityRepository>();
+  List<_NotificationData> _notifications = [];
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotifications();
+  }
+
+  Future<void> _loadNotifications() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final userResult = await _userUseCase.invoke();
+      final user = userResult.tryGetSuccess();
+      if (user?.id == null) throw StateError('No active session');
+      final activityResult =
+          await _activityRepository.getActivityList(user!.id!, 100, 0);
+      final holder = activityResult.tryGetSuccess();
+      if (holder == null) throw activityResult.tryGetError()!;
+      if (!mounted) return;
+      setState(() {
+        _notifications =
+            holder.activity.map(_NotificationData.fromActivity).toList();
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _error = 'No pudimos cargar tus notificaciones.';
+      });
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _markAsRead(_NotificationData item) async {
+    if (item.isRead) return;
+    final index = _notifications.indexWhere((value) => value.id == item.id);
+    if (index < 0) return;
+    setState(() => _notifications[index] = item.copyWith(isRead: true));
+    try {
+      final result = await _activityRepository.updateActivityStatus(item.id);
+      if (result.isError()) throw result.tryGetError()!;
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _notifications[index] = item);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo marcar como leída.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +134,28 @@ class NotificationsScreen extends StatelessWidget {
   }
 
   Widget _buildBody(BondlyColorScheme colors) {
-    // TODO: Replace with actual notifications list from API
-    const notifications = <_NotificationData>[];
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-    if (notifications.isEmpty) {
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(_error!, style: TextStyle(color: colors.textSecondary)),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: _loadNotifications,
+              icon: const Icon(LucideIcons.refreshCw, size: 16),
+              label: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_notifications.isEmpty) {
       return _buildEmptyState(colors);
     }
 
@@ -80,14 +164,17 @@ class NotificationsScreen extends StatelessWidget {
         horizontal: AppDimensions.paddingScreen,
         vertical: 12,
       ),
-      itemCount: notifications.length,
+      itemCount: _notifications.length,
       separatorBuilder: (_, __) => Divider(
         color: colors.border,
         height: 1,
       ),
       itemBuilder: (context, index) {
-        final item = notifications[index];
-        return _NotificationTile(item: item);
+        final item = _notifications[index];
+        return InkWell(
+          onTap: () => _markAsRead(item),
+          child: _NotificationTile(item: item),
+        );
       },
     );
   }
@@ -145,6 +232,7 @@ class NotificationsScreen extends StatelessWidget {
 enum NotificationType { recognition, reward, system }
 
 class _NotificationData {
+  final String id;
   final String title;
   final String body;
   final String timeAgo;
@@ -152,12 +240,53 @@ class _NotificationData {
   final bool isRead;
 
   const _NotificationData({
+    required this.id,
     required this.title,
     required this.body,
     required this.timeAgo,
     required this.type,
     required this.isRead,
   });
+
+  factory _NotificationData.fromActivity(UserActivityItem activity) {
+    final searchable = '${activity.title} ${activity.content}'.toLowerCase();
+    final type =
+        searchable.contains('canje') || searchable.contains('recompensa')
+            ? NotificationType.reward
+            : searchable.contains('reconoc') || searchable.contains('insignia')
+                ? NotificationType.recognition
+                : NotificationType.system;
+    final createdAt = DateTime.tryParse(activity.createdAt);
+    return _NotificationData(
+      id: activity.id,
+      title: activity.title.isEmpty ? 'Notificación' : activity.title,
+      body: activity.content,
+      timeAgo: _formatTimeAgo(createdAt),
+      type: type,
+      isRead: activity.read,
+    );
+  }
+
+  _NotificationData copyWith({bool? isRead}) => _NotificationData(
+        id: id,
+        title: title,
+        body: body,
+        timeAgo: timeAgo,
+        type: type,
+        isRead: isRead ?? this.isRead,
+      );
+
+  static String _formatTimeAgo(DateTime? date) {
+    if (date == null) return '';
+    final difference = DateTime.now().difference(date.toLocal());
+    if (difference.inMinutes < 1) return 'Ahora';
+    if (difference.inHours < 1) return 'Hace ${difference.inMinutes} min';
+    if (difference.inDays < 1) return 'Hace ${difference.inHours} h';
+    if (difference.inDays < 7) return 'Hace ${difference.inDays} d';
+    return '${date.toLocal().day.toString().padLeft(2, '0')}/'
+        '${date.toLocal().month.toString().padLeft(2, '0')}/'
+        '${date.toLocal().year}';
+  }
 }
 
 // ─── List tile widget ───────────────────────────────────────────────────

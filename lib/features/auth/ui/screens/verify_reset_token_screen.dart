@@ -21,8 +21,7 @@ class VerifyResetTokenScreen extends StatefulWidget {
   final String email;
 
   @override
-  State<VerifyResetTokenScreen> createState() =>
-      _VerifyResetTokenScreenState();
+  State<VerifyResetTokenScreen> createState() => _VerifyResetTokenScreenState();
 }
 
 class _VerifyResetTokenScreenState extends State<VerifyResetTokenScreen> {
@@ -34,8 +33,7 @@ class _VerifyResetTokenScreenState extends State<VerifyResetTokenScreen> {
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
-  String get _token =>
-      _digitControllers.map((c) => c.text).join();
+  String get _token => _digitControllers.map((c) => c.text).join();
 
   @override
   Widget build(BuildContext context) {
@@ -276,7 +274,7 @@ class _VerifyResetTokenScreenState extends State<VerifyResetTokenScreen> {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            model.onVerifyToken(_token);
+            model.onVerifyToken(widget.email, _token);
           },
           child: Center(
             child: Text(

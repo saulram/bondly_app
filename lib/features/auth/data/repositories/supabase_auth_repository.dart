@@ -2,6 +2,8 @@ import 'package:bondly_app/features/auth/domain/models/user_model.dart';
 import 'package:bondly_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:bondly_app/src/supabase_client_provider.dart';
 import 'package:multiple_result/multiple_result.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'
+    show AuthException, OtpType, UserAttributes;
 
 class SupabaseAuthRepository extends AuthRepository {
   final SupabaseClientProvider _provider;
@@ -16,7 +18,8 @@ class SupabaseAuthRepository extends AuthRepository {
   ) async {
     try {
       // Single-tenant: look up email by employee number only (no company filter)
-      final email = await _provider.client.rpc('get_email_by_employee', params: {
+      final email =
+          await _provider.client.rpc('get_email_by_employee', params: {
         'p_employee_number': int.tryParse(user) ?? 0,
       });
 
@@ -65,15 +68,49 @@ class SupabaseAuthRepository extends AuthRepository {
   }
 
   @override
-  Future<Result<bool, Exception>> verifyResetToken(String token) async {
-    // TODO: Implement Supabase token verification
-    return Result.error(InvalidTokenException());
+  Future<Result<bool, Exception>> verifyResetToken(
+      String email, String token) async {
+    try {
+      final response = await _provider.client.auth.verifyOTP(
+        email: email,
+        token: token,
+        type: OtpType.recovery,
+      );
+      if (response.session == null) {
+        return Result.error(InvalidTokenException());
+      }
+      return Result.success(true);
+    } on AuthException catch (exception) {
+      final message = exception.message.toLowerCase();
+      if (message.contains('expired')) {
+        return Result.error(ExpiredTokenException());
+      }
+      return Result.error(InvalidTokenException());
+    } catch (_) {
+      return Result.error(NoConnectionException());
+    }
   }
 
   @override
   Future<Result<bool, Exception>> confirmResetPassword(
       String token, String newPassword) async {
-    // TODO: Implement Supabase password reset confirmation
-    return Result.error(PasswordResetException());
+    try {
+      if (_provider.client.auth.currentSession == null) {
+        return Result.error(InvalidTokenException());
+      }
+      await _provider.client.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+      await _provider.client.auth.signOut();
+      return Result.success(true);
+    } on AuthException catch (exception) {
+      final message = exception.message.toLowerCase();
+      if (message.contains('weak') || message.contains('password')) {
+        return Result.error(WeakPasswordException());
+      }
+      return Result.error(PasswordResetException());
+    } catch (_) {
+      return Result.error(NoConnectionException());
+    }
   }
 }

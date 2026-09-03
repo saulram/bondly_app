@@ -26,7 +26,7 @@ abstract class AuthRepository {
       String user, String password, String company);
   Future<Result<List<String>, Exception>> getCompanies();
   Future<Result<bool, Exception>> resetPassword(String email);
-  Future<Result<bool, Exception>> verifyResetToken(String token);
+  Future<Result<bool, Exception>> verifyResetToken(String email, String token);
   Future<Result<bool, Exception>> confirmResetPassword(
       String token, String newPassword);
 }

@@ -122,8 +122,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                 ),
                 decoration: BoxDecoration(
                   gradient: AppDimensions.accentGradient(colors),
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusPill),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
                 ),
                 child: Text(
                   '${rewardsModel.userBalance} ${StringsCart.pointsSuffix}',
@@ -176,15 +175,13 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  gradient: isActive
-                      ? AppDimensions.accentGradient(colors)
-                      : null,
+                  gradient:
+                      isActive ? AppDimensions.accentGradient(colors) : null,
                   color: isActive ? null : colors.surfaceElevated,
                   border: isActive
                       ? null
                       : Border.all(color: colors.border, width: 1),
-                  borderRadius:
-                      BorderRadius.circular(AppDimensions.radiusPill),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
                 ),
                 alignment: Alignment.center,
                 child: Text(
@@ -244,7 +241,11 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
           return _buildRewardsListView(rewards, rewardsModel, colors);
         }
         return _buildRewardsGridView(
-          rewards, rewardsModel, colors, crossAxisCount, availableWidth,
+          rewards,
+          rewardsModel,
+          colors,
+          crossAxisCount,
+          availableWidth,
         );
       },
     );
@@ -375,10 +376,13 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Toca para generar sugerencias personalizadas',
+                      rewardsModel.recommendationsError ??
+                          'Toca para generar sugerencias personalizadas',
                       style: GoogleFonts.montserrat(
                         fontSize: 11,
-                        color: colors.textMuted,
+                        color: rewardsModel.recommendationsError == null
+                            ? colors.textMuted
+                            : Colors.red,
                       ),
                     ),
                   ],
@@ -449,9 +453,10 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
   }
 
   void _handleAddToCart(MyRewardsViewModel rewardsModel, String rewardId) {
-    rewardsModel.cartEdited = true;
     final added = rewardsModel.addToCart(rewardId);
-    if (!added) {
+    if (added) {
+      rewardsModel.cartEdited = true;
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(StringsCart.notEnoughPoints),
@@ -468,6 +473,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
   ) {
     final itemCount = rewardsModel.getItemCount(reward.id);
     final canAfford = rewardsModel.canAffordItem(reward.id);
+    final isAvailable = reward.enable && reward.visible;
 
     return Container(
       decoration: BoxDecoration(
@@ -481,8 +487,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
         children: [
           // Card header row
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -496,25 +501,32 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                 ),
                 itemCount == 0
                     ? GestureDetector(
-                        onTap: () =>
-                            _handleAddToCart(rewardsModel, reward.id),
+                        onTap: isAvailable
+                            ? () => _handleAddToCart(rewardsModel, reward.id)
+                            : null,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: colors.accentSoft,
+                            color: isAvailable
+                                ? colors.accentSoft
+                                : colors.surfaceElevated,
                             borderRadius: BorderRadius.circular(
                               AppDimensions.radiusPill,
                             ),
                           ),
                           child: Text(
-                            StringsCart.selectItem,
+                            isAvailable
+                                ? StringsCart.selectItem
+                                : StringsCart.unavailableItem,
                             style: GoogleFonts.montserrat(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: colors.accent,
+                              color: isAvailable
+                                  ? colors.accent
+                                  : colors.textMuted,
                             ),
                           ),
                         ),
@@ -554,8 +566,10 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () =>
-                                _handleAddToCart(rewardsModel, reward.id),
+                            onTap: isAvailable
+                                ? () =>
+                                    _handleAddToCart(rewardsModel, reward.id)
+                                : null,
                             child: Container(
                               width: 28,
                               height: 28,
@@ -602,8 +616,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
                     child: CachedNetworkImage(
                       imageUrl: safeImageUrl(reward.image),
                       fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          const BondlyShimmerBlock(
+                      placeholder: (context, url) => const BondlyShimmerBlock(
                         width: double.infinity,
                         height: double.infinity,
                         borderRadius: 12,
@@ -625,8 +638,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
 
           // Title + Points badge
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               children: [
                 Expanded(
@@ -677,8 +689,7 @@ class _MyRewardsScreenState extends State<MyRewardsScreen> {
 
           // Description
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Text(
               reward.description,
               maxLines: 3,

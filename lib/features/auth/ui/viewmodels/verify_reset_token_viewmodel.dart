@@ -13,11 +13,11 @@ class VerifyResetTokenViewModel extends NavigationModel {
 
   VerifyResetTokenViewModel(this._verifyUseCase, this._resendUseCase);
 
-  Future<void> onVerifyToken(String token) async {
+  Future<void> onVerifyToken(String email, String token) async {
     state = VerifyResetTokenLoading();
     notifyListeners();
 
-    final result = await _verifyUseCase.invoke(token);
+    final result = await _verifyUseCase.invoke(email, token);
     result.when(
       (success) {
         state = VerifyResetTokenSuccess();
@@ -29,8 +29,7 @@ class VerifyResetTokenViewModel extends NavigationModel {
           EmptyLoginFieldsException() => VerifyResetTokenErrorType.emptyToken,
           InvalidTokenException() => VerifyResetTokenErrorType.invalidToken,
           ExpiredTokenException() => VerifyResetTokenErrorType.expiredToken,
-          NoConnectionException() =>
-            VerifyResetTokenErrorType.connectionError,
+          NoConnectionException() => VerifyResetTokenErrorType.connectionError,
           _ => VerifyResetTokenErrorType.unknownError,
         };
         state = VerifyResetTokenFailed(errorType);

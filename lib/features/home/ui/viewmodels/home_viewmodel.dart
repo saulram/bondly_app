@@ -61,6 +61,10 @@ class HomeViewModel extends NavigationModel {
       GlobalKey<FlutterMentionsState>();
 
   User? user;
+  bool _userLoading = true;
+  bool get userLoading => _userLoading;
+  String? _userLoadError;
+  String? get userLoadError => _userLoadError;
   Logger log = Logger(
     printer: PrettyPrinter(methodCount: 0),
   );
@@ -91,15 +95,23 @@ class HomeViewModel extends NavigationModel {
 
   /// Sets up the user.
   Future<void> setUpUser() async {
+    _userLoading = true;
+    _userLoadError = null;
+    notifyListeners();
     final Result<User, Exception> result = await _userUseCase.invoke();
     result.when((user) {
       this.user = user;
+      _userLoading = false;
       log.i("HomeViewModel### User: ${user.toJson()}");
       notifyListeners();
       handleHomeCalls();
     }, (error) {
+      _userLoading = false;
+      _userLoadError =
+          'No pudimos cargar tu sesión. Revisa tu conexión e intenta de nuevo.';
       log.e(error.toString());
       _tokenHandler.clear();
+      notifyListeners();
     });
   }
 
@@ -524,10 +536,14 @@ class HomeViewModel extends NavigationModel {
   PersonalizedFeedResult? _feedPersonalization;
   PersonalizedFeedResult? get feedPersonalization => _feedPersonalization;
 
+  String? _feedPersonalizationError;
+  String? get feedPersonalizationError => _feedPersonalizationError;
+
   Future<void> toggleFeedPersonalization() async {
     if (_isPersonalized) {
       _isPersonalized = false;
       _feedPersonalization = null;
+      _feedPersonalizationError = null;
       // Re-sort chronologically
       _feeds.data.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       notifyListeners();
@@ -535,6 +551,7 @@ class HomeViewModel extends NavigationModel {
     }
 
     _personalizingFeed = true;
+    _feedPersonalizationError = null;
     notifyListeners();
 
     final feedItems = _feeds.data.map((f) {
@@ -584,6 +601,8 @@ class HomeViewModel extends NavigationModel {
           "HomeViewModel### Feed personalized with ${orderedIds.length} items");
     }, (error) {
       log.e("Feed personalization failed: $error");
+      _feedPersonalizationError =
+          'No pudimos personalizar el feed. Conservamos el orden habitual.';
     });
 
     _personalizingFeed = false;

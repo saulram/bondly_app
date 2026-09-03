@@ -111,6 +111,7 @@ class MyRewardsViewModel extends NavigationModel {
   // ── Rewards list ───────────────────────────────────────────────────
 
   RewardList _rewardList = RewardList(rewards: []);
+  List<Reward> _allRewards = [];
 
   RewardList get rewardList => _rewardList;
 
@@ -130,20 +131,15 @@ class MyRewardsViewModel extends NavigationModel {
 
   Future<void> filterByCategory(String category) async {
     busy = true;
-    await handleGetRewards();
     if (category == StringsCart.categoryAll) {
-      rewardList = RewardList(rewards: _rewardList.rewards);
+      rewardList = RewardList(rewards: List<Reward>.from(_allRewards));
     } else {
-      List<Reward> filteredList = [];
-      for (var reward in _rewardList.rewards ?? []) {
-        if (reward.category == category) {
-          filteredList.add(reward);
-        }
-      }
+      final filteredList =
+          _allRewards.where((reward) => reward.category == category).toList();
       rewardList = RewardList(rewards: filteredList);
-      busy = false;
     }
     busy = false;
+    notifyListeners();
   }
 
   bool _cartEdited = false;
@@ -213,10 +209,20 @@ class MyRewardsViewModel extends NavigationModel {
   Future<void> handleGetRewards() async {
     Result result = await _getShoppingItemsUseCase.invoke();
     result.when((rewards) {
-      rewardList = rewards;
+      final loadedRewards = (rewards as RewardList).rewards ?? <Reward>[];
+      _allRewards = List<Reward>.from(loadedRewards);
+      rewardList = RewardList(rewards: List<Reward>.from(_allRewards));
+
+      final categories = _allRewards
+          .map((reward) => reward.category.trim())
+          .where((category) => category.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort();
+      rewardCategories = [StringsCart.categoryAll, ...categories];
 
       _rewardPointsMap.clear();
-      for (var reward in (rewards as RewardList).rewards ?? []) {
+      for (var reward in _allRewards) {
         _rewardPointsMap[reward.id] = reward.points;
       }
     }, (error) {
@@ -288,12 +294,7 @@ class MyRewardsViewModel extends NavigationModel {
     return userCart;
   }
 
-  List<String> _rewardCategories = [
-    StringsCart.categoryAll,
-    StringsCart.categoryExperiences,
-    StringsCart.categoryGiftCards,
-    StringsCart.categoryIncentives,
-  ];
+  List<String> _rewardCategories = [StringsCart.categoryAll];
   List<String> get rewardCategories => _rewardCategories;
   set rewardCategories(List<String> categories) {
     _rewardCategories = categories;
@@ -313,6 +314,10 @@ class MyRewardsViewModel extends NavigationModel {
   }
 
   Future<bool> checkOutCart() async {
+    if (_userCart.rewards.isEmpty) {
+      handleShowSnackBar(StringsCart.emptyCartCheckout);
+      return false;
+    }
     navigation.pop();
     busy = true;
     Result result = await _checkOutCartUseCase.invoke(_userCart.id);
@@ -390,6 +395,9 @@ class MyRewardsViewModel extends NavigationModel {
   bool _loadingRecommendations = false;
   bool get loadingRecommendations => _loadingRecommendations;
 
+  String? _recommendationsError;
+  String? get recommendationsError => _recommendationsError;
+
   /// User profile data set externally before fetching recommendations.
   Map<String, dynamic>? userProfileForAI;
 
@@ -397,6 +405,7 @@ class MyRewardsViewModel extends NavigationModel {
     if (_rewardList.rewards == null || _rewardList.rewards!.isEmpty) return;
 
     _loadingRecommendations = true;
+    _recommendationsError = null;
     notifyListeners();
 
     final availableRewards = _rewardList.rewards!.map((r) {
@@ -410,12 +419,13 @@ class MyRewardsViewModel extends NavigationModel {
       };
     }).toList();
 
-    final userProfile = userProfileForAI ?? {
-      'name': 'Usuario',
-      'availablePoints': 0,
-      'monthlyPoints': 0,
-      'company': '',
-    };
+    final userProfile = userProfileForAI ??
+        {
+          'name': 'Usuario',
+          'availablePoints': 0,
+          'monthlyPoints': 0,
+          'company': '',
+        };
 
     final result = await _getRewardRecommendationsUseCase.invoke(
       userProfile: userProfile,
@@ -427,6 +437,8 @@ class MyRewardsViewModel extends NavigationModel {
       log.i("MyRewardsViewModel### Recommendations: ${recs.length}");
     }, (error) {
       log.e("Recommendations error: $error");
+      _recommendationsError =
+          'No pudimos generar recomendaciones en este momento. Intenta de nuevo.';
     });
 
     _loadingRecommendations = false;

@@ -284,8 +284,8 @@ class _FilterDropdown extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-            color: value != null ? colors.accent : colors.border),
+        border:
+            Border.all(color: value != null ? colors.accent : colors.border),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -293,8 +293,8 @@ class _FilterDropdown extends StatelessWidget {
           hint: Text(hint,
               style: GoogleFonts.montserrat(
                   fontSize: 13, color: colors.textMuted)),
-          style: GoogleFonts.montserrat(
-              fontSize: 13, color: colors.textPrimary),
+          style:
+              GoogleFonts.montserrat(fontSize: 13, color: colors.textPrimary),
           dropdownColor: colors.surface,
           onChanged: onChanged,
           items: [
@@ -366,10 +366,8 @@ class _TableHeader extends StatelessWidget {
             child: _HeaderCell(StringsAdmin.colName, colors),
           ),
           Expanded(flex: 2, child: _HeaderCell(StringsAdmin.colRole, colors)),
-          Expanded(
-              flex: 1, child: _HeaderCell(StringsAdmin.colStatus, colors)),
-          Expanded(
-              flex: 2, child: _HeaderCell(StringsAdmin.colPoints, colors)),
+          Expanded(flex: 1, child: _HeaderCell(StringsAdmin.colStatus, colors)),
+          Expanded(flex: 2, child: _HeaderCell(StringsAdmin.colPoints, colors)),
           const SizedBox(width: 80),
         ],
       ),
@@ -398,8 +396,7 @@ class _UserRow extends StatelessWidget {
   final AdminUsersViewModel vm;
   final BondlyColorScheme colors;
 
-  const _UserRow(
-      {required this.user, required this.vm, required this.colors});
+  const _UserRow({required this.user, required this.vm, required this.colors});
 
   @override
   Widget build(BuildContext context) {
@@ -482,22 +479,29 @@ class _UserRow extends StatelessWidget {
               children: [
                 IconButton(
                   icon: Icon(
-                    user.isActive
-                        ? LucideIcons.userX
-                        : LucideIcons.userCheck,
+                    user.isActive ? LucideIcons.userX : LucideIcons.userCheck,
                     size: 16,
                     color: user.isActive ? Colors.red : Colors.green,
                   ),
                   tooltip: user.isActive
                       ? StringsAdmin.deactivateUser
                       : StringsAdmin.activateUser,
-                  onPressed: () => vm.toggleActive(user),
+                  onPressed: () async {
+                    final confirmed = await _confirmUserChange(
+                      context,
+                      title: user.isActive
+                          ? 'Desactivar usuario'
+                          : 'Activar usuario',
+                      message:
+                          '¿Confirmas que deseas ${user.isActive ? 'desactivar' : 'activar'} a ${user.completeName ?? user.email}?',
+                    );
+                    if (confirmed) await vm.toggleActive(user);
+                  },
                 ),
                 IconButton(
                   icon: Icon(LucideIcons.moreVertical,
                       size: 16, color: colors.textMuted),
-                  onPressed: () =>
-                      _showUserMenu(context, user, vm, colors),
+                  onPressed: () => _showUserMenu(context, user, vm, colors),
                 ),
               ],
             ),
@@ -525,13 +529,20 @@ class _UserRow extends StatelessWidget {
                     fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             ListTile(
-              leading: Icon(LucideIcons.shieldCheck,
-                  color: colors.accent, size: 20),
+              leading:
+                  Icon(LucideIcons.shieldCheck, color: colors.accent, size: 20),
               title: Text('Cambiar a Admin',
                   style: GoogleFonts.montserrat(fontSize: 14)),
-              onTap: () {
+              enabled: user.role != 'admin',
+              onTap: () async {
                 Navigator.pop(context);
-                vm.updateRole(user.id, 'admin');
+                final confirmed = await _confirmUserChange(
+                  context,
+                  title: 'Cambiar rol',
+                  message:
+                      '¿Confirmas que deseas asignar el rol Admin a ${user.completeName ?? user.email}?',
+                );
+                if (confirmed) await vm.updateRole(user.id, 'admin');
               },
             ),
             ListTile(
@@ -539,9 +550,16 @@ class _UserRow extends StatelessWidget {
                   Icon(LucideIcons.user, color: colors.textMuted, size: 20),
               title: Text('Cambiar a Cliente',
                   style: GoogleFonts.montserrat(fontSize: 14)),
-              onTap: () {
+              enabled: user.role != 'client',
+              onTap: () async {
                 Navigator.pop(context);
-                vm.updateRole(user.id, 'client');
+                final confirmed = await _confirmUserChange(
+                  context,
+                  title: 'Cambiar rol',
+                  message:
+                      '¿Confirmas que deseas asignar el rol Cliente a ${user.completeName ?? user.email}?',
+                );
+                if (confirmed) await vm.updateRole(user.id, 'client');
               },
             ),
             ListTile(
@@ -554,8 +572,7 @@ class _UserRow extends StatelessWidget {
               },
             ),
             ListTile(
-              leading:
-                  Icon(LucideIcons.mapPin, color: colors.accent, size: 20),
+              leading: Icon(LucideIcons.mapPin, color: colors.accent, size: 20),
               title: Text(StringsAdmin.assignZones,
                   style: GoogleFonts.montserrat(fontSize: 14)),
               onTap: () {
@@ -573,15 +590,48 @@ class _UserRow extends StatelessWidget {
                       ? StringsAdmin.deactivateUser
                       : StringsAdmin.activateUser,
                   style: GoogleFonts.montserrat(fontSize: 14)),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
-                vm.toggleActive(user);
+                final confirmed = await _confirmUserChange(
+                  context,
+                  title:
+                      user.isActive ? 'Desactivar usuario' : 'Activar usuario',
+                  message:
+                      '¿Confirmas que deseas ${user.isActive ? 'desactivar' : 'activar'} a ${user.completeName ?? user.email}?',
+                );
+                if (confirmed) await vm.toggleActive(user);
               },
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<bool> _confirmUserChange(
+    BuildContext context, {
+    required String title,
+    required String message,
+  }) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            backgroundColor: colors.surface,
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text(StringsAdmin.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: const Text('Confirmar'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 
   void _showAdjustPointsDialog(BuildContext context, AdminUser user,
@@ -591,8 +641,7 @@ class _UserRow extends StatelessWidget {
 
     final toGiveCtrl =
         TextEditingController(text: points['to_give'].toString());
-    final earnedCtrl =
-        TextEditingController(text: points['earned'].toString());
+    final earnedCtrl = TextEditingController(text: points['earned'].toString());
 
     showDialog(
       context: context,
@@ -600,7 +649,8 @@ class _UserRow extends StatelessWidget {
         backgroundColor: colors.surface,
         title: Text(
           '${StringsAdmin.adjustPoints} — ${user.completeName ?? user.email}',
-          style: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.bold),
+          style:
+              GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         content: SizedBox(
           width: (MediaQuery.of(context).size.width - 32).clamp(0.0, 400.0),
@@ -660,8 +710,8 @@ class _UserRow extends StatelessWidget {
           backgroundColor: colors.surface,
           title: Text(
             '${StringsAdmin.assignZones} — ${user.completeName ?? user.email}',
-            style:
-                GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.bold),
+            style: GoogleFonts.montserrat(
+                fontSize: 16, fontWeight: FontWeight.bold),
           ),
           content: SizedBox(
             width: (MediaQuery.of(context).size.width - 32).clamp(0.0, 400.0),

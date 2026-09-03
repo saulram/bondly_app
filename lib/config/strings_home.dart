@@ -40,8 +40,7 @@ class StringsHome {
 
   static String feedLikeCount(int count) => '$count me gusta';
   static String feedCommentCount(int count) => '$count comentarios';
-  static String feedViewAllComments(int count) =>
-      'Ver los $count comentarios';
+  static String feedViewAllComments(int count) => 'Ver los $count comentarios';
 
   // Acknowledgment
   static const String acknowledgMentInputHint = 'Escribe tu reconocimiento';
@@ -57,7 +56,15 @@ class StringsHome {
 
   // 3-Step Recognize Flow
   static const String step1ChooseBadge = 'Elige una insignia';
-  static const String step1BadgeCostInfo = 'Cada insignia cuesta 10 puntos';
+  static String badgeCostInfo(Iterable<int> costs) {
+    final values = costs.where((cost) => cost > 0).toSet().toList()..sort();
+    if (values.isEmpty) return 'El costo depende de la insignia seleccionada';
+    if (values.length == 1) {
+      return 'Cada insignia cuesta ${values.first} puntos';
+    }
+    return 'Las insignias cuestan entre ${values.first} y ${values.last} puntos';
+  }
+
   static const String step2SearchLabel = 'A quién quieres reconocer?';
   static const String step2SearchHint = 'Buscar compañero...';
   static const String step2NoResults = 'No se encontraron resultados';
@@ -65,8 +72,7 @@ class StringsHome {
   static const String step3SendButton = 'Enviar reconocimiento';
   static const String acknowledgmentSuccess =
       'Reconocimiento enviado exitosamente';
-  static const String acknowledgmentError =
-      'Error al enviar reconocimiento';
+  static const String acknowledgmentError = 'Error al enviar reconocimiento';
 
   // Embajadas section
   static const String embassySectionTitle = 'Embajadas';

@@ -170,10 +170,15 @@ class _MyCartScreenState extends State<MyCartScreen> {
             title: "Cart",
             floatingActionButton: FloatingActionButton.extended(
               isExtended: true,
-              onPressed: () {
-                showConfirmationModal(context,
-                    rewardsModel.userCart.rewards.length, rewardsModel);
-              },
+              onPressed: rewardsModel.userCart.rewards.isEmpty
+                  ? null
+                  : () {
+                      showConfirmationModal(
+                        context,
+                        rewardsModel.userCart.rewards.length,
+                        rewardsModel,
+                      );
+                    },
               tooltip: "Cart",
               icon: const Icon(LucideIcons.wallet),
               label: const Text(StringsCart.confirm),
@@ -199,41 +204,19 @@ class _MyCartScreenState extends State<MyCartScreen> {
                             ],
                           ),
                         )
-                      : ListView.builder(
-                          itemCount: rewardsModel.userCart.rewards.length,
-                          itemBuilder: (context, index) {
-                            if (index == 0) {
-                              return Column(
-                                children: [
-                                  const CartListHeader(),
-                                  const SizedBox(height: 10),
-                                  CartItemTile(
-                                    item: rewardsModel.userCart.rewards[index],
-                                    model: rewardsModel,
-                                  ),
-                                ],
-                              );
-                            } else if (index ==
-                                rewardsModel.userCart.rewards.length - 2) {
-                              return Column(
-                                children: [
-                                  const SizedBox(height: 10),
-                                  CartItemTile(
-                                    item: rewardsModel.userCart.rewards[index],
-                                    model: rewardsModel,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  CartListFooter(
-                                    total: rewardsModel.userCart.total,
-                                  ),
-                                ],
-                              );
-                            }
-                            return CartItemTile(
-                              item: rewardsModel.userCart.rewards[index],
-                              model: rewardsModel,
-                            );
-                          },
+                      : ListView(
+                          children: [
+                            const CartListHeader(),
+                            const SizedBox(height: 10),
+                            ...rewardsModel.userCart.rewards.map(
+                              (item) => CartItemTile(
+                                item: item,
+                                model: rewardsModel,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            CartListFooter(total: rewardsModel.userCart.total),
+                          ],
                         ),
             ),
           );
@@ -322,8 +305,7 @@ class CartItemTile extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppDimensions.radiusSm),
           image: DecorationImage(
-            image:
-                CachedNetworkImageProvider(safeImageUrl(item.reward.image)),
+            image: CachedNetworkImageProvider(safeImageUrl(item.reward.image)),
             fit: BoxFit.cover,
           ),
         ),

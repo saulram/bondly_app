@@ -14,6 +14,9 @@ class StringsCart {
 
   // Rewards screen
   static const String selectItem = 'Seleccionar';
+  static const String unavailableItem = 'No disponible';
+  static const String emptyCartCheckout =
+      'Agrega al menos una recompensa antes de confirmar el canje.';
   static const String noRewardsAvailable = 'No hay recompensas disponibles';
   static const String validityPrefix = 'Vigencia:';
   static const String pointsSuffix = 'pts';
@@ -25,7 +28,4 @@ class StringsCart {
 
   // Reward categories
   static const String categoryAll = 'Todos';
-  static const String categoryExperiences = 'Experiencias';
-  static const String categoryGiftCards = 'Gift Cards';
-  static const String categoryIncentives = 'Incentivos';
 }

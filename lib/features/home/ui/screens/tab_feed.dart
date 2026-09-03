@@ -93,7 +93,14 @@ class _FeedTabState extends State<FeedTab> {
                     isPersonalized: model.isPersonalized,
                     isLoading: model.personalizingFeed,
                     onToggle: () {
-                      model.toggleFeedPersonalization();
+                      final messenger = ScaffoldMessenger.of(context);
+                      model.toggleFeedPersonalization().then((_) {
+                        final message = model.feedPersonalizationError;
+                        if (!mounted || message == null) return;
+                        messenger.showSnackBar(
+                          SnackBar(content: Text(message)),
+                        );
+                      });
                     },
                   ),
                 ),
@@ -242,7 +249,7 @@ class _FeedTabState extends State<FeedTab> {
       // Comments preview
       showComments: _expandedComments.contains(postId),
       commentsPreview: previewComments,
-      onViewAllCommentsTap: null,
+      onViewAllCommentsTap: () => _showAllComments(post),
       // Comment input
       currentUserAvatarUrl:
           currentUserAvatar != null && currentUserAvatar.isNotEmpty
@@ -251,6 +258,95 @@ class _FeedTabState extends State<FeedTab> {
       commentController: _commentControllers[postId],
       isCommentBusy: _commentBusy.contains(postId),
       onSendComment: () => _handleSendComment(postId, index),
+    );
+  }
+
+  void _showAllComments(FeedData post) {
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheetContext) => SafeArea(
+        child: SizedBox(
+          height: MediaQuery.of(sheetContext).size.height * 0.7,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                child: Text(
+                  StringsHome.feedViewAllComments(post.comments.length),
+                  style: GoogleFonts.montserrat(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: colors.textPrimary,
+                  ),
+                ),
+              ),
+              Divider(height: 1, color: colors.border),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(20),
+                  itemCount: post.comments.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 14),
+                  itemBuilder: (_, index) {
+                    final comment = post.comments[index];
+                    final avatar = safeImageUrl(
+                      comment.user.avatar,
+                      isAvatar: true,
+                    );
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundImage: NetworkImage(avatar),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                comment.user.completeName.trim(),
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: colors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                comment.message ?? '',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 13,
+                                  color: colors.textSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                FeedPostHelpers.formatTimeAgo(
+                                  comment.timeStamp,
+                                ),
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 10,
+                                  color: colors.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

@@ -137,15 +137,15 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
     final homeModel = getIt<HomeViewModel>();
     final currentUserAvatar = homeModel.user?.avatar;
 
-    final previewComments = post.comments
-        .take(2)
-        .map((c) => FeedCommentData(
-              userName: c.user.completeName.trim(),
-              userAvatarUrl: safeImageUrl(c.user.avatar, isAvatar: true),
-              timeAgo: FeedPostHelpers.formatTimeAgo(c.timeStamp),
-              message: c.message ?? '',
-            ))
-        .toList();
+    final previewComments =
+        (_commentsExpanded ? post.comments : post.comments.take(2))
+            .map((c) => FeedCommentData(
+                  userName: c.user.completeName.trim(),
+                  userAvatarUrl: safeImageUrl(c.user.avatar, isAvatar: true),
+                  timeAgo: FeedPostHelpers.formatTimeAgo(c.timeStamp),
+                  message: c.message ?? '',
+                ))
+            .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(
@@ -183,6 +183,9 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
             : null,
         showComments: _commentsExpanded,
         commentsPreview: previewComments,
+        onViewAllCommentsTap: () {
+          setState(() => _commentsExpanded = true);
+        },
         currentUserAvatarUrl:
             currentUserAvatar != null && currentUserAvatar.isNotEmpty
                 ? safeImageUrl(currentUserAvatar, isAvatar: true)
@@ -291,5 +294,4 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
       if (mounted) setState(() => _commentBusy = false);
     }
   }
-
 }

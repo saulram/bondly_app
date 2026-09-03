@@ -62,25 +62,76 @@ class ProfileScreenState extends State<ProfileScreen> {
           body: SafeArea(
             child: model.busy
                 ? _buildLoadingState(colors)
-                : Column(
-                    children: [
-                      _buildTopBar(colors),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              _buildProfileHero(colors, model),
-                              _buildMenuSection(colors),
-                            ],
+                : model.loadError != null && model.user == null
+                    ? _buildErrorState(colors, model)
+                    : Column(
+                        children: [
+                          _buildTopBar(colors),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  _buildProfileHero(colors, model),
+                                  _buildMenuSection(colors),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
+                          _buildBottomSection(colors, model),
+                        ],
                       ),
-                      _buildBottomSection(colors, model),
-                    ],
-                  ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildErrorState(
+    BondlyColorScheme colors,
+    ProfileViewModel model,
+  ) {
+    return Column(
+      children: [
+        _buildTopBar(colors),
+        Expanded(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppDimensions.paddingScreen),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(LucideIcons.circleAlert,
+                      size: 48, color: colors.textMuted),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No pudimos cargar tu perfil',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Revisa tu conexión e inténtalo nuevamente.',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 13,
+                      color: colors.textMuted,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  FilledButton.icon(
+                    onPressed: () => model.load(),
+                    icon: const Icon(LucideIcons.refreshCw, size: 16),
+                    label: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -488,7 +539,8 @@ class ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(LucideIcons.logOut, size: 18, color: BondlyColors.white),
+                  const Icon(LucideIcons.logOut,
+                      size: 18, color: BondlyColors.white),
                   const SizedBox(width: 8),
                   Text(
                     StringsProfile.closeSession,

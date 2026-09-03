@@ -107,6 +107,7 @@ void main() {
     test('initial state has empty recommendations', () {
       expect(viewModel.recommendations, isEmpty);
       expect(viewModel.loadingRecommendations, isFalse);
+      expect(viewModel.recommendationsError, isNull);
     });
 
     test('handleGetRecommendations returns when rewards list is empty',
@@ -165,6 +166,7 @@ void main() {
 
       expect(viewModel.recommendations, isEmpty);
       expect(viewModel.loadingRecommendations, isFalse);
+      expect(viewModel.recommendationsError, isNotNull);
     });
 
     test('handleGetRecommendations uses userProfileForAI when set', () async {

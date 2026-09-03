@@ -23,6 +23,7 @@ class ProfileViewModel extends NavigationModel {
   User? user;
   UserProfile? userProfile;
   bool showUserUpdateError = false;
+  Exception? loadError;
 
   int? _spendableBalance;
   int? get spendableBalance => _spendableBalance;
@@ -36,6 +37,7 @@ class ProfileViewModel extends NavigationModel {
 
   Future<void> load({bool remote = true}) async {
     busy = true;
+    loadError = null;
     notifyListeners();
 
     Result<User, Exception> result = await userUseCase.invoke(remote: remote);
@@ -120,8 +122,10 @@ class ProfileViewModel extends NavigationModel {
   void handleError(Exception error) {
     if (error is UserUnavailableException) {
       closeSession();
+    } else {
+      loadError = error;
+      notifyListeners();
     }
-    load(remote: false);
     Logger().e(error);
   }
 }

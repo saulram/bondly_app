@@ -353,9 +353,84 @@ class _AmbassadorsTabState extends State<AmbassadorsTab> {
       gradientColors: gradientColors,
       icon: icon,
       imageUrl: badge?.image,
-      onTap: () {
-        // TODO(BONDLY): Navigate to badge detail screen
-      },
+      onTap: () => _showEmbassyDetail(embassy, badgeType),
+    );
+  }
+
+  void _showEmbassyDetail(Embassy embassy, BadgeType badgeType) {
+    final colors = Theme.of(context).extension<BondlyColorScheme>()!;
+    final badge = embassy.badgeId;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: colors.surface,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 4, 24, 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: _gradientColorsForType(badgeType),
+                  ),
+                ),
+                child: badge?.image?.isNotEmpty == true
+                    ? ClipOval(
+                        child: Image.network(
+                          badge!.image!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(
+                            _iconForType(badgeType),
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        ),
+                      )
+                    : Icon(
+                        _iconForType(badgeType),
+                        color: Colors.white,
+                        size: 32,
+                      ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                badge?.name ?? 'Insignia',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.montserrat(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: colors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                _categoryLabelForType(badgeType),
+                style: GoogleFonts.montserrat(
+                  fontSize: 13,
+                  color: colors.accent,
+                ),
+              ),
+              if (embassy.date != null) ...[
+                const SizedBox(height: 6),
+                Text(
+                  '${embassy.date!.day.toString().padLeft(2, '0')}/'
+                  '${embassy.date!.month.toString().padLeft(2, '0')}/'
+                  '${embassy.date!.year}',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 12,
+                    color: colors.textMuted,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 

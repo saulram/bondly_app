@@ -69,16 +69,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     // Body (PageView for tabs)
                     Expanded(
-                      child: PageView(
-                        physics: const NeverScrollableScrollPhysics(),
-                        controller: model.pageController,
-                        onPageChanged: model.onPageChanged,
-                        children: [
-                          FeedTab(model: model),
-                          RecognizeTab(model: model),
-                          AmbassadorsTab(model: model),
-                        ],
-                      ),
+                      child: model.userLoadError != null
+                          ? _buildUserLoadError(colors)
+                          : PageView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              controller: model.pageController,
+                              onPageChanged: model.onPageChanged,
+                              children: [
+                                FeedTab(model: model),
+                                RecognizeTab(model: model),
+                                AmbassadorsTab(model: model),
+                              ],
+                            ),
                     ),
                     // Bottom Tab Bar (hidden on desktop — sidebar handles navigation)
                     if (MediaQuery.of(context).size.width <=
@@ -93,6 +95,32 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildUserLoadError(BondlyColorScheme colors) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_outlined, size: 48, color: colors.textMuted),
+            const SizedBox(height: 16),
+            Text(
+              model.userLoadError!,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: colors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: model.setUp,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Reintentar'),
+            ),
+          ],
+        ),
       ),
     );
   }

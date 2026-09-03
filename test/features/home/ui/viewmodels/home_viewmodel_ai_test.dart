@@ -140,6 +140,7 @@ void main() {
     test('initial state is not personalized', () {
       expect(viewModel.isPersonalized, isFalse);
       expect(viewModel.personalizingFeed, isFalse);
+      expect(viewModel.feedPersonalizationError, isNull);
       expect(viewModel.feedPersonalization, isNull);
     });
 
@@ -225,6 +226,7 @@ void main() {
 
       expect(viewModel.isPersonalized, isFalse);
       expect(viewModel.personalizingFeed, isFalse);
+      expect(viewModel.feedPersonalizationError, isNotNull);
     });
 
     test('toggleFeedPersonalization preserves feeds not in AI response',

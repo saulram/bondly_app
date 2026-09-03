@@ -15,7 +15,7 @@ import 'package:bondly_app/features/admin/ui/screens/admin_suggestions_screen.da
 import 'package:bondly_app/features/admin/ui/screens/admin_shell_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_users_screen.dart';
 import 'package:bondly_app/features/admin/ui/screens/admin_zones_screen.dart';
-import 'package:bondly_app/features/home/ui/viewmodels/home_viewmodel.dart';
+import 'package:bondly_app/features/auth/domain/usecases/user_usecase.dart';
 import 'package:bondly_app/features/auth/ui/screens/forgot_password_screen.dart';
 import 'package:bondly_app/features/auth/ui/screens/login_screen.dart';
 import 'package:bondly_app/features/auth/ui/screens/reset_password_confirmation_screen.dart';
@@ -100,16 +100,15 @@ class AppRouter {
           }),
       GoRoute(
           path: ResetPasswordConfirmationScreen.route,
-          builder: (context, state) =>
-              const ResetPasswordConfirmationScreen()),
+          builder: (context, state) => const ResetPasswordConfirmationScreen()),
       // Admin panel shell — guarded: only admin/superAdmin
       ShellRoute(
-        redirect: (context, state) {
-          final user = getIt<HomeViewModel>().user;
-          if (user == null || !user.isAdmin) {
-            return HomeScreen.route;
-          }
-          return null;
+        redirect: (context, state) async {
+          final result = await getIt<UserUseCase>().invoke(remote: true);
+          return result.when(
+            (user) => user.isAdmin ? null : HomeScreen.route,
+            (_) => LoginScreen.route,
+          );
         },
         builder: (context, state, child) => AdminShellScreen(
           breadcrumbs: _adminBreadcrumbs(state.uri.path),
@@ -118,8 +117,8 @@ class AppRouter {
         routes: [
           GoRoute(
             path: '/admin',
-            pageBuilder: (context, state) => _fadePage(
-                state, const AdminDashboardScreen()),
+            pageBuilder: (context, state) =>
+                _fadePage(state, const AdminDashboardScreen()),
           ),
           GoRoute(
             path: AdminUsersScreen.route,

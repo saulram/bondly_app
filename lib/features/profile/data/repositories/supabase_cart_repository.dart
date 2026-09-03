@@ -60,7 +60,8 @@ class SupabaseCartRepository extends CartRepository {
       if (cartItems != null && cartItems.isNotEmpty) {
         final rows = cartItems.map((item) {
           // item is a CartItem domain object
-          final rewardId = item is Map ? item['reward_id'] : item.reward.id;
+          final rewardId =
+              item is Map ? item['reward_id'] ?? item['id'] : item.reward.id;
           final quantity = item is Map ? item['quantity'] : item.quantity;
           return {
             'cart_id': cartId,

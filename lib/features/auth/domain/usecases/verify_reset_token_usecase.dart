@@ -6,12 +6,13 @@ class VerifyResetTokenUseCase {
 
   VerifyResetTokenUseCase(this._repository);
 
-  Future<Result<bool, Exception>> invoke(String token) async {
+  Future<Result<bool, Exception>> invoke(String email, String token) async {
+    final trimmedEmail = email.trim();
     final trimmed = token.trim();
-    if (trimmed.isEmpty || trimmed.length < 6) {
+    if (trimmedEmail.isEmpty || trimmed.isEmpty || trimmed.length < 6) {
       return Result.error(EmptyLoginFieldsException());
     }
 
-    return _repository.verifyResetToken(trimmed);
+    return _repository.verifyResetToken(trimmedEmail, trimmed);
   }
 }

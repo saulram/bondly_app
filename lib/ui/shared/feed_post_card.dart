@@ -272,8 +272,7 @@ class FeedPostCard extends StatelessWidget {
     // Like label: count "N" when likeCount > 0, otherwise "Me gusta"
     final likeLabel =
         likeCount > 0 ? likeCount.toString() : StringsHome.feedLike;
-    final likeFontWeight =
-        likeCount > 0 ? FontWeight.w600 : FontWeight.w500;
+    final likeFontWeight = likeCount > 0 ? FontWeight.w600 : FontWeight.w500;
 
     // Comment label: count "N" when commentCount > 0, otherwise "Comentar"
     final commentLabel =
@@ -364,7 +363,7 @@ class FeedPostCard extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: _buildCommentBubble(c, colors),
               )),
-          if (commentCount > 2)
+          if (commentCount > 2 && commentsPreview.length < commentCount)
             GestureDetector(
               onTap: onViewAllCommentsTap,
               behavior: HitTestBehavior.opaque,
@@ -486,8 +485,8 @@ class FeedPostCard extends StatelessWidget {
                   : null,
             ),
             child: currentUserAvatarUrl == null
-                ? const Icon(
-                    LucideIcons.user, size: 12, color: BondlyColors.white)
+                ? const Icon(LucideIcons.user,
+                    size: 12, color: BondlyColors.white)
                 : null,
           ),
           const SizedBox(width: 10),
